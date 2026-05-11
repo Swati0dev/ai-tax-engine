@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TaxCategory {
+  DIRECT_TAX
+  INDIRECT_TAX
+}
+
+enum ReviewStatus {
+  VERIFIED
+  NEEDS_REVIEW
+  OUTDATED
+  DRAFT
+}
+
+enum SourceType {
+  OFFICIAL
+  PROJECT_APPROVED
+  ORIENTATION_ONLY
+}
+
+model TaxKnowledgeItem {
+  id                   String            @id @default(cuid())
+  category             TaxCategory
+  actName              String
+  sectionNumber        String?
+  title                String
+  summary              String
+  explanation          String
+  applicability        String[]
+  benefitsOrDeductions String[]
+  restrictions         String[]
+  examples             String[]
+  relatedForms         String[]
+  filingProcedure      String[]
+  relatedItems         String[]
+  effectiveFrom        DateTime?
+  lastReviewed         DateTime          @default(now())
+  reviewStatus         ReviewStatus      @default(DRAFT)
+  
+  sourceReferences     SourceReference[]
+  
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  @@index([category])
+  @@index([reviewStatus])
+}
+
+model SourceReference {
+  id          String           @id @default(cuid())
+  title       String
+  url         String
+  sourceType  SourceType       @default(OFFICIAL)
+  publishedAt DateTime?
+  accessedAt  DateTime         @default(now())
+  
+  knowledgeItem   TaxKnowledgeItem @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
+  knowledgeItemId String
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([knowledgeItemId])
+}

@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --primary: 196 64% 24%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 204 100% 97%;
+  --secondary-foreground: 196 64% 15%;
+  --muted: 210 40% 94%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 38 92% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 196 64% 24%;
+  --radius: 1rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
+  }
+  
+  .soft-ui-card {
+    @apply bg-card border border-border/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 hover:border-primary/20 rounded-2xl;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-primary via-primary/80 to-accent;
+  }
+
+  .btn-premium {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+  
+  .icon-box {
+    @apply h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shadow-inner;
+  }
+}
+
+a, button {
+  @apply cursor-pointer;
+}
+
+a {
+  text-underline-offset: 4px;
+}
