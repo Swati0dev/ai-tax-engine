@@ -2,21 +2,34 @@
 
 import { prisma } from "@/lib/db";
 import { TaxCategory, ReviewStatus } from "@prisma/client";
+import { unstable_cache } from "next/cache";
+import { logger } from "@/lib/logger";
+
+
 
 export async function getKnowledgeItems(category?: TaxCategory) {
   try {
-    const items = await prisma.taxKnowledgeItem.findMany({
-      where: {
-        ...(category ? { category } : {}),
-        reviewStatus: ReviewStatus.VERIFIED
+    const fetchItems = unstable_cache(
+      async (cat?: TaxCategory) => {
+        return await prisma.taxKnowledgeItem.findMany({
+          where: {
+            ...(cat ? { category: cat } : {}),
+            reviewStatus: ReviewStatus.VERIFIED
+          },
+          include: {
+            sourceReferences: true
+          },
+          orderBy: {
+            updatedAt: "desc"
+          }
+        });
       },
-      include: {
-        sourceReferences: true
-      },
-      orderBy: {
-        updatedAt: "desc"
-      }
-    });
+      [`knowledge-items-${category || 'all'}`],
+      { tags: ['tax-content'], revalidate: 3600 } // Cache for 1 hour
+    );
+
+    const items = await fetchItems(category);
+
 
     // Serialize Dates for Client Components
     const serializedItems = items.map(item => ({
@@ -36,19 +49,29 @@ export async function getKnowledgeItems(category?: TaxCategory) {
 
     return { success: true, data: serializedItems };
   } catch (error) {
-    console.error("Error fetching knowledge items:", error);
+    logger.error("Error fetching knowledge items", { error, category });
     return { success: false, error: "Failed to fetch tax knowledge items." };
   }
+
 }
 
 export async function getKnowledgeItemById(id: string) {
   try {
-    const item = await prisma.taxKnowledgeItem.findUnique({
-      where: { id },
-      include: {
-        sourceReferences: true
-      }
-    });
+    const fetchItem = unstable_cache(
+      async (itemId: string) => {
+        return await prisma.taxKnowledgeItem.findUnique({
+          where: { id: itemId },
+          include: {
+            sourceReferences: true
+          }
+        });
+      },
+      [`knowledge-item-${id}`],
+      { tags: ['tax-content'], revalidate: 3600 }
+    );
+
+    const item = await fetchItem(id);
+
 
     if (!item) {
       return { success: false, error: "Knowledge item not found." };
@@ -72,30 +95,40 @@ export async function getKnowledgeItemById(id: string) {
 
     return { success: true, data: serializedItem };
   } catch (error) {
-    console.error("Error fetching knowledge item by ID:", error);
+    logger.error("Error fetching knowledge item by ID", { error, id });
     return { success: false, error: "Failed to fetch tax knowledge item." };
   }
+
 }
 
 export async function getFormsAndProcedures() {
   try {
-    const items = await prisma.taxKnowledgeItem.findMany({
-      where: {
-        reviewStatus: ReviewStatus.VERIFIED,
-        OR: [
-          { relatedForms: { isEmpty: false } },
-          { filingProcedure: { isEmpty: false } }
-        ]
+    const fetchForms = unstable_cache(
+      async () => {
+        return await prisma.taxKnowledgeItem.findMany({
+          where: {
+            reviewStatus: ReviewStatus.VERIFIED,
+            OR: [
+              { relatedForms: { isEmpty: false } },
+              { filingProcedure: { isEmpty: false } }
+            ]
+          },
+          select: {
+            id: true,
+            title: true,
+            relatedForms: true,
+            filingProcedure: true,
+            category: true,
+            sectionNumber: true
+          }
+        });
       },
-      select: {
-        id: true,
-        title: true,
-        relatedForms: true,
-        filingProcedure: true,
-        category: true,
-        sectionNumber: true
-      }
-    });
+      ['forms-and-procedures'],
+      { tags: ['tax-content'], revalidate: 3600 }
+    );
+
+    const items = await fetchForms();
+
 
     return { success: true, data: items };
   } catch (error) {

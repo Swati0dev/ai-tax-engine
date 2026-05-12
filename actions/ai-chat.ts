@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/db";
 import { ReviewStatus } from "@prisma/client";
+import { logger } from "@/lib/logger";
+
 
 const EVASION_KEYWORDS = [
   "hide income", "black money", "evade tax", "avoid tax illegally", 
@@ -16,7 +18,9 @@ export async function processAIChat(query: string) {
   
   // 1. Safety Guardrail
   if (EVASION_KEYWORDS.some(keyword => normalizedQuery.includes(keyword))) {
+    logger.safety("Safety guardrail triggered", { query });
     return {
+
       success: true,
       data: {
         role: "assistant",
@@ -83,6 +87,8 @@ export async function processAIChat(query: string) {
 
     response += `\nFor a full breakdown, you can view the [Detail Page](${primaryDoc.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${primaryDoc.id}).`;
 
+    logger.info("AI Chat successful", { query, resultsCount: groundedDocs.length });
+
     return {
       success: true,
       data: {
@@ -92,7 +98,10 @@ export async function processAIChat(query: string) {
       }
     };
 
+
   } catch (error) {
+    logger.error("AI Chat Error", { error, query });
     return { success: false, error: "I encountered an error while processing your request." };
   }
+
 }
