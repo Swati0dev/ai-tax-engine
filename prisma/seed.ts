@@ -19,6 +19,7 @@ async function main() {
     data: {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
+      slug: "section-80c",
       sectionNumber: "Section 80C",
       title: "Deduction for Investments and Savings",
       summary: "Allows deductions up to ₹1.5 Lakh for specific investments like EPF, PPF, and ELSS.",
@@ -41,6 +42,7 @@ async function main() {
     data: {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
+      slug: "section-80d",
       sectionNumber: "Section 80D",
       title: "Deduction for Medical Insurance Premium",
       summary: "Allows deduction for premium paid for health insurance for self, family, and parents.",
@@ -63,6 +65,7 @@ async function main() {
     data: {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
+      slug: "section-24b",
       sectionNumber: "Section 24(b)",
       title: "Interest on Home Loan Deduction",
       summary: "Deduction on interest paid for a home loan for a self-occupied or let-out property.",
@@ -84,6 +87,7 @@ async function main() {
     data: {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Act, 2017",
+      slug: "gst-registration",
       sectionNumber: "Section 22",
       title: "GST Registration Thresholds",
       summary: "Mandatory registration for businesses exceeding specific turnover limits.",
@@ -105,6 +109,7 @@ async function main() {
     data: {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
+      slug: "section-10-13a-hra",
       sectionNumber: "Section 10(13A)",
       title: "House Rent Allowance (HRA) Exemption",
       summary: "Exemption for rent paid by salaried individuals who receive HRA from their employer.",
@@ -127,6 +132,7 @@ async function main() {
     data: {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Act, 2017",
+      slug: "gst-composition",
       sectionNumber: "Section 10",
       title: "GST Composition Scheme",
       summary: "A simplified tax scheme for small businesses with lower compliance and fixed tax rates.",
@@ -148,6 +154,7 @@ async function main() {
     data: {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Rules",
+      slug: "itr-1-guide",
       sectionNumber: "ITR-1",
       title: "ITR-1 (Sahaj) Filing Guide",
       summary: "Simplified income tax return for individuals with income from salary, one house property, and other sources.",
@@ -169,6 +176,7 @@ async function main() {
     data: {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Rules",
+      slug: "itr-4-guide",
       sectionNumber: "ITR-4",
       title: "ITR-4 (Sugam) Filing Guide",
       summary: "Tax return for individuals, HUFs, and firms opting for presumptive taxation schemes.",
@@ -190,6 +198,7 @@ async function main() {
     data: {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Rules",
+      slug: "gstr-3b-guide",
       sectionNumber: "GSTR-3B",
       title: "GSTR-3B Filing Procedure",
       summary: "Monthly/Quarterly summary return for regular GST taxpayers to declare sales, claim ITC, and pay tax.",

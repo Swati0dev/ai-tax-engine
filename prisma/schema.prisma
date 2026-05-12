@@ -28,6 +28,7 @@ model TaxKnowledgeItem {
   id                   String            @id @default(cuid())
   category             TaxCategory
   actName              String
+  slug                 String            @unique
   sectionNumber        String?
   title                String
   summary              String

@@ -34,10 +34,19 @@ Decision: The project phase system uses ten phases covering planning, scaffold a
 
 Reason: The original six-phase plan grouped database, deployment, optimization, and maintenance concerns too broadly for a scalable Next.js, Neon, Prisma, GitHub, and Vercel platform.
 
-## Pending Decisions
+### 2026-05-12 - Stable Slugs for Tax Knowledge
+Decision: Tax knowledge items use a unique, human-readable `slug` for stable URLs instead of database `cuid`.
+Reason: `cuid` changes on re-seeds, which breaks bookmarks and shared links. Slugs (e.g., `section-80c`) provide stability and SEO benefits.
 
-- Exact AI model/provider integration.
-- Search implementation approach.
-- Tax data storage format: JSON, TypeScript modules, database, or hybrid.
+### 2026-05-12 - Tax Data Storage
+Decision: Tax data is stored in a Neon/PostgreSQL database via Prisma.
+Reason: Database storage allows for complex querying, AI search grounding, and easy updates via seeding or an admin UI.
+
+### 2026-05-12 - Search Implementation
+Decision: Search is implemented using Prisma's `contains` operator with `insensitive` mode across title, summary, and section fields.
+Reason: Sufficient for MVP needs. If complexity grows, we will move to PostgreSQL Full-Text Search or Vector Search (pgvector).
+
+## Pending Decisions
+- Exact AI model/provider integration (Currently simulated).
 - Admin/content editing interface strategy.
 - Privacy and retention policy for user chat/query data.

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 interface FormProcedureCardProps {
   item: {
     id: string;
+    slug: string;
     title: string;
     relatedForms: string[];
     filingProcedure: string[];
@@ -14,7 +15,7 @@ interface FormProcedureCardProps {
 }
 
 export function FormProcedureCard({ item }: FormProcedureCardProps) {
-  const detailPath = `${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.id}`;
+  const detailPath = `${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`;
 
   return (
     <div className="soft-ui-card p-6 md:p-8 rounded-3xl flex flex-col gap-6 group hover:border-primary/30 transition-all">

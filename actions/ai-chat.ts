@@ -85,7 +85,7 @@ export async function processAIChat(query: string) {
       });
     }
 
-    response += `\nFor a full breakdown, you can view the [Detail Page](${primaryDoc.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${primaryDoc.id}).`;
+    response += `\nFor a full breakdown, you can view the [Detail Page](${primaryDoc.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${primaryDoc.slug}).`;
 
     logger.info("AI Chat successful", { query, resultsCount: groundedDocs.length });
 

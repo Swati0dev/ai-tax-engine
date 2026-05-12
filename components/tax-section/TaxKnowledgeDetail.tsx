@@ -135,17 +135,55 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
             </div>
 
             {/* Procedures & Forms */}
-            <div className="space-y-6">
-              <h4 className="text-sm font-black uppercase tracking-widest text-foreground/60 px-2">Filing Procedures</h4>
-              <div className="space-y-4">
-                {item.filingProcedure.map((step, idx) => (
-                  <div key={idx} className="flex gap-4 items-start p-4 rounded-2xl bg-muted/30 border border-transparent hover:border-primary/20 transition-all">
-                    <span className="h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                      {idx + 1}
-                    </span>
-                    <p className="text-sm text-muted-foreground font-medium leading-tight">{step}</p>
+            <div className="space-y-10">
+              {/* Required Forms */}
+              {item.relatedForms.length > 0 && (
+                <div className="space-y-6">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-foreground/60 px-2 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Required Forms
+                  </h4>
+                  <div className="flex flex-wrap gap-2 px-2">
+                    {item.relatedForms.map((form, idx) => (
+                      <span key={idx} className="px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/20 text-xs font-bold text-primary">
+                        {form}
+                      </span>
+                    ))}
                   </div>
-                ))}
+                </div>
+              )}
+
+              {/* Restrictions Section */}
+              {item.restrictions.length > 0 && (
+                <div className="space-y-6">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-foreground/60 px-2 flex items-center gap-2">
+                    <Scale className="h-4 w-4 text-amber-500" />
+                    Important Restrictions
+                  </h4>
+                  <div className="space-y-3 px-2">
+                    {item.restrictions.map((res, idx) => (
+                      <div key={idx} className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 text-sm text-muted-foreground font-medium flex items-start gap-3">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
+                        {res}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Filing Procedures */}
+              <div className="space-y-6">
+                <h4 className="text-sm font-black uppercase tracking-widest text-foreground/60 px-2">Filing Procedures</h4>
+                <div className="space-y-4">
+                  {item.filingProcedure.map((step, idx) => (
+                    <div key={idx} className="flex gap-4 items-start p-4 rounded-2xl bg-muted/30 border border-transparent hover:border-primary/20 transition-all">
+                      <span className="h-7 w-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                        {idx + 1}
+                      </span>
+                      <p className="text-sm text-muted-foreground font-medium leading-tight">{step}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

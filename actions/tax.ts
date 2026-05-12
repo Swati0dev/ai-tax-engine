@@ -55,22 +55,22 @@ export async function getKnowledgeItems(category?: TaxCategory) {
 
 }
 
-export async function getKnowledgeItemById(id: string) {
+export async function getKnowledgeItemBySlug(slug: string) {
   try {
     const fetchItem = unstable_cache(
-      async (itemId: string) => {
+      async (itemSlug: string) => {
         return await prisma.taxKnowledgeItem.findUnique({
-          where: { id: itemId },
+          where: { slug: itemSlug },
           include: {
             sourceReferences: true
           }
         });
       },
-      [`knowledge-item-${id}`],
+      [`knowledge-item-${slug}`],
       { tags: ['tax-content'], revalidate: 3600 }
     );
 
-    const item = await fetchItem(id);
+    const item = await fetchItem(slug);
 
 
     if (!item) {
@@ -95,7 +95,7 @@ export async function getKnowledgeItemById(id: string) {
 
     return { success: true, data: serializedItem };
   } catch (error) {
-    logger.error("Error fetching knowledge item by ID", { error, id });
+    logger.error("Error fetching knowledge item by slug", { error, slug });
     return { success: false, error: "Failed to fetch tax knowledge item." };
   }
 
@@ -115,6 +115,7 @@ export async function getFormsAndProcedures() {
           },
           select: {
             id: true,
+            slug: true,
             title: true,
             relatedForms: true,
             filingProcedure: true,

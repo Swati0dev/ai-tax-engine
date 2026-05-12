@@ -41,8 +41,8 @@ export default async function FormsPage() {
             </div>
           ) : (
             <EmptyState 
-              title="Forms and procedures will be added during the tax knowledge phase after source review." 
-              description="No tax-law explanation is shown here until the content has a source-backed record and review status." 
+              title="Tax forms and filing procedures are being reviewed for compliance." 
+              description="Detailed guides for ITR and GST forms will appear here once verified by our legal audit team." 
             />
           )}
         </div>
