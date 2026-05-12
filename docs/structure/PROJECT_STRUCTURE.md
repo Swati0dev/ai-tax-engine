@@ -63,6 +63,8 @@ Read this file before creating, moving, or reorganizing project files.
         route.ts
       search/
         route.ts
+    error.tsx
+    not-found.tsx
     chat/
       page.tsx
     direct-tax/
@@ -96,6 +98,7 @@ Read this file before creating, moving, or reorganizing project files.
     validation/
     db/
     ai/
+    logger.ts
   types/
     tax.ts
   prisma/
