@@ -20,7 +20,7 @@ export function CategoryPageShell({ category, description, emptyState, items = [
       />
 
       {/* Main Content */}
-      <main className="bg-muted/10 py-12 lg:py-24 flex-1">
+      <main className="relative z-10 bg-background py-12 lg:py-24 flex-1 shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           {items.length > 0 ? (
             <div className="flex flex-col gap-8">

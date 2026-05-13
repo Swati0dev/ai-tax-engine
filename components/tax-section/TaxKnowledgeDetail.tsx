@@ -23,7 +23,7 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
       />
 
       {/* Meta Info Bar */}
-      <div className="bg-muted/30 border-b py-4">
+      <div className="relative z-10 bg-background border-b py-4 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-wrap items-center gap-4">
           <ReviewBadge status={item.reviewStatus} />
           {item.sectionNumber && (
@@ -39,8 +39,9 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
       </div>
 
       {/* Detail Content */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
+      <main className="relative z-10 bg-background mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 md:py-20 shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           
           {/* Main Info Column */}
           <div className="lg:col-span-8 space-y-16">

@@ -20,10 +20,10 @@ export function PageHero({
   className
 }: PageHeroProps) {
   return (
-    <section className={cn("relative w-full min-h-[500px] flex items-center justify-center overflow-hidden border-b", className)}>
-      {/* Background Image with Overlay */}
+    <div className={cn("relative w-full h-[60vh] lg:h-[70vh] overflow-visible", className)}>
+      {/* Sticky Background Image Container */}
       {image && (
-        <div className="absolute inset-0 -z-10">
+        <div className="sticky top-0 left-0 w-full h-[60vh] lg:h-[70vh] -z-10 overflow-hidden">
           <Image
             src={image}
             alt={title}
@@ -31,14 +31,15 @@ export function PageHero({
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" /> {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" /> {/* Overlay */}
         </div>
       )}
       
-      {!image && <div className="absolute inset-0 -z-10 hero-gradient" />}
+      {!image && <div className="sticky top-0 left-0 w-full h-[60vh] lg:h-[70vh] -z-10 hero-gradient" />}
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <div className="flex flex-col items-center space-y-8">
+      {/* Content that stays centered during scroll or moves up */}
+      <div className="absolute inset-0 flex items-center justify-center text-center px-4 sm:px-6 lg:px-8 z-10">
+        <div className="flex flex-col items-center space-y-8 max-w-4xl">
           <div className="flex flex-wrap justify-center gap-4 text-xs font-bold tracking-widest uppercase">
             {readingTime && (
               <span className="flex items-center gap-1.5 bg-white/10 text-white px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
@@ -54,7 +55,7 @@ export function PageHero({
             )}
           </div>
           
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] max-w-4xl">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1]">
             {title}
           </h1>
           
@@ -63,6 +64,6 @@ export function PageHero({
           </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
