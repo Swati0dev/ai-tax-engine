@@ -25,4 +25,5 @@ This skill provides instructions on how to manage the lifecycle of a feature usi
 
 ## Agent Instructions
 - Always reference the `.speckit` folder as the source of truth for "What" and "How".
+- **Append Only for Logs**: When updating `fixes_log.md` or `WALKTHROUGH.md`, always append new entries at the bottom. Do not overwrite or delete previous history.
 - Do not deviate from the approved plan without updating it first.
