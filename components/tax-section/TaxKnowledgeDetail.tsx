@@ -1,5 +1,4 @@
-import { BookOpen, Scale, FileText, CheckCircle2, ListChecks, ArrowLeft, AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { BookOpen, Scale, FileText, CheckCircle2, ListChecks, AlertCircle } from "lucide-react";
 import { TaxKnowledgeItem } from "@/types/tax";
 import { ReviewBadge } from "./ReviewBadge";
 import { SourceBlock } from "./SourceBlock";
@@ -10,7 +9,6 @@ interface TaxKnowledgeDetailProps {
 }
 
 export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
-  const backPath = item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax";
 
   return (
     <div className="flex flex-col w-full pb-20">
@@ -186,6 +184,7 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
               </div>
             )}
           </aside>
+          </div>
         </div>
       </main>
     </div>
