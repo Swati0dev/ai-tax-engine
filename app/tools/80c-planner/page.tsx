@@ -17,7 +17,7 @@ export default function InvestmentPlannerPage() {
         image="https://images.unsplash.com/photo-1454165833767-027ffea9e772?q=80&w=2070&auto=format&fit=crop"
       />
 
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-[-100px] relative z-20">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 relative z-20">
         <Breadcrumbs />
         <InvestmentPlanner80C />
         
