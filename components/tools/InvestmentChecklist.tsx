@@ -63,7 +63,7 @@ export function InvestmentChecklist({ data, setData }: Props) {
                 type="number"
                 placeholder="0"
                 value={data[cat.id as keyof InvestmentData] || ""}
-                onChange={(e) => handleChange(cat.id, e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(cat.id, e.target.value)}
                 className="pl-8 bg-white/50 border-primary/5 focus:border-primary/30 rounded-xl font-mono font-bold text-lg transition-all shadow-inner"
               />
             </div>

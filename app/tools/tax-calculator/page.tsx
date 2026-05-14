@@ -24,7 +24,7 @@ export default function TaxCalculatorPage() {
         {/* Additional Info Section */}
         <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold">What's new in FY 2024-25?</h3>
+            <h3 className="text-2xl font-bold">What&apos;s new in FY 2024-25?</h3>
             <div className="space-y-4 text-muted-foreground font-medium leading-relaxed">
               <p>
                 In the July 2024 Union Budget, the **New Tax Regime** was further incentivized to make it the default choice for most taxpayers.

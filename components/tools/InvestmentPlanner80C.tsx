@@ -2,9 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { InvestmentChecklist, InvestmentData } from "./InvestmentChecklist";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, TrendingUp, AlertCircle, Target, Sparkles, ArrowRight } from "lucide-react";
+import { ShieldCheck, TrendingUp, AlertCircle, Target, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function InvestmentPlanner80C() {

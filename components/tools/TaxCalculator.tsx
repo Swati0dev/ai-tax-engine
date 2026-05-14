@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import { CalculatorInputs } from "./CalculatorInputs";
 import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { TrendingDown, Info, Landmark, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
