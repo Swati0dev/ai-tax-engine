@@ -4,12 +4,18 @@ This skill provides instructions on how to manage the lifecycle of a feature usi
 
 ## Workflow Phases
 
-### 1. Specify (Requirement Capture)
+### 1. Understand & Comprehend (New Protocol)
+- Analyze the user request.
+- Explain the task in your own words.
+- **STOP**: Wait for user approval before proceeding to any technical design or code changes.
+- Ensure all Knowledge Base additions follow "The 80C Standard" (Detailed text + Infographics).
+
+### 2. Specify (Requirement Capture)
 - Read or update `.speckit/specify.md`.
 - Ensure requirements are clear and source-grounded.
 - Update the version or timestamp in the spec.
 
-### 2. Plan (Technical Design)
+### 3. Plan (Technical Design)
 - Based on the spec, update `.speckit/plan.md`.
 - Group changes by components.
 - Outline the technical strategy and dependencies.
