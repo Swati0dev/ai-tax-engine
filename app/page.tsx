@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileSearch, MessageSquareText, ShieldCheck, BookOpen, Receipt, CheckCircle2 } from "lucide-react";
+import { ArrowRight, FileSearch, MessageSquareText, ShieldCheck, BookOpen, Receipt, CheckCircle2, TrendingDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/tax-section/SearchBar";
@@ -25,6 +25,20 @@ const entryPoints = [
     href: "/indirect-tax",
     icon: Receipt,
     color: "text-blue-600"
+  },
+  {
+    title: "Tax Calculator",
+    description: "Compare Old vs New Tax Regimes for FY 2024-25 with real-time savings estimates.",
+    href: "/tools/tax-calculator",
+    icon: TrendingDown,
+    color: "text-orange-600"
+  },
+  {
+    title: "80C Planner",
+    description: "Maximize your ₹1.5 Lakh tax-saving limit with our interactive investment tracker.",
+    href: "/tools/80c-planner",
+    icon: ShieldCheck,
+    color: "text-emerald-600"
   }
 ];
 

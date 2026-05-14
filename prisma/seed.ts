@@ -8,15 +8,15 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("Starting Phase 10 Expanded Seed...");
+  console.log("Starting Expanded Knowledge Base Seed...");
 
-  // Clean existing data
+  // Clean existing data to ensure a fresh, consistent state
   await prisma.sourceReference.deleteMany();
   await prisma.taxKnowledgeItem.deleteMany();
 
-  // 1. Section 80C (Existing)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+  const items = [
+    // 1. Section 80C
+    {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
       slug: "section-80c",
@@ -34,12 +34,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "Income Tax India - 80C", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 2. Section 80D (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 2. Section 80D
+    {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
       slug: "section-80d",
@@ -57,12 +54,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "Income Tax India - 80D", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 3. Section 24(b) (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 3. Section 24(b)
+    {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
       slug: "section-24b",
@@ -79,12 +73,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "Income Tax India - House Property", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 4. GST Registration (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 4. GST Registration
+    {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Act, 2017",
       slug: "gst-registration",
@@ -101,12 +92,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "CBIC GST Registration", url: "https://www.cbic.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 5. Section 10(13A) - HRA (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 5. Section 10(13A) - HRA
+    {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
       slug: "section-10-13a-hra",
@@ -124,12 +112,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "Income Tax India - HRA", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 6. GST Composition Scheme (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 6. GST Composition Scheme
+    {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Act, 2017",
       slug: "gst-composition",
@@ -146,12 +131,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "GST Council - Composition", url: "https://www.gst.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 7. ITR-1 Sahaj Guide (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 7. ITR-1 Sahaj Guide
+    {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Rules",
       slug: "itr-1-guide",
@@ -168,12 +150,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "ITR-1 Instructions", url: "https://www.incometax.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 8. ITR-4 Sugam Guide (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 8. ITR-4 Sugam Guide
+    {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Rules",
       slug: "itr-4-guide",
@@ -190,12 +169,9 @@ async function main() {
       sourceReferences: {
         create: [{ title: "ITR-4 Guide", url: "https://www.incometax.gov.in", sourceType: SourceType.OFFICIAL }]
       }
-    }
-  });
-
-  // 9. GSTR-3B Filing Guide (New)
-  await prisma.taxKnowledgeItem.create({
-    data: {
+    },
+    // 9. GSTR-3B Filing Guide
+    {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Rules",
       slug: "gstr-3b-guide",
@@ -212,10 +188,130 @@ async function main() {
       sourceReferences: {
         create: [{ title: "GST Portal Help - 3B", url: "https://www.gst.gov.in", sourceType: SourceType.OFFICIAL }]
       }
+    },
+    // 10. Section 80TTA & 80TTB (NEW)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Act, 1961",
+      slug: "section-80tta-80ttb",
+      sectionNumber: "80TTA / 80TTB",
+      title: "Deduction for Savings Interest",
+      summary: "Tax benefits on interest earned from savings accounts with banks or post offices.",
+      explanation: "Section 80TTA provides a deduction of up to ₹10,000 on interest from savings accounts for regular individuals. Section 80TTB is a broader deduction for senior citizens, covering interest from all types of deposits including FDs.",
+      applicability: ["Individuals", "Senior Citizens (80TTB)"],
+      benefitsOrDeductions: ["80TTA: Up to ₹10,000 for regular individuals", "80TTB: Up to ₹50,000 for Senior Citizens", "Includes Bank, Post Office, and Co-op society interest"],
+      restrictions: ["80TTA does not cover Fixed Deposits (FDs) or Recurring Deposits (RDs)", "Only 80TTB covers FD/RD interest"],
+      examples: ["A senior citizen earning ₹40k interest on FDs can claim the full amount as deduction under 80TTB."],
+      relatedForms: ["Form 16A", "ITR-1"],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "Income Tax India - Interest Deduction", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 11. Section 44ADA (NEW)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Act, 1961",
+      slug: "section-44ada-professionals",
+      sectionNumber: "Section 44ADA",
+      title: "Presumptive Taxation for Professionals",
+      summary: "A simplified tax scheme for professionals like doctors, engineers, and freelancers.",
+      explanation: "Section 44ADA allows professionals with gross receipts up to ₹75 Lakh to declare 50% of their receipts as taxable income, eliminating the need to maintain detailed expense records.",
+      applicability: ["Freelancers", "Doctors", "Engineers", "CAs", "Architects"],
+      benefitsOrDeductions: ["No need to maintain books of accounts", "No audit required if 50% profit is declared", "Simplified tax filing using ITR-4"],
+      restrictions: ["Gross receipts must be below ₹75 Lakh (if 95% is digital)", "Cannot claim further business expenses once 50% is opted"],
+      examples: ["A freelancer earning ₹20 Lakh can pay tax on only ₹10 Lakh without showing expenses."],
+      relatedForms: ["ITR-4"],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "Presumptive Taxation Guide", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 12. Capital Gains Basics (NEW)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Act, 1961",
+      slug: "capital-gains-basics",
+      sectionNumber: "Section 45",
+      title: "Basics of Capital Gains Tax",
+      summary: "Tax on profits earned from selling capital assets like shares, mutual funds, or real estate.",
+      explanation: "Capital gains are divided into Short-Term (STCG) and Long-Term (LTCG) based on the holding period of the asset. Different tax rates apply to equity and non-equity assets.",
+      applicability: ["Investors", "Property Sellers"],
+      benefitsOrDeductions: ["Equity LTCG: Zero tax up to ₹1.25 Lakh profit per year", "Indexation benefit for property (depending on regime)", "Exemptions under Section 54/54EC for reinvestment"],
+      restrictions: ["Holding period varies: 12m for listed shares, 24m for property", "STCG rates are usually higher"],
+      examples: ["Selling shares after 15 months with ₹2L profit. ₹1.25L is exempt, pay 12.5% on remaining ₹75k."],
+      relatedForms: ["ITR-2", "ITR-3"],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "Capital Gains Tax Rates", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 13. Section 80G (NEW)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Act, 1961",
+      slug: "section-80g-donations",
+      sectionNumber: "Section 80G",
+      title: "Deduction for Charitable Donations",
+      summary: "Deductions for contributions made to specified relief funds and charitable institutions.",
+      explanation: "Taxpayers can claim a deduction for donations made to certain funds or charitable organizations. The deduction can be 50% or 100% of the donation amount, with or without limits.",
+      applicability: ["All Taxpayers"],
+      benefitsOrDeductions: ["100% deduction for Prime Minister's Relief Fund", "50% deduction for most registered NGOs", "Deduction available for both cash (up to ₹2k) and digital payments"],
+      restrictions: ["Cannot claim for donations in kind (food, clothes)", "Max cash donation allowed: ₹2,000", "Must have 80G certificate from the NGO"],
+      examples: ["Donating ₹10,000 to a 50% deduction NGO reduces taxable income by ₹5,000."],
+      relatedForms: ["ITR-1", "Donation Receipt"],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "80G Donation Rules", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 14. GST Input Tax Credit (NEW)
+    {
+      category: TaxCategory.INDIRECT_TAX,
+      actName: "CGST Act, 2017",
+      slug: "gst-input-tax-credit",
+      sectionNumber: "Section 16",
+      title: "Understanding Input Tax Credit (ITC)",
+      summary: "Reducing net GST liability by deducting tax already paid on business purchases.",
+      explanation: "Input Tax Credit (ITC) allows a registered person to take credit for tax paid on inward supplies of goods or services which are used in the course or furtherance of business.",
+      applicability: ["Registered GST Taxpayers"],
+      benefitsOrDeductions: ["Prevents cascading of taxes (Tax on Tax)", "Reduces the final tax burden on the business", "ITC can be used to pay IGST, CGST, and SGST"],
+      restrictions: ["Must have a valid tax invoice", "Goods/services must have been received", "Supplier must have filed GSTR-1 and paid tax"],
+      examples: ["Tax on sales: ₹100, Tax on purchases: ₹60. Net GST to be paid in cash: ₹40."],
+      relatedForms: ["GSTR-2B", "GSTR-3B"],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "CBIC ITC Guide", url: "https://www.cbic.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 15. TDS & Form 26AS Basics (NEW)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Rules",
+      slug: "tds-form-26as-basics",
+      sectionNumber: "TDS / 26AS",
+      title: "TDS and Tax Credit Tracking",
+      summary: "Understanding how tax is deducted at source and tracked in your official records.",
+      explanation: "Tax Deducted at Source (TDS) is a system where the person responsible for making specified payments (like salary, rent, interest) deducts tax before paying. These deductions are reflected in Form 26AS and AIS.",
+      applicability: ["Salaried Individuals", "Contractors", "FD Holders"],
+      benefitsOrDeductions: ["Automatic tax payment throughout the year", "Refundable if total tax liability is less than TDS", "Digital proof of tax payment via Form 26AS"],
+      restrictions: ["Must verify TDS credit in 26AS before filing ITR", "TDS rates vary by nature of payment (1%, 10%, etc.)"],
+      examples: ["Bank deducts 10% TDS on FD interest. This appears in your 26AS as a tax credit."],
+      relatedForms: ["Form 26AS", "Form 16", "Form 16A"],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "TRACES - Form 26AS", url: "https://www.tdscpc.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
     }
-  });
+  ];
 
-  console.log("Seed finished. Added 8 high-value tax knowledge items and guides.");
+  for (const item of items) {
+    await prisma.taxKnowledgeItem.create({
+      data: item
+    });
+  }
+
+  console.log(`Seed finished. Total items in Knowledge Base: ${items.length}`);
 }
 
 main()
