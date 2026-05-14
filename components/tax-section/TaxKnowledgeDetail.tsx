@@ -3,6 +3,7 @@ import { TaxKnowledgeItem } from "@/types/tax";
 import { ReviewBadge } from "./ReviewBadge";
 import { SourceBlock } from "./SourceBlock";
 import { PageHero } from "@/components/layout/PageHero";
+import Image from "next/image";
 
 interface TaxKnowledgeDetailProps {
   item: TaxKnowledgeItem;
@@ -61,9 +62,11 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
 
                 {item.imageUrl && (
                   <div className="relative group overflow-hidden rounded-[2.5rem] border bg-white shadow-xl hover:shadow-2xl transition-all duration-500">
-                    <img 
+                    <Image 
                       src={item.imageUrl} 
                       alt={`${item.title} Guide Chart`} 
+                      width={1200}
+                      height={800}
                       className="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />

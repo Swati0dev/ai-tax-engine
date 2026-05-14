@@ -4,6 +4,7 @@ import { InvestmentPlanner80C } from "@/components/tools/InvestmentPlanner80C";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 
 import { Sparkles } from "lucide-react";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Section 80C Investment Planner | AI Tax Engine",
@@ -41,9 +42,11 @@ export default function InvestmentPlannerPage() {
               </div>
             </div>
             <div className="relative group overflow-hidden rounded-3xl border shadow-2xl">
-              <img 
+              <Image 
                 src="/images/section-80c-chart.png" 
                 alt="Section 80C Investment Guide" 
+                width={800}
+                height={600}
                 className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700"
               />
             </div>
