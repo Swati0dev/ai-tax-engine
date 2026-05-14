@@ -4,6 +4,7 @@ import { ReviewBadge } from "./ReviewBadge";
 import { SourceBlock } from "./SourceBlock";
 import { PageHero } from "@/components/layout/PageHero";
 import Image from "next/image";
+import { ReadingProgressBar } from "@/components/layout/ReadingProgressBar";
 
 interface TaxKnowledgeDetailProps {
   item: TaxKnowledgeItem;
@@ -13,6 +14,7 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
 
   return (
     <div className="flex flex-col w-full pb-20">
+      <ReadingProgressBar />
       <PageHero 
         title={item.title}
         description={item.summary}
