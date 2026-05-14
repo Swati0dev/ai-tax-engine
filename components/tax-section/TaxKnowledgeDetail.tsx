@@ -45,15 +45,30 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
           <div className="lg:col-span-8 space-y-16">
             
             {/* Explanation Section */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-3 mb-8">
+            <section className="space-y-8">
+              <div className="flex items-center gap-3">
                 <div className="icon-box h-10 w-10">
                   <BookOpen className="h-5 w-5 text-primary" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight">Lawful Explanation</h2>
               </div>
-              <div className="prose prose-slate dark:prose-invert max-w-none text-lg text-muted-foreground leading-relaxed space-y-6 bg-white p-8 rounded-3xl border shadow-sm">
-                {item.explanation}
+              
+              <div className="space-y-8">
+                <div className="prose prose-slate dark:prose-invert max-w-none text-lg text-muted-foreground leading-relaxed space-y-6 bg-white p-8 md:p-10 rounded-[2.5rem] border shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-2 h-full bg-primary/20" />
+                  {item.explanation}
+                </div>
+
+                {item.imageUrl && (
+                  <div className="relative group overflow-hidden rounded-[2.5rem] border bg-white shadow-xl hover:shadow-2xl transition-all duration-500">
+                    <img 
+                      src={item.imageUrl} 
+                      alt={`${item.title} Guide Chart`} 
+                      className="w-full h-auto object-cover transform group-hover:scale-[1.02] transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                  </div>
+                )}
               </div>
             </section>
 

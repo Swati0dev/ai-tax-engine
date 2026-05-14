@@ -16,6 +16,7 @@ export type TaxKnowledgeItem = {
   category: TaxCategory;
   actName: string;
   slug: string;
+  imageUrl?: string | null;
   sectionNumber: string | null;
   title: string;
   summary: string;

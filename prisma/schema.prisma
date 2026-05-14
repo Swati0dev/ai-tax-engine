@@ -27,6 +27,7 @@ model TaxKnowledgeItem {
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   slug                 String            @unique
+  imageUrl             String?
   sourceReferences     SourceReference[]
 
   @@index([category])
