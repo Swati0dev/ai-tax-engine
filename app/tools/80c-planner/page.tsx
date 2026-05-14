@@ -3,6 +3,8 @@ import { PageHero } from "@/components/layout/PageHero";
 import { InvestmentPlanner80C } from "@/components/tools/InvestmentPlanner80C";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 
+import { Sparkles } from "lucide-react";
+
 export const metadata: Metadata = {
   title: "Section 80C Investment Planner | AI Tax Engine",
   description: "Track your tax-saving investments and maximize your ₹1.5 Lakh limit under Section 80C.",
@@ -19,7 +21,34 @@ export default function InvestmentPlannerPage() {
 
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12 relative z-20">
         <Breadcrumbs />
-        <InvestmentPlanner80C />
+        
+        <div className="space-y-12">
+          <InvestmentPlanner80C />
+          
+          {/* Visual Guide & Detailed Explanation */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-white p-8 md:p-12 rounded-[2.5rem] border shadow-sm">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="h-3 w-3" />
+                Expert Guide
+              </div>
+              <h2 className="text-3xl font-bold tracking-tight">Understanding Section 80C</h2>
+              <p className="text-lg text-muted-foreground font-medium leading-relaxed">
+                Section 80C is the most powerful tax-saving tool for individuals. By investing in safe instruments like PPF or growth-oriented ones like ELSS, you can reduce your taxable income by up to ₹1,50,000 every financial year.
+              </p>
+              <div className="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/10 text-amber-900 font-medium text-sm">
+                <strong>Important:</strong> These deductions are strictly for the <strong>Old Tax Regime</strong>. If you opt for the New Regime, you cannot claim 80C benefits.
+              </div>
+            </div>
+            <div className="relative group overflow-hidden rounded-3xl border shadow-2xl">
+              <img 
+                src="/images/section-80c-chart.png" 
+                alt="Section 80C Investment Guide" 
+                className="w-full h-auto transform group-hover:scale-105 transition-transform duration-700"
+              />
+            </div>
+          </section>
+        </div>
         
         {/* Educational Content */}
         <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -28,11 +28,13 @@ export function InvestmentPlanner80C() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Top Warning Banner */}
-      <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center gap-3">
-        <AlertCircle className="h-5 w-5 text-orange-600" />
-        <p className="text-sm font-bold text-orange-900">
-          Note: Section 80C deductions are only available in the <span className="underline">Old Tax Regime</span>.
+      {/* Top Info Banner */}
+      <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center gap-3">
+        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <Info className="h-4 w-4 text-primary" />
+        </div>
+        <p className="text-sm font-medium text-muted-foreground leading-relaxed">
+          Section 80C deductions are specific to the <span className="text-foreground font-bold underline underline-offset-4 decoration-primary/30">Old Tax Regime</span>. Please ensure you are comparing regimes to maximize savings.
         </p>
       </div>
 

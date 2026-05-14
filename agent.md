@@ -12,6 +12,11 @@ The following skills are active for this project and must be followed:
 1. **SDD Workflow**: [.agents/skills/sdd-workflow.md](file:///d:/agent/ai-tax-engine/.agents/skills/sdd-workflow.md)
 2. **UI Standards**: [.agents/skills/ui-standards.md](file:///d:/agent/ai-tax-engine/.agents/skills/ui-standards.md)
 
+## Interaction Protocol
+- **Comprehension First**: Before starting any task, the agent must explain the task in their own words to the user.
+- **Approval Check**: The agent must wait for user confirmation/approval after the explanation before proceeding to execution.
+- **Clarification**: If any part of the task is ambiguous, ask for details during the comprehension phase.
+
 ## Governing Principles
 Refer to [.speckit/constitution.md](file:///d:/agent/ai-tax-engine/.speckit/constitution.md) for the project's core principles and coding standards.
 
