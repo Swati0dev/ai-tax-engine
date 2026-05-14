@@ -25,7 +25,7 @@ export async function getKnowledgeItems(category?: TaxCategory) {
         });
       },
       [`knowledge-items-${category || 'all'}`],
-      { tags: ['tax-content'], revalidate: 3600 } // Cache for 1 hour
+      { tags: ['tax-content'], revalidate: 60 } // Cache for 1 minute
     );
 
     const items = await fetchItems(category);
@@ -67,7 +67,7 @@ export async function getKnowledgeItemBySlug(slug: string) {
         });
       },
       [`knowledge-item-${slug}`],
-      { tags: ['tax-content'], revalidate: 3600 }
+      { tags: ['tax-content'], revalidate: 60 } // Cache for 1 minute for faster updates
     );
 
     const item = await fetchItem(slug);
@@ -125,7 +125,7 @@ export async function getFormsAndProcedures() {
         });
       },
       ['forms-and-procedures'],
-      { tags: ['tax-content'], revalidate: 3600 }
+      { tags: ['tax-content'], revalidate: 60 } // Cache for 1 minute for faster updates
     );
 
     const items = await fetchForms();
