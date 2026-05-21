@@ -1,3 +1,4 @@
+
 # Constitution
 
 This document defines the principles, standards, and rules for the AI Tax Engine project.
@@ -8,6 +9,12 @@ This document defines the principles, standards, and rules for the AI Tax Engine
 3. **Clarity**: The UI should be intuitive and helpful for users navigating complex tax rules.
 4. **Source-Grounded**: Every tax rule must link back to a verified legal source or section.
 5. **History Preservation**: Never overwrite previous entries in logs (`fixes_log.md`, `WALKTHROUGH.md`). Always append new information to maintain a complete audit trail.
+
+## Core Vision (MOTO)
+The primary goal of this platform is to make tax knowledge highly accessible, engaging, and easy to understand.
+- **Gamified Experience:** The website must feel like playing a game, engaging enough that even a younger person could use it without getting bored.
+- **Simplification:** Break down complex filing procedures and rules into interactive, visual walkthroughs.
+- **Comprehensive:** Cover both individual and business tax planning, regime comparisons, and ITR form selection intuitively.
 
 ## Project Connectivity Map
 

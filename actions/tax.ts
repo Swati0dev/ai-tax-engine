@@ -5,7 +5,19 @@ import { TaxCategory, ReviewStatus } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import { logger } from "@/lib/logger";
 
+function toISO(date: any): string {
+  if (!date) return "";
+  if (typeof date === "string") return date;
+  if (date instanceof Date) return date.toISOString();
+  return new Date(date).toISOString();
+}
 
+function toISOOrNull(date: any): string | null {
+  if (!date) return null;
+  if (typeof date === "string") return date;
+  if (date instanceof Date) return date.toISOString();
+  return new Date(date).toISOString();
+}
 
 export async function getKnowledgeItems(category?: TaxCategory) {
   try {
@@ -34,16 +46,16 @@ export async function getKnowledgeItems(category?: TaxCategory) {
     // Serialize Dates for Client Components
     const serializedItems = items.map(item => ({
       ...item,
-      effectiveFrom: item.effectiveFrom?.toISOString() || null,
-      lastReviewed: item.lastReviewed.toISOString(),
-      createdAt: item.createdAt.toISOString(),
-      updatedAt: item.updatedAt.toISOString(),
+      effectiveFrom: toISOOrNull(item.effectiveFrom),
+      lastReviewed: toISO(item.lastReviewed),
+      createdAt: toISO(item.createdAt),
+      updatedAt: toISO(item.updatedAt),
       sourceReferences: item.sourceReferences.map(ref => ({
         ...ref,
-        publishedAt: ref.publishedAt?.toISOString() || null,
-        accessedAt: ref.accessedAt.toISOString(),
-        createdAt: ref.createdAt.toISOString(),
-        updatedAt: ref.updatedAt.toISOString(),
+        publishedAt: toISOOrNull(ref.publishedAt),
+        accessedAt: toISO(ref.accessedAt),
+        createdAt: toISO(ref.createdAt),
+        updatedAt: toISO(ref.updatedAt),
       }))
     }));
 
@@ -80,16 +92,16 @@ export async function getKnowledgeItemBySlug(slug: string) {
     // Serialize Dates
     const serializedItem = {
       ...item,
-      effectiveFrom: item.effectiveFrom?.toISOString() || null,
-      lastReviewed: item.lastReviewed.toISOString(),
-      createdAt: item.createdAt.toISOString(),
-      updatedAt: item.updatedAt.toISOString(),
+      effectiveFrom: toISOOrNull(item.effectiveFrom),
+      lastReviewed: toISO(item.lastReviewed),
+      createdAt: toISO(item.createdAt),
+      updatedAt: toISO(item.updatedAt),
       sourceReferences: item.sourceReferences.map(ref => ({
         ...ref,
-        publishedAt: ref.publishedAt?.toISOString() || null,
-        accessedAt: ref.accessedAt.toISOString(),
-        createdAt: ref.createdAt.toISOString(),
-        updatedAt: ref.updatedAt.toISOString(),
+        publishedAt: toISOOrNull(ref.publishedAt),
+        accessedAt: toISO(ref.accessedAt),
+        createdAt: toISO(ref.createdAt),
+        updatedAt: toISO(ref.updatedAt),
       }))
     };
 
@@ -120,7 +132,13 @@ export async function getFormsAndProcedures() {
             relatedForms: true,
             filingProcedure: true,
             category: true,
-            sectionNumber: true
+            sectionNumber: true,
+            explanation: true,
+            applicability: true,
+            benefitsOrDeductions: true,
+            restrictions: true,
+            examples: true,
+            actName: true
           }
         });
       },

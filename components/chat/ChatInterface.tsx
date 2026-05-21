@@ -15,12 +15,19 @@ interface Message {
   sources?: { title: string; url: string }[];
 }
 
+const suggestions = [
+  { label: "80C deductions kya hain? 🪙", query: "Section 80C deductions kya hain aur kitni limit hai?" },
+  { label: "ITR-1 filing steps? 📋", query: "ITR-1 file karne ke steps kya hain aur kisey file karna hota hai?" },
+  { label: "GST registration limits? 🏢", query: "What are the GST registration thresholds for business?" },
+  { label: "ITR-6 corporate filing details? 💼", query: "ITR-6 corporate guide batao, companies ke liye kya rules hain?" }
+];
+
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
-      content: "Hello! I am your AI Tax Assistant. You can ask me about Income Tax sections, GST rules, or filing procedures. How can I help you today?",
+      content: "Hello! Main aapka AI Tax Assistant hoon. Aap mujhse Income Tax sections, ITR filing, GST rules ya koi bhi query English, Hindi ya Hinglish (WhatsApp script) mein pooch sakte hain. How can I help you today?",
       timestamp: new Date(),
     },
   ]);
@@ -29,20 +36,29 @@ export function ChatInterface() {
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+    const queryText = input;
+    setInput("");
+    await submitQuery(queryText);
+  };
 
+  const handleSuggestClick = async (queryText: string) => {
+    if (isLoading) return;
+    await submitQuery(queryText);
+  };
+
+  const submitQuery = async (queryText: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
+      content: queryText,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
     setIsLoading(true);
 
     try {
-      const result = await processAIChat(input);
+      const result = await processAIChat(queryText);
       if (result.success && result.data) {
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -80,7 +96,7 @@ export function ChatInterface() {
             <h2 className="text-lg font-bold tracking-tight">Tax AI Assistant</h2>
             <div className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active • Phase 6</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active • Multilingual Gemini</span>
             </div>
           </div>
         </div>
@@ -154,16 +170,32 @@ export function ChatInterface() {
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="p-6 bg-background/80 border-t">
+      {/* Input & Suggestions Area */}
+      <div className="p-6 bg-background/80 border-t space-y-4">
+        {/* Suggestion Chips */}
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {suggestions.map((s, idx) => (
+            <button
+              key={idx}
+              type="button"
+              disabled={isLoading}
+              onClick={() => handleSuggestClick(s.query)}
+              className="px-3 py-1.5 rounded-full bg-primary/5 hover:bg-primary/10 border border-primary/10 text-xs font-bold text-primary transition-all whitespace-nowrap shrink-0 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+
         <div className="relative flex items-center gap-2 bg-muted/30 p-2 rounded-2xl border focus-within:border-primary/50 transition-colors shadow-inner">
           <input
             type="text"
-            placeholder="Ask about Sections, GST, or Procedures..."
+            placeholder="Poochhein - 80C rules, GST limits, ya ITR details..."
             className="flex-1 bg-transparent px-4 py-2 text-sm font-medium focus:outline-none"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            disabled={isLoading}
           />
           <Button 
             onClick={handleSend}
@@ -173,8 +205,8 @@ export function ChatInterface() {
             <Send className="h-4 w-4" />
           </Button>
         </div>
-        <p className="mt-3 text-[10px] text-center text-muted-foreground font-bold uppercase tracking-widest opacity-50">
-          Source-grounded AI • Professional Assistance
+        <p className="text-[10px] text-center text-muted-foreground font-bold uppercase tracking-widest opacity-50">
+          Source-grounded AI • Speaks English, Hindi & Hinglish
         </p>
       </div>
     </div>

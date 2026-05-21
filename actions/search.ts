@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { searchTaxKnowledge } from "@/lib/search/tax-search";
@@ -26,7 +27,7 @@ export async function performTaxSearch(query: string, category?: TaxCategory) {
 
 
     return { success: true, data: serializedResults };
-  } catch (error) {
+  } catch {
     return { success: false, error: "Search failed." };
   }
 }

@@ -30,7 +30,7 @@ async function main() {
       restrictions: ["Lock-in periods apply", "Only available under the Old Tax Regime"],
       examples: ["Investing ₹1.5L in PPF can reduce taxable income by the same amount."],
       relatedForms: ["Form 16", "ITR-1"],
-      filingProcedure: ["Declare in Form 12BB", "Claim in ITR"],
+      filingProcedure: ["Declare in Form 12BB to employer", "Claim in ITR under Chapter VI-A deductions schedule"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Income Tax India - 80C", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -51,7 +51,7 @@ async function main() {
       restrictions: ["Premium must be paid in any mode other than cash", "Preventive health checkup limited to ₹5,000"],
       examples: ["Paying ₹20k for self and ₹30k for senior citizen parents gives total ₹50k deduction."],
       relatedForms: ["Form 16", "ITR-1"],
-      filingProcedure: ["Claim under Section 80D during ITR filing"],
+      filingProcedure: ["Declare premium in Form 12BB", "Claim under Section 80D during ITR filing in Schedule 80D"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Income Tax India - 80D", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -72,6 +72,7 @@ async function main() {
       restrictions: ["Construction must be completed within 5 years", "Available in both regimes but with limitations in New Regime"],
       examples: ["Annual interest of ₹2.5L on home loan allows ₹2L deduction for self-occupied house."],
       relatedForms: ["ITR-2", "Form 12BB"],
+      filingProcedure: ["Calculate interest from home loan certificate", "Declare under Income/Loss from House Property in ITR", "Declare in Form 12BB to employer for TDS adjustment"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Income Tax India - House Property", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -91,7 +92,7 @@ async function main() {
       benefitsOrDeductions: ["Legally authorized to collect tax", "Eligibility for Input Tax Credit (ITC)"],
       restrictions: ["₹40 Lakh for goods (Normal states)", "₹20 Lakh for services", "₹10 Lakh for special category states"],
       relatedForms: ["REG-01", "REG-06"],
-      filingProcedure: ["Apply online on GST Portal", "Verification by officer", "Grant of GSTIN"],
+      filingProcedure: ["Apply online on GST Portal using Form GST REG-01", "Provide PAN, Aadhaar, and business address proof", "Verification by officer within 7 working days", "Grant of GSTIN and Registration Certificate in Form GST REG-06"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "CBIC GST Registration", url: "https://www.cbic.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -112,7 +113,7 @@ async function main() {
       restrictions: ["Not available in New Tax Regime", "Must stay in a rented house", "Landlord's PAN required if rent > ₹1L per year"],
       examples: ["Salary ₹50k, HRA ₹20k, Rent ₹15k in Delhi. Calculation: Least of (20k, 25k, 15k-5k=10k). Exempt: ₹10k."],
       relatedForms: ["Form 16", "ITR-1"],
-      filingProcedure: ["Submit rent receipts to employer", "Declare in ITR under Salary schedule"],
+      filingProcedure: ["Submit rent receipts & rent agreement to employer", "Declare Landlord PAN if annual rent exceeds ₹1,00,000", "Declare in ITR under Salary schedule"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Income Tax India - HRA", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -132,7 +133,7 @@ async function main() {
       benefitsOrDeductions: ["Tax rates: 1% (Traders/Mfrs), 5% (Restaurants), 6% (Service Providers)", "Fewer returns (Quarterly CMP-08, Annual GSTR-4)"],
       restrictions: ["Cannot claim Input Tax Credit (ITC)", "Cannot collect tax from customers", "Cannot make interstate sales", "Turnover limit: ₹1.5 Cr (₹75L for special states)"],
       relatedForms: ["CMP-02", "CMP-08", "GSTR-4"],
-      filingProcedure: ["Opt-in via CMP-02 before financial year starts", "Quarterly payment via CMP-08"],
+      filingProcedure: ["Opt-in via Form GST CMP-02 before financial year starts", "Quarterly payment via CMP-08 statement by 18th of next month", "File annual return GSTR-4 by 30th April of next financial year"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "GST Council - Composition", url: "https://www.gst.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -152,7 +153,7 @@ async function main() {
       benefitsOrDeductions: ["Simplest form", "Pre-filled data available", "Easy e-verification via Aadhaar"],
       restrictions: ["Not for Directors", "Not for those with Capital Gains", "Not for Business/Professional income", "Not for Foreign Assets"],
       relatedForms: ["Form 16", "Form 26AS", "AIS"],
-      filingProcedure: ["Log in to e-filing portal", "Select AY 2026-27", "Verify pre-filled data", "Compute tax and e-verify"],
+      filingProcedure: ["Log in to e-filing portal", "Select AY 2026-27", "Verify pre-filled data against Form 16 & Form 26AS/AIS", "Compute tax, pay outstanding tax if any, and submit ITR-1", "E-verify using Aadhaar OTP within 30 days"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "ITR-1 Instructions", url: "https://www.incometax.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -172,7 +173,7 @@ async function main() {
       benefitsOrDeductions: ["No need to maintain detailed books of accounts", "Lower compliance burden", "Income up to ₹50 Lakh (or ₹75L/3Cr for specific presumptive limits)"],
       restrictions: ["Not for Capital Gains", "Not for Foreign Assets", "Not for Company Directors"],
       relatedForms: ["Form 16", "AIS", "Form 26AS"],
-      filingProcedure: ["Calculate turnover", "Apply presumptive rate (6%/8% for 44AD, 50% for 44ADA)", "Fill ITR-4 and e-verify"],
+      filingProcedure: ["Calculate turnover/gross receipts", "Apply presumptive rate (6%/8% for 44AD, 50% for 44ADA)", "Fill ITR-4 and report presumptive business details", "Pay balance tax and e-verify return using Aadhaar OTP"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "ITR-4 Guide", url: "https://www.incometax.gov.in", sourceType: SourceType.OFFICIAL }]
@@ -192,13 +193,13 @@ async function main() {
       benefitsOrDeductions: ["Mechanism to claim Input Tax Credit", "Auto-populated from GSTR-1 and GSTR-2B"],
       restrictions: ["Mandatory even for Nil returns", "Interest applies on late payments", "Late fee for delayed filing"],
       relatedForms: ["GSTR-1", "GSTR-2B"],
-      filingProcedure: ["File GSTR-1 first", "Verify auto-populated values in 3B", "Pay net tax using cash/credit ledger", "File using DSC or EVC"],
+      filingProcedure: ["File GSTR-1 first (updates buyer's ITC and your outward tax)", "Verify auto-populated values in GSTR-3B from GSTR-1 & GSTR-2B", "Offset output liability using available ITC", "Pay net tax using cash ledger (net tax payable)", "File GSTR-3B using DSC or EVC"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "GST Portal Help - 3B", url: "https://www.gst.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     },
-    // 10. Section 80TTA & 80TTB (NEW)
+    // 10. Section 80TTA & 80TTB
     {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
@@ -213,12 +214,13 @@ async function main() {
       restrictions: ["80TTA does not cover Fixed Deposits (FDs) or Recurring Deposits (RDs)", "Only 80TTB covers FD/RD interest"],
       examples: ["A senior citizen earning ₹40k interest on FDs can claim the full amount as deduction under 80TTB."],
       relatedForms: ["Form 16A", "ITR-1"],
+      filingProcedure: ["Collect interest certificate from bank/post office", "Declare interest income under 'Income from Other Sources'", "Claim deduction under Chapter VI-A (Section 80TTA/80TTB) in ITR"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Income Tax India - Interest Deduction", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     },
-    // 11. Section 44ADA (NEW)
+    // 11. Section 44ADA
     {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
@@ -233,12 +235,13 @@ async function main() {
       restrictions: ["Gross receipts must be below ₹75 Lakh (if 95% is digital)", "Cannot claim further business expenses once 50% is opted"],
       examples: ["A freelancer earning ₹20 Lakh can pay tax on only ₹10 Lakh without showing expenses."],
       relatedForms: ["ITR-4"],
+      filingProcedure: ["Calculate total gross receipts during financial year", "Ensure digital transactions meet 95% rule for higher limit", "Declare 50% (or more) of receipts as income in ITR-4 presumptive schedules", "File return and e-verify"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Presumptive Taxation Guide", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     },
-    // 12. Capital Gains Basics (NEW)
+    // 12. Capital Gains Basics
     {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
@@ -253,12 +256,13 @@ async function main() {
       restrictions: ["Holding period varies: 12m for listed shares, 24m for property", "STCG rates are usually higher"],
       examples: ["Selling shares after 15 months with ₹2L profit. ₹1.25L is exempt, pay 12.5% on remaining ₹75k."],
       relatedForms: ["ITR-2", "ITR-3"],
+      filingProcedure: ["Obtain Capital Gains statement from broker/registry", "Categorize into Short-Term or Long-Term based on asset hold times", "Report in Schedule CG of ITR-2 or ITR-3", "Pay self-assessment tax if tax liability arises"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "Capital Gains Tax Rates", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     },
-    // 13. Section 80G (NEW)
+    // 13. Section 80G
     {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Act, 1961",
@@ -269,16 +273,17 @@ async function main() {
       summary: "Deductions for contributions made to specified relief funds and charitable institutions.",
       explanation: "Section 80G encourages philanthropy by offering tax deductions on donations to approved funds. Depending on the fund, you can claim either 50% or 100% of the donated amount. RESTRICTION: Cash donations exceeding ₹2,000 are not eligible. IMPORTANT: This deduction is strictly for the Old Tax Regime.",
       applicability: ["All Taxpayers"],
-      benefitsOrDeductions: ["100% deduction for Prime Minister's Relief Fund", "50% deduction for most registered NGOs", "Deduction available for both cash (up to ₹2k) and digital payments"],
+      benefitsOrDeductions: ["100% deduction for Prime Minister's Relief Fund", "50% deduction for most registered NGOs", "Deduction available for both cash (up to ₹k) and digital payments"],
       restrictions: ["Cannot claim for donations in kind (food, clothes)", "Max cash donation allowed: ₹2,000", "Must have 80G certificate from the NGO"],
       examples: ["Donating ₹10,000 to a 50% deduction NGO reduces taxable income by ₹5,000."],
       relatedForms: ["ITR-1", "Donation Receipt"],
+      filingProcedure: ["Collect 80G donation receipt and Form 10BE from the NGO", "Ensure NGO has filed Form 10BD to reflect donation in your AIS", "Claim deduction under Section 80G in Schedule 80G of ITR"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "80G Donation Rules", url: "https://www.incometaxindia.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     },
-    // 14. GST Input Tax Credit (NEW)
+    // 14. GST Input Tax Credit
     {
       category: TaxCategory.INDIRECT_TAX,
       actName: "CGST Act, 2017",
@@ -293,12 +298,13 @@ async function main() {
       restrictions: ["Must have a valid tax invoice", "Goods/services must have been received", "Supplier must have filed GSTR-1 and paid tax"],
       examples: ["Tax on sales: ₹100, Tax on purchases: ₹60. Net GST to be paid in cash: ₹40."],
       relatedForms: ["GSTR-2B", "GSTR-3B"],
+      filingProcedure: ["Verify available credit in GSTR-2B (auto-drafted statement)", "Ensure matching with purchase invoices in books", "Claim credit in Table 4 of GSTR-3B monthly", "Ensure payment to supplier is made within 180 days to avoid reversal"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "CBIC ITC Guide", url: "https://www.cbic.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     },
-    // 15. TDS & Form 26AS Basics (NEW)
+    // 15. TDS & Form 26AS Basics
     {
       category: TaxCategory.DIRECT_TAX,
       actName: "Income Tax Rules",
@@ -313,9 +319,114 @@ async function main() {
       restrictions: ["Must verify TDS credit in 26AS before filing ITR", "TDS rates vary by nature of payment (1%, 10%, etc.)"],
       examples: ["Bank deducts 10% TDS on FD interest. This appears in your 26AS as a tax credit."],
       relatedForms: ["Form 26AS", "Form 16", "Form 16A"],
+      filingProcedure: ["Log in to Income Tax e-filing portal", "Navigate to View Form 26AS/AIS", "Match TDS amount with Form 16/16A", "Claim tax credit in corresponding schedules of ITR"],
       reviewStatus: ReviewStatus.VERIFIED,
       sourceReferences: {
         create: [{ title: "TRACES - Form 26AS", url: "https://www.tdscpc.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 16. ITR-5 Guide (NEW - Firm & LLP)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Rules",
+      slug: "itr-5-guide",
+      sectionNumber: "ITR-5",
+      title: "ITR-5 Filing Guide for Firms & LLPs",
+      imageUrl: "/images/itr5-guide-chart.png",
+      summary: "Income tax return for Partnership Firms, LLPs, AOPs, BOIs, and Artificial Juridical Persons.",
+      explanation: "ITR-5 is dedicated to business entities that are not individuals, HUFs, or companies. It is applicable for Partnership Firms, LLPs (Limited Liability Partnerships), Association of Persons (AOP), and Body of Individuals (BOI). CRITICAL: LLPs and firms are taxed at a flat rate of 30% (plus surcharge and cess). Unlike individuals, there is no slab benefit. Tax audit u/s 44AB might apply if turnover exceeds ₹10 Crore (for business) or ₹50 Lakh (for professionals).",
+      applicability: ["Partnership Firms", "LLPs", "Association of Persons (AOP)", "Body of Individuals (BOI)"],
+      benefitsOrDeductions: ["Allows deduction of partner's salary & interest (subject to Section 40(b) limits)", "Carry forward of business losses up to 8 years"],
+      restrictions: ["Not for Individual taxpayers", "Not for Companies (ITR-6)", "Not for Charitable Trusts (ITR-7)"],
+      examples: ["An LLP with ₹25 Lakh profit files ITR-5 and pays flat 30% tax + 4% cess."],
+      relatedForms: ["Form 3CD (Audit Report)", "Form 10IC", "Partner Capital Accounts"],
+      filingProcedure: [
+        "Prepare final accounts (P&L and Balance Sheet)",
+        "Calculate partner remuneration & interest limits under Section 40(b)",
+        "Undergo tax audit under Section 44AB if turnover exceeds threshold limits",
+        "Fill ITR-5 online/offline utility, verify shares/profit splits",
+        "Digitally sign the return (DSC) of the designated partner/partner"
+      ],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "ITR-5 Instructions - Income Tax", url: "https://www.incometax.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 17. ITR-6 Guide (NEW - Corporate Companies)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Rules",
+      slug: "itr-6-guide",
+      sectionNumber: "ITR-6",
+      title: "ITR-6 Filing Guide for Companies",
+      imageUrl: "/images/itr6-guide-chart.png",
+      summary: "Income tax return for corporate taxpayers (Companies) other than those claiming exemption u/s 11.",
+      explanation: "All companies registered under the Companies Act (Private Limited, Public Limited, One Person Company) must file ITR-6. Even if a company has zero business activity or is inactive, filing ITR-6 is legally mandatory. Tax rates vary: 15% for new manufacturing companies (u/s 115BAB), 22% under Section 115BAA, or 25%/30% base rates. CRITICAL: Every company filing ITR-6 must sign the return using a Class 3 Digital Signature Certificate (DSC) of the Director.",
+      applicability: ["Private Limited Companies", "Public Limited Companies", "One Person Companies (OPC)"],
+      benefitsOrDeductions: ["Concessional tax rates of 22% or 15% under new regimes", "Exemptions on inter-corporate dividends"],
+      restrictions: ["Cannot be filed by individuals or firms", "Not for companies claiming exemption u/s 11 (Charitable/Religious trusts)"],
+      examples: ["A Private Limited Company registered in India files ITR-6 and opts for Section 115BAA to pay 22% flat tax + surcharge & cess."],
+      relatedForms: ["Form 3CD (Audit Report)", "Form 29B (MAT report)", "MGT-7"],
+      filingProcedure: [
+        "Audit accounts by Chartered Accountant (Form 3CD is uploaded beforehand)",
+        "Ensure MAT (Minimum Alternate Tax) calculation is done if regular regime is opted",
+        "Fill Schedule AL (Assets and Liabilities) and Shareholding pattern",
+        "File ITR-6 on e-filing portal using Director's Digital Signature Certificate (DSC)"
+      ],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "ITR-6 Guide - Income Tax India", url: "https://www.incometax.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 18. GSTR-1 Guide (NEW - GST Sales)
+    {
+      category: TaxCategory.INDIRECT_TAX,
+      actName: "CGST Act, 2017",
+      slug: "gstr-1-guide",
+      sectionNumber: "GSTR-1",
+      title: "GSTR-1 Filing Procedure",
+      imageUrl: "/images/gstr1-guide-chart.png",
+      summary: "Monthly or quarterly return to declare details of outward supplies (sales invoices) of goods and services.",
+      explanation: "GSTR-1 is a mandatory return where a registered GST taxpayer details all invoices, debit notes, credit notes, and revised invoices for sales. The data uploaded here directly populates the GSTR-2B of your buyers, enabling them to claim Input Tax Credit (ITC). If you don't file GSTR-1 on time, your buyers cannot claim ITC.",
+      applicability: ["Regular GST Taxpayers", "SEZ Developers/Units", "Casual Taxable Persons"],
+      benefitsOrDeductions: ["Passes on Input Tax Credit (ITC) to buyers", "B2B and B2C sales segregation"],
+      restrictions: ["Must be filed before the 11th of next month (monthly) or 13th (quarterly under QRMP)", "No tax payment is made in GSTR-1 (tax is paid in GSTR-3B)"],
+      relatedForms: ["GSTR-2B", "GSTR-3B"],
+      filingProcedure: [
+        "Upload all sales invoices on GST Portal",
+        "Categorize under B2B (business-to-business) or B2C (business-to-consumer) supplies",
+        "Verify GSTR-1 summary generated by the portal",
+        "File using DSC (for companies/LLPs) or EVC (Aadhaar OTP for others)"
+      ],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "GSTR-1 Help - GST Portal", url: "https://www.gst.gov.in", sourceType: SourceType.OFFICIAL }]
+      }
+    },
+    // 19. Form 26Q (NEW - TDS Non-Salary)
+    {
+      category: TaxCategory.DIRECT_TAX,
+      actName: "Income Tax Act, 1961",
+      slug: "form-26q-tds",
+      sectionNumber: "Form 26Q",
+      title: "Form 26Q TDS Return (Non-Salary)",
+      imageUrl: "/images/form-26q-chart.png",
+      summary: "Quarterly return for tax deducted at source (TDS) on payments other than salary (e.g. rent, professional fees, commission).",
+      explanation: "Form 26Q is filed by deductors (employers, businesses) who deduct TDS on payments made to resident individuals/firms for business expenses. Common sections under this include Section 194C (contractors), 194J (professional/technical fees), and 194I (rent). CRITICAL: Late filing attracts a fee of ₹200 per day under Section 234E and interest on delayed payments (1% or 1.5%).",
+      applicability: ["Corporate Deductors", "Non-corporate Deductors (under Tax Audit)"],
+      benefitsOrDeductions: ["Ensures government receives tax on income as it is earned", "Allows deductee to claim tax credit in Form 26AS"],
+      restrictions: ["Applicable only for payments to resident individuals/entities", "Must be filed quarterly by the end of the month following the quarter"],
+      examples: ["A company pays ₹50,000 professional fees to a CA. It deducts 10% TDS (₹5,000) u/s 194J and reports this in Form 26Q."],
+      relatedForms: ["Form 16A (TDS Certificate)", "Challan 281"],
+      filingProcedure: [
+        "Deduct TDS at correct rate (e.g. 10% u/s 194J) when booking expense or making payment",
+        "Deposit TDS to government account using Challan 281 by 7th of the next calendar month",
+        "Prepare quarterly TDS return using NSDL e-Gov utility",
+        "Validate file using FVU (File Validation Utility) and upload on TRACES/Income tax portal"
+      ],
+      reviewStatus: ReviewStatus.VERIFIED,
+      sourceReferences: {
+        create: [{ title: "TRACES TDS Guidelines", url: "https://www.tdscpc.gov.in", sourceType: SourceType.OFFICIAL }]
       }
     }
   ];

@@ -2,11 +2,13 @@ import Link from "next/link";
 import { Landmark } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { GamificationBadge } from "./GamificationBadge";
 
 const navigationItems = [
   { href: "/chat", label: "Chat" },
   { href: "/direct-tax", label: "Direct Tax" },
   { href: "/indirect-tax", label: "Indirect Tax" },
+  { href: "/tools/find-my-itr", label: "Find My ITR" },
   { href: "/forms", label: "Forms" },
   { href: "/sources", label: "Sources" }
 ];
@@ -39,6 +41,8 @@ export function SiteHeader({ className }: SiteHeaderProps) {
         </nav>
 
         <div className="flex items-center gap-4">
+          <GamificationBadge />
+          
           <button className="md:hidden p-2 text-muted-foreground hover:text-primary rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             {/* Mobile Menu Icon would go here */}
             <span className="sr-only">Toggle menu</span>

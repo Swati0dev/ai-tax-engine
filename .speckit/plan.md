@@ -25,8 +25,16 @@ This document outlines the strategy for implementing new features.
 - [x] Identify high-value tax topics (TTA/TTB, 44ADA, Capital Gains, etc.).
 - [x] Update `seed.ts` with 6 new comprehensive sections.
 - [x] Successfully seeded database with total 15 tax knowledge items.
-- [x] Verified database integrity and slugs.## Future Phases
+- [x] Verified database integrity and slugs.
+
+## Phase 6: Gamification & Interactive Experience (Upcoming)
+- [ ] Implement Gamified Knowledge Base (Interactive Cards/Quizzes).
+- [ ] Build 'Find My ITR' Wizard.
+- [ ] Expand Tax Calculator for Business Structures (LLP, Pvt Ltd).
+- [ ] Create Step-by-Step Visual Filing Walkthroughs.
+- [ ] Integrate Gamification Engine (XP, Badges).
+
+## Future Phases
 - [ ] AI Integration (Grounded RAG).
 - [ ] Multi-user Auth & Personal Dashboards.
 - [ ] PDF Tax Report Generation.
-- [ ] UI/UX refinements based on latest specifications.
