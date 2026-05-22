@@ -3,6 +3,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { ComplianceCenter } from "@/components/tools/ComplianceCenter";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import { getFormsAndProcedures } from "@/actions/tax";
+import { getCompletedComplianceDocs } from "@/actions/compliance";
 
 export const metadata: Metadata = {
   title: "Tax Compliance Center | AI Tax Platform",
@@ -13,6 +14,7 @@ export default async function CompliancePage() {
   // Fetch forms and procedures dynamically from Neon Postgres database
   const res = await getFormsAndProcedures();
   const initialDbForms = res.success && res.data ? res.data : [];
+  const completedDocs = await getCompletedComplianceDocs();
 
   return (
     <main className="flex flex-col w-full pb-24 bg-background">
@@ -26,7 +28,7 @@ export default async function CompliancePage() {
         <Breadcrumbs />
         
         <div className="mt-8">
-          <ComplianceCenter initialDbForms={initialDbForms} />
+          <ComplianceCenter initialDbForms={initialDbForms} initialCompletedDocs={completedDocs} />
         </div>
       </div>
     </main>

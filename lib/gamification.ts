@@ -1,3 +1,5 @@
+import { addExperiencePoints, syncLocalProgress } from "@/actions/gamification";
+
 export const LEVELS = [
   { level: 1, name: "Tax Novice", xpRequired: 0 },
   { level: 2, name: "Tax Learner", xpRequired: 100 },
@@ -34,9 +36,10 @@ export const getGamificationState = (): GamificationState => {
   };
 };
 
-export const addXp = (amount: number): GamificationState => {
+export const addXp = async (amount: number): Promise<GamificationState> => {
   if (typeof window === "undefined") return { xp: 0, level: 1, title: LEVELS[0].name };
   
+  // 1. Optimistic local update for instant UI response
   const currentXp = parseInt(localStorage.getItem("userXp") || "0", 10);
   const newXp = currentXp + amount;
   localStorage.setItem("userXp", newXp.toString());
@@ -44,5 +47,26 @@ export const addXp = (amount: number): GamificationState => {
   // Custom event so the Header can listen and update instantly
   window.dispatchEvent(new Event('gamification-update'));
   
+  // 2. Background DB Sync (Safe to fail for guests)
+  try {
+    await addExperiencePoints(amount);
+  } catch (error) {
+    // Ignore, likely not logged in
+  }
+  
   return getGamificationState();
+};
+
+export const syncToDb = async (completedDocs: string[] = []) => {
+  if (typeof window === "undefined") return;
+  const currentXp = parseInt(localStorage.getItem("userXp") || "0", 10);
+  try {
+    const dbProgress = await syncLocalProgress(currentXp, completedDocs);
+    if (dbProgress) {
+      localStorage.setItem("userXp", dbProgress.xp.toString());
+      window.dispatchEvent(new Event('gamification-update'));
+    }
+  } catch (e) {
+    console.error("Failed to sync progress:", e);
+  }
 };

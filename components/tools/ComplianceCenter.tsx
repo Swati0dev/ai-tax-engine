@@ -17,6 +17,7 @@ import {
   BellOff
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toggleComplianceDoc } from "@/actions/compliance";
 
 type Category = "ALL" | "DIRECT" | "INDIRECT" | "TDS";
 type EstimatorType = "itr" | "gst" | "tds";
@@ -39,6 +40,7 @@ interface ComplianceFormItem {
 
 interface ComplianceCenterProps {
   initialDbForms?: ComplianceFormItem[];
+  initialCompletedDocs?: string[];
 }
 
 const TIMELINE_EVENTS = [
@@ -120,7 +122,7 @@ const DEFAULT_CHECKLIST = [
   { id: "c9", label: "Prepare TDS deduction invoices and collect vendor PANs", category: "TDS" }
 ];
 
-export function ComplianceCenter({ initialDbForms = [] }: ComplianceCenterProps) {
+export function ComplianceCenter({ initialDbForms = [], initialCompletedDocs = [] }: ComplianceCenterProps) {
   const [timelineFilter, setTimelineFilter] = useState<Category>("ALL");
   const [completedEvents, setCompletedEvents] = useState<string[]>([]);
   const [alertsEnabled, setAlertsEnabled] = useState<string[]>([]);
@@ -142,26 +144,38 @@ export function ComplianceCenter({ initialDbForms = [] }: ComplianceCenterProps)
   const [tdsPendingAmt, setTdsPendingAmt] = useState<number>(15000);
   const [tdsDaysLate, setTdsDaysLate] = useState<number>(20);
 
-  // Sync with LocalStorage
+  // Sync with LocalStorage and DB
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedEvents = localStorage.getItem("tax-compliance-completed");
-      if (savedEvents) setCompletedEvents(JSON.parse(savedEvents));
-      
-      const savedChecked = localStorage.getItem("tax-compliance-checklist");
-      if (savedChecked) setCheckedItems(JSON.parse(savedChecked));
+      if (initialCompletedDocs && initialCompletedDocs.length > 0) {
+        const events = initialCompletedDocs.filter(id => id.startsWith('t'));
+        const items = initialCompletedDocs.filter(id => id.startsWith('c'));
+        setCompletedEvents(events);
+        setCheckedItems(items);
+        localStorage.setItem("tax-compliance-completed", JSON.stringify(events));
+        localStorage.setItem("tax-compliance-checklist", JSON.stringify(items));
+      } else {
+        const savedEvents = localStorage.getItem("tax-compliance-completed");
+        if (savedEvents) setCompletedEvents(JSON.parse(savedEvents));
+        
+        const savedChecked = localStorage.getItem("tax-compliance-checklist");
+        if (savedChecked) setCheckedItems(JSON.parse(savedChecked));
+      }
 
       const savedAlerts = localStorage.getItem("tax-compliance-alerts");
       if (savedAlerts) setAlertsEnabled(JSON.parse(savedAlerts));
     }
-  }, []);
+  }, [initialCompletedDocs]);
 
   const toggleEventComplete = (id: string) => {
-    const updated = completedEvents.includes(id)
-      ? completedEvents.filter(eId => eId !== id)
-      : [...completedEvents, id];
+    const isCompleted = !completedEvents.includes(id);
+    const updated = isCompleted 
+      ? [...completedEvents, id]
+      : completedEvents.filter(eId => eId !== id);
+      
     setCompletedEvents(updated);
     localStorage.setItem("tax-compliance-completed", JSON.stringify(updated));
+    toggleComplianceDoc(id, isCompleted).catch(() => {});
   };
 
   const toggleAlert = (id: string) => {
@@ -173,11 +187,14 @@ export function ComplianceCenter({ initialDbForms = [] }: ComplianceCenterProps)
   };
 
   const toggleChecklistItem = (id: string) => {
-    const updated = checkedItems.includes(id)
-      ? checkedItems.filter(cId => cId !== id)
-      : [...checkedItems, id];
+    const isCompleted = !checkedItems.includes(id);
+    const updated = isCompleted
+      ? [...checkedItems, id]
+      : checkedItems.filter(cId => cId !== id);
+      
     setCheckedItems(updated);
     localStorage.setItem("tax-compliance-checklist", JSON.stringify(updated));
+    toggleComplianceDoc(id, isCompleted).catch(() => {});
   };
 
   // Timeline events filter

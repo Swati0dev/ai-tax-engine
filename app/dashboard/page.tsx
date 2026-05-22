@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { getGamificationState, addXp, GamificationState } from "@/lib/gamification";
 import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
+import { getUserProgress } from "@/actions/gamification";
+import { getCompletedComplianceDocs, toggleComplianceDoc } from "@/actions/compliance";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { triggerConfetti } from "@/components/ui/Confetti";
@@ -82,20 +84,40 @@ export default function DashboardPage() {
     setMounted(true);
 
     if (typeof window !== "undefined") {
-      // 1. Gamification Title
+      // 1. Gamification Title (Optimistic)
       setGamerState(getGamificationState());
+      
+      // Background Gamification DB Sync
+      getUserProgress().then(progress => {
+        if (progress) {
+          setGamerState({ xp: progress.xp, level: progress.level, title: progress.title });
+          localStorage.setItem("userXp", progress.xp.toString());
+        }
+      });
 
-      // 2. Checklist Items
-      const savedChecklist = localStorage.getItem("tax-compliance-checklist");
-      if (savedChecklist) {
-        setCheckedItems(JSON.parse(savedChecklist));
-      }
-
-      // 3. Completed events
-      const savedEvents = localStorage.getItem("tax-compliance-completed");
-      if (savedEvents) {
-        setCompletedEvents(JSON.parse(savedEvents));
-      }
+      // 2 & 3. Compliance Docs DB Sync
+      getCompletedComplianceDocs().then(docs => {
+        if (docs.length > 0) {
+          const events = docs.filter(id => id.startsWith('t'));
+          const items = docs.filter(id => id.startsWith('c'));
+          setCompletedEvents(events);
+          setCheckedItems(items);
+          localStorage.setItem("tax-compliance-completed", JSON.stringify(events));
+          localStorage.setItem("tax-compliance-checklist", JSON.stringify(items));
+        } else {
+          // Fallback to local storage for guests
+          const savedChecklist = localStorage.getItem("tax-compliance-checklist");
+          if (savedChecklist) setCheckedItems(JSON.parse(savedChecklist));
+          
+          const savedEvents = localStorage.getItem("tax-compliance-completed");
+          if (savedEvents) setCompletedEvents(JSON.parse(savedEvents));
+        }
+      }).catch(() => {
+        const savedChecklist = localStorage.getItem("tax-compliance-checklist");
+        if (savedChecklist) setCheckedItems(JSON.parse(savedChecklist));
+        const savedEvents = localStorage.getItem("tax-compliance-completed");
+        if (savedEvents) setCompletedEvents(JSON.parse(savedEvents));
+      });
 
       // 4. Recent chats
       const savedChats = localStorage.getItem("tax-ai-conversations");
@@ -169,14 +191,14 @@ export default function DashboardPage() {
     setCheckedItems(updated);
     if (typeof window !== "undefined") {
       localStorage.setItem("tax-compliance-checklist", JSON.stringify(updated));
+      toggleComplianceDoc(id, !checkedItems.includes(id)).catch(() => {});
       
       // Dispatch event to sync compliance score
       window.dispatchEvent(new Event("compliance-update"));
       
       // Add XP for updating task list
       if (!checkedItems.includes(id)) {
-        addXp(15);
-        setGamerState(getGamificationState());
+        addXp(15).then(newState => setGamerState(newState));
         
         // Confetti triggers if they complete all items
         if (updated.length === DEFAULT_DASHBOARD_CHECKLIST.length) {
@@ -194,10 +216,10 @@ export default function DashboardPage() {
     setCompletedEvents(updated);
     if (typeof window !== "undefined") {
       localStorage.setItem("tax-compliance-completed", JSON.stringify(updated));
+      toggleComplianceDoc(id, !completedEvents.includes(id)).catch(() => {});
       
       if (!completedEvents.includes(id)) {
-        addXp(30);
-        setGamerState(getGamificationState());
+        addXp(30).then(newState => setGamerState(newState));
       }
     }
   };
@@ -220,8 +242,7 @@ export default function DashboardPage() {
       localStorage.setItem("tax-last-check-in", today);
       setLastCheckIn(today);
       setCheckInClaimed(true);
-      addXp(25);
-      setGamerState(getGamificationState());
+      addXp(25).then(newState => setGamerState(newState));
       triggerConfetti();
     }
   };

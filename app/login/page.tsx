@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Landmark, ShieldCheck, Mail, Lock, ArrowRight, Chrome, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,39 +27,51 @@ export default function LoginPage() {
     setIsLoading(true);
     setErrorMsg("");
 
-    // Simulate database credentials check
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      if (typeof window !== "undefined") {
-        const alreadyLoggedIn = localStorage.getItem("tax-logged-in");
-        
-        // Award 25 XP for first login
-        if (!alreadyLoggedIn) {
-          localStorage.setItem("tax-logged-in", "true");
-          addXp(25);
-        }
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
 
-        // Trigger premium level-up celebration
-        triggerConfetti();
-        
-        // Redirect to personal dashboard
-        router.push("/dashboard");
+      if (res?.error) {
+        setErrorMsg("Invalid credentials. Please check your email and password.");
+        setIsLoading(false);
+      } else {
+        if (typeof window !== "undefined") {
+          const alreadyLoggedIn = localStorage.getItem("tax-logged-in");
+          
+          if (!alreadyLoggedIn) {
+            localStorage.setItem("tax-logged-in", "true");
+            addXp(25);
+          }
+
+          triggerConfetti();
+          router.push("/dashboard");
+          router.refresh();
+        }
       }
-    }, 1500);
+    } catch (err) {
+      setErrorMsg("An unexpected error occurred. Please try again.");
+      setIsLoading(false);
+    }
   };
 
-  const handleThirdPartyLogin = (provider: string) => {
+  const handleThirdPartyLogin = async (provider: string) => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("tax-logged-in", "true");
-        addXp(25);
-        triggerConfetti();
-        router.push("/dashboard");
-      }
-    }, 1000);
+    if (provider === "google") {
+      await signIn("google", { callbackUrl: "/dashboard" });
+    } else {
+      setTimeout(() => {
+        setIsLoading(false);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("tax-logged-in", "true");
+          addXp(25);
+          triggerConfetti();
+          router.push("/dashboard");
+        }
+      }, 1000);
+    }
   };
 
   return (
