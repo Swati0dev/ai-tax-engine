@@ -71,7 +71,7 @@ export function SearchBar() {
                 {results.map((item) => (
                   <Link
                     key={item.id}
-                    href={`${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.id}`}
+                    href={`${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}
                     onClick={() => setShowResults(false)}
                     className="flex items-center justify-between p-4 rounded-xl hover:bg-primary/5 transition-colors group"
                   >

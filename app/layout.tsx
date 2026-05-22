@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Sora } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -16,9 +16,9 @@ const inter = Inter({
   display: "swap"
 });
 
-const outfit = Outfit({
+const sora = Sora({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-sora",
   display: "swap"
 });
 
@@ -34,7 +34,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${sora.variable} font-sans antialiased`}>
         <ReadingProgressBar />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />

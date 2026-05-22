@@ -4,15 +4,15 @@ import { TaxCalculator } from "@/components/tools/TaxCalculator";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 
 export const metadata: Metadata = {
-  title: "Tax Regime Calculator | AI Tax Engine",
-  description: "Compare Old vs New Tax Regime for FY 2024-25 with our interactive calculator.",
+  title: "Tax Regime Comparator | AI Tax Platform",
+  description: "Compare Old vs New Tax Regime for FY 2024-25 with our interactive real-time calculator.",
 };
 
-export default function TaxCalculatorPage() {
+export default function IncomeTaxCalculatorPage() {
   return (
     <main className="flex flex-col w-full pb-24">
       <PageHero
-        title="Tax Regime Calculator"
+        title="Tax Regime Comparator"
         description="Choose the right path for your financial savings. Compare liabilities under the latest July 2024 Budget updates."
         image="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2022&auto=format&fit=crop"
       />
@@ -22,9 +22,9 @@ export default function TaxCalculatorPage() {
         <TaxCalculator />
         
         {/* Additional Info Section */}
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-8 md:p-12 rounded-[2.5rem] border shadow-sm">
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold">What&apos;s new in FY 2024-25?</h3>
+            <h3 className="text-2xl font-bold tracking-tight">What&apos;s new in FY 2024-25?</h3>
             <div className="space-y-4 text-muted-foreground font-medium leading-relaxed">
               <p>
                 In the July 2024 Union Budget, the **New Tax Regime** was further incentivized to make it the default choice for most taxpayers.
@@ -37,7 +37,7 @@ export default function TaxCalculatorPage() {
             </div>
           </div>
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold">Should you choose the Old Regime?</h3>
+            <h3 className="text-2xl font-bold tracking-tight">Should you choose the Old Regime?</h3>
             <p className="text-muted-foreground font-medium leading-relaxed">
               The Old Regime may still be beneficial if you have significant investments and expenses that qualify for deductions, such as:
             </p>

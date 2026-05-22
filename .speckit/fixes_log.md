@@ -17,3 +17,17 @@ This log records the technical issues, bugs, and queries solved during the devel
     - Modified `PageHero.tsx` to use `sticky top-0` for the image container.
     - Implemented a dark overlay for text contrast.
     - Added `relative z-10 bg-background` to subsequent content areas to create a "scroll-over" effect.
+
+## [2026-05-21] Technical Fixes: Webpack Runtime Error & Gemini API Key on Vercel
+- **Issue 1**: Webpack modules runtime TypeError: `__webpack_modules__[moduleId] is not a function` on Next.js 15.5.18.
+- **Root Cause 1**: Date object deserialization in `unstable_cache` caused Next.js to crash during dynamic page renders, and importing canvas-confetti directly on SSR pages broke Webpack client chunk evaluation.
+- **Solution 1**:
+    - Serialized Date objects inside the data-fetching cache function to clean JSON string formats.
+    - Added an SSR check/guard using dynamic imports (`dynamic(() => import('canvas-confetti'), { ssr: false })`) to prevent Webpack server/client build conflicts.
+- **Issue 2**: Chatbot returned "Please check that GEMINI_API_KEY is active" error on Vercel deployment.
+- **Root Cause 2**: `GEMINI_API_KEY` was configured in the local `.env` file but was missing from the Vercel project's environment variables.
+- **Solution 2**:
+    - Linked the local repository to Vercel via CLI using `npx vercel link --yes`.
+    - Added the `GEMINI_API_KEY` environment variable to the Vercel project for both production and preview environments.
+    - Triggered a production redeployment via `npx vercel --prod --yes` to rebuild the project with the active key.
+

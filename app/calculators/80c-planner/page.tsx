@@ -2,12 +2,11 @@ import { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { InvestmentPlanner80C } from "@/components/tools/InvestmentPlanner80C";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
-
 import { Sparkles } from "lucide-react";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Section 80C Investment Planner | AI Tax Engine",
+  title: "Section 80C Investment Planner | AI Tax Platform",
   description: "Track your tax-saving investments and maximize your ₹1.5 Lakh limit under Section 80C.",
 };
 
@@ -43,7 +42,7 @@ export default function InvestmentPlannerPage() {
             </div>
             <div className="relative group overflow-hidden rounded-3xl border shadow-2xl">
               <Image 
-                src="/images/section-80c-chart.png" 
+                src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=2070&auto=format&fit=crop" 
                 alt="Section 80C Investment Guide" 
                 width={800}
                 height={600}
