@@ -1,6 +1,6 @@
 "use server";
 
-import { GoogleGenerativeAI, Type } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { TaxInputs, TaxComparisonResult } from "@/lib/tax-calculations";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
@@ -24,15 +24,15 @@ export async function generateTaxInsights(
       generationConfig: {
         responseMimeType: "application/json",
         responseSchema: {
-          type: Type.OBJECT,
+          type: SchemaType.OBJECT,
           properties: {
             insight: {
-              type: Type.STRING,
+              type: SchemaType.STRING,
               description: "A 2-3 sentence personalized explanation of why the recommended regime is mathematically better based on their exact deductions."
             },
             actionableAdvice: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
               description: "An array of 1-3 highly personalized, actionable tips to save more tax, focusing on specific deductions or switching regimes."
             }
           },
@@ -66,8 +66,8 @@ export async function generateTaxInsights(
     const data = JSON.parse(jsonStr) as TaxAIInsight;
 
     return { success: true, data };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("AI Insights Error:", error);
-    return { success: false, error: error.message || "Failed to generate AI insights." };
+    return { success: false, error: error instanceof Error ? error.message : "Failed to generate AI insights." };
   }
 }

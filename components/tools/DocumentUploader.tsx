@@ -89,8 +89,8 @@ export function DocumentUploader({ onExtractSuccess }: DocumentUploaderProps) {
       } else {
         setError(result.error || "Extraction failed. Please try again.");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during upload.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred during upload.");
     } finally {
       setIsUploading(false);
     }
@@ -172,7 +172,7 @@ export function DocumentUploader({ onExtractSuccess }: DocumentUploaderProps) {
             <div className="mt-6 p-4 rounded-[1.5rem] bg-emerald-50 border border-emerald-100 flex items-start gap-3">
               <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
               <p className="text-sm font-semibold text-emerald-800 leading-relaxed">
-                Extraction complete! We've automatically filled your tax calculators.
+                Extraction complete! We&apos;ve automatically filled your tax calculators.
               </p>
             </div>
           )}

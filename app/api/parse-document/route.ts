@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pdfParse from "pdf-parse";
+const pdfParse = require("pdf-parse");
 
 export const maxDuration = 30; // Useful for Vercel deployment if parsing takes time
 
@@ -78,11 +78,11 @@ export async function POST(req: NextRequest) {
       }
     });
 
-  } catch (error: any) {
-    console.error("PDF parsing error:", error);
+  } catch (err: unknown) {
+    console.error("PDF Parsing Error:", err);
     return NextResponse.json({ 
       success: false, 
-      error: error.message || "Failed to parse document securely." 
+      error: err instanceof Error ? err.message : "Failed to parse document" 
     }, { status: 500 });
   }
 }

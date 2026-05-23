@@ -11,12 +11,9 @@ import {
   ArrowUpRight, 
   Sparkles, 
   Landmark, 
-  ShieldCheck, 
   CheckCircle, 
-  Bell, 
   ArrowRight,
-  Info,
-  BadgeAlert
+  Loader2
 } from "lucide-react";
 import { getGamificationState, addXp, GamificationState } from "@/lib/gamification";
 import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
@@ -78,7 +75,6 @@ export default function DashboardPage() {
   const [preferredRegime, setPreferredRegime] = useState<"NEW" | "OLD">("NEW");
 
   // Check-in state
-  const [lastCheckIn, setLastCheckIn] = useState<string | null>(null);
   const [checkInClaimed, setCheckInClaimed] = useState(false);
 
   // AI Recommendation State
@@ -158,13 +154,17 @@ export default function DashboardPage() {
 
       // 7. Check-in
       const savedCheckInDate = localStorage.getItem("tax-last-check-in");
-      setLastCheckIn(savedCheckInDate);
       if (savedCheckInDate) {
         const today = new Date().toDateString();
         setCheckInClaimed(savedCheckInDate === today);
       }
     }
   }, []);
+
+  // Clear old AI insight if inputs change
+  useEffect(() => {
+    setAiInsight(null);
+  }, [plannerInputs]);
 
   // Recalculate tax comparison on inputs change
   const taxResults = useMemo(() => {
@@ -176,8 +176,6 @@ export default function DashboardPage() {
       otherDeductions: 0,
       interestOnHomeLoan: 0
     };
-    // Clear old AI insight if inputs change
-    if (aiInsight) setAiInsight(null);
     return compareRegimes(inputs);
   }, [plannerInputs]);
 
@@ -217,7 +215,7 @@ export default function DashboardPage() {
   };
 
   // Handle successful PDF extraction
-  const handleExtractSuccess = (data: any) => {
+  const handleExtractSuccess = (data: Partial<SavedCalculationInputs> & { tds?: number }) => {
     const nextInputs = {
       grossSalary: data.grossSalary || plannerInputs.grossSalary,
       section80C: data.section80C || plannerInputs.section80C,
@@ -663,8 +661,9 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
           {/* Interactive Filing Checklist */}
           <section className="space-y-4">
