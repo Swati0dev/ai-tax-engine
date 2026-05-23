@@ -13,7 +13,8 @@ import {
   Landmark, 
   CheckCircle, 
   ArrowRight,
-  Loader2
+  Loader2,
+  BadgeAlert
 } from "lucide-react";
 import { getGamificationState, addXp, GamificationState } from "@/lib/gamification";
 import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
@@ -289,7 +290,6 @@ export default function DashboardPage() {
     const today = new Date().toDateString();
     if (typeof window !== "undefined") {
       localStorage.setItem("tax-last-check-in", today);
-      setLastCheckIn(today);
       setCheckInClaimed(true);
       addXp(25).then(newState => setGamerState(newState));
       triggerConfetti();

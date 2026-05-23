@@ -1,7 +1,7 @@
 "use server";
 
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import { TaxInputs, TaxComparisonResult } from "@/lib/tax-calculations";
+import { TaxInputs, ComparisonResult } from "@/lib/tax-calculations";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -12,7 +12,7 @@ export interface TaxAIInsight {
 
 export async function generateTaxInsights(
   inputs: TaxInputs,
-  results: TaxComparisonResult
+  results: ComparisonResult
 ): Promise<{ success: boolean; data?: TaxAIInsight; error?: string }> {
   try {
     if (!process.env.GEMINI_API_KEY) {
