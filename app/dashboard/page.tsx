@@ -22,6 +22,8 @@ import { getGamificationState, addXp, GamificationState } from "@/lib/gamificati
 import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
 import { getUserProgress } from "@/actions/gamification";
 import { getCompletedComplianceDocs, toggleComplianceDoc } from "@/actions/compliance";
+import { generateTaxInsights, TaxAIInsight } from "@/actions/ai-recommendations";
+import { DocumentUploader } from "@/components/tools/DocumentUploader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { triggerConfetti } from "@/components/ui/Confetti";
@@ -78,6 +80,10 @@ export default function DashboardPage() {
   // Check-in state
   const [lastCheckIn, setLastCheckIn] = useState<string | null>(null);
   const [checkInClaimed, setCheckInClaimed] = useState(false);
+
+  // AI Recommendation State
+  const [aiInsight, setAiInsight] = useState<TaxAIInsight | null>(null);
+  const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
 
   // Hydration safety check
   useEffect(() => {
@@ -170,8 +176,36 @@ export default function DashboardPage() {
       otherDeductions: 0,
       interestOnHomeLoan: 0
     };
+    // Clear old AI insight if inputs change
+    if (aiInsight) setAiInsight(null);
     return compareRegimes(inputs);
   }, [plannerInputs]);
+
+  const handleGenerateInsight = async () => {
+    setIsGeneratingInsight(true);
+    setAiInsight(null);
+    try {
+      const inputs: TaxInputs = {
+        grossSalary: plannerInputs.grossSalary,
+        hraExemption: plannerInputs.hraExemption,
+        section80C: plannerInputs.section80C,
+        section80D: plannerInputs.section80D,
+        otherDeductions: 0,
+        interestOnHomeLoan: 0
+      };
+      
+      const res = await generateTaxInsights(inputs, taxResults);
+      if (res.success && res.data) {
+        setAiInsight(res.data);
+        addXp(20).then(newState => setGamerState(newState));
+        triggerConfetti();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsGeneratingInsight(false);
+    }
+  };
 
   // Handle calculator input changes & save them
   const updatePlannerInput = (key: keyof SavedCalculationInputs, val: number) => {
@@ -180,6 +214,23 @@ export default function DashboardPage() {
     if (typeof window !== "undefined") {
       localStorage.setItem("tax-dashboard-calculation", JSON.stringify(nextInputs));
     }
+  };
+
+  // Handle successful PDF extraction
+  const handleExtractSuccess = (data: any) => {
+    const nextInputs = {
+      grossSalary: data.grossSalary || plannerInputs.grossSalary,
+      section80C: data.section80C || plannerInputs.section80C,
+      hraExemption: data.hraExemption || plannerInputs.hraExemption,
+      section80D: data.section80D || plannerInputs.section80D,
+    };
+    setPlannerInputs(nextInputs);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("tax-dashboard-calculation", JSON.stringify(nextInputs));
+    }
+    // Gamification reward for uploading
+    addXp(50).then(newState => setGamerState(newState));
+    triggerConfetti();
   };
 
   // Toggle compliance checklists
@@ -437,9 +488,15 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <CardContent className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-8">
-              {/* Inputs Sliders */}
-              <div className="md:col-span-7 space-y-5">
+            <CardContent className="p-6 md:p-8 space-y-8">
+              {/* Form 16 Uploader */}
+              <div className="w-full bg-slate-50 border border-slate-100 p-6 rounded-[2rem]">
+                <DocumentUploader onExtractSuccess={handleExtractSuccess} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                {/* Inputs Sliders */}
+                <div className="md:col-span-7 space-y-5">
                 {/* Gross salary */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-xs font-bold">
@@ -544,7 +601,67 @@ export default function DashboardPage() {
                       Recommended: {taxResults.recommendation} REGIME
                     </div>
                   </div>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={handleGenerateInsight}
+                      disabled={isGeneratingInsight}
+                      className={cn(
+                        "w-full rounded-2xl py-3 text-xs font-bold text-white transition-all shadow-md flex items-center justify-center gap-2",
+                        isGeneratingInsight 
+                          ? "bg-slate-400 cursor-not-allowed shadow-none" 
+                          : "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 shadow-purple-500/20"
+                      )}
+                    >
+                      {isGeneratingInsight ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Analyzing your tax profile...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          Ask AI for Insights ✨
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
+
+                {/* AI Insights Result Card */}
+                {aiInsight && (
+                  <div className="mt-6 p-6 rounded-[2rem] bg-gradient-to-br from-indigo-500/5 to-purple-500/10 border border-purple-500/20 text-left relative overflow-hidden backdrop-blur-sm shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="absolute right-0 top-0 h-32 w-32 bg-purple-500/10 rounded-full blur-3xl -mr-10 -mt-10" />
+                    
+                    <div className="space-y-4 relative z-10">
+                      <div>
+                        <h4 className="text-xs font-black text-indigo-700 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                          <Sparkles className="h-3 w-3" />
+                          AI Tax Verdict
+                        </h4>
+                        <p className="text-sm font-semibold text-slate-800 leading-relaxed">
+                          {aiInsight.insight}
+                        </p>
+                      </div>
+                      
+                      <div className="pt-4 border-t border-purple-500/20">
+                        <h4 className="text-[10px] font-black text-purple-700 uppercase tracking-widest mb-2">
+                          Actionable Optimization
+                        </h4>
+                        <ul className="space-y-2">
+                          {aiInsight.actionableAdvice.map((tip, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <div className="h-4 w-4 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                                <span className="text-[8px] font-black text-purple-700">{idx + 1}</span>
+                              </div>
+                              <p className="text-xs font-medium text-slate-700">{tip}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
