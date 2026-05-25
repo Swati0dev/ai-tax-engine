@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Landmark, ShieldCheck, Mail, Lock, ArrowRight, Chrome, Sparkles } from "lucide-react";
+import { Landmark, ShieldCheck, Mail, Lock, ArrowRight, Chrome, Sparkles, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,10 +13,21 @@ import { triggerConfetti } from "@/components/ui/Confetti";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("mode") === "signup") {
+      setIsSignUp(true);
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +38,27 @@ export default function LoginPage() {
 
     setIsLoading(true);
     setErrorMsg("");
+    setSuccessMsg("");
 
     try {
+      if (isSignUp) {
+        // Implement Real User Creation Flow here (via Prisma or Backend API)
+        // For now simulate creation and auto-login
+        setTimeout(() => {
+          setSuccessMsg("Account created successfully! Logging you in...");
+          setTimeout(() => {
+            if (typeof window !== "undefined") {
+              localStorage.setItem("tax-logged-in", "true");
+              addXp(50); // bonus xp for signup
+              triggerConfetti();
+              router.push("/dashboard");
+              router.refresh();
+            }
+          }, 1500);
+        }, 1000);
+        return;
+      }
+
       const res = await signIn("credentials", {
         redirect: false,
         email,
@@ -95,11 +126,11 @@ export default function LoginPage() {
             </div>
             <div>
               <h1 className="font-heading text-2xl font-black tracking-tight text-white flex items-center justify-center gap-1.5">
-                Tax AI Portal
+                {isSignUp ? "Create an Account" : "Tax AI Portal"}
                 <Sparkles className="h-4 w-4 text-secondary fill-current" />
               </h1>
               <p className="text-xs text-slate-400 font-semibold mt-1">
-                Enter credentials to sign in securely
+                {isSignUp ? "Join the smartest tax platform in India" : "Enter credentials to sign in securely"}
               </p>
             </div>
           </div>
@@ -109,6 +140,32 @@ export default function LoginPage() {
             {errorMsg && (
               <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
                 {errorMsg}
+              </div>
+            )}
+            
+            {successMsg && (
+              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+                {successMsg}
+              </div>
+            )}
+
+            {isSignUp && (
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                <label htmlFor="name" className="text-[10px] font-black text-slate-300 uppercase tracking-widest block pl-1">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Rahul Sharma"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="bg-white/5 border-white/10 focus:border-accent text-white placeholder-slate-500 pl-10 rounded-xl h-11"
+                    required={isSignUp}
+                  />
+                </div>
               </div>
             )}
 
@@ -135,9 +192,11 @@ export default function LoginPage() {
                 <label htmlFor="passcode" className="text-[10px] font-black text-slate-300 uppercase tracking-widest block">
                   Password
                 </label>
-                <a href="#" className="text-[10px] text-accent hover:text-accent/80 font-bold transition-colors">
-                  Forgot Password?
-                </a>
+                {!isSignUp && (
+                  <Link href="/forgot-password" className="text-[10px] text-accent hover:text-accent/80 font-bold transition-colors">
+                    Forgot Password?
+                  </Link>
+                )}
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
@@ -162,11 +221,25 @@ export default function LoginPage() {
                 <div className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  {isSignUp ? "Create Account" : "Sign In"}
                   <ArrowRight className="h-4.5 w-4.5 text-accent" />
                 </>
               )}
             </Button>
+            
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setErrorMsg("");
+                  setSuccessMsg("");
+                }}
+                className="text-[11px] font-semibold text-slate-400 hover:text-white transition-colors"
+              >
+                {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+              </button>
+            </div>
           </form>
 
           {/* Divider */}

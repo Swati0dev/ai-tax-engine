@@ -2,20 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Landmark, Menu, X, ChevronRight, User } from "lucide-react";
-import { useState } from "react";
+import { Landmark, Menu, X, ChevronRight, User, LogOut, LayoutDashboard, Settings, UserPlus, LogIn } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 import { GamificationBadge } from "./GamificationBadge";
 
 const desktopNavigationItems = [
-  { href: "/chat", label: "Ask AI" },
   { href: "/direct-tax", label: "Direct Tax" },
   { href: "/indirect-tax", label: "Indirect Tax" },
   { href: "/calculators", label: "Calculators" },
   { href: "/compliance", label: "Compliance" },
-  { href: "/knowledge-hub", label: "Knowledge Hub" },
-  { href: "/dashboard", label: "Dashboard" }
+  { href: "/knowledge-hub", label: "Knowledge Hub" }
 ];
 
 const allNavigationItems = [
@@ -31,6 +29,32 @@ type SiteHeaderProps = {
 export function SiteHeader({ className }: SiteHeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsLoggedIn(localStorage.getItem("tax-logged-in") === "true");
+    
+    // Close dropdown on outside click
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    localStorage.removeItem("tax-logged-in");
+    setIsLoggedIn(false);
+    setProfileOpen(false);
+    
+    // Dynamic import to avoid SSR errors if not wrapped in provider
+    const { signOut } = await import("next-auth/react");
+    signOut({ callbackUrl: "/" });
+  };
 
   return (
     <header className={cn("sticky top-0 z-50 w-full glass-navbar transition-all duration-300", className)}>
@@ -72,14 +96,54 @@ export function SiteHeader({ className }: SiteHeaderProps) {
         <div className="flex items-center gap-2 sm:gap-4">
           <GamificationBadge />
           
-          {/* Dashboard Icon Shortcut */}
-          <Link
-            href="/login"
-            className="p-2 text-muted-foreground hover:text-primary rounded-xl hover:bg-primary/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            title="Profile / Login"
-          >
-            <User className="h-5 w-5" />
-          </Link>
+          {/* Profile Dropdown Menu */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="p-2 text-muted-foreground hover:text-primary rounded-xl hover:bg-primary/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring flex items-center justify-center"
+              title="Profile Menu"
+            >
+              <User className="h-5 w-5" />
+            </button>
+            
+            {profileOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Account</p>
+                </div>
+                <div className="p-2 flex flex-col gap-1">
+                  {isLoggedIn ? (
+                    <>
+                      <Link href="/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                      <Link href="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
+                        <Settings className="h-4 w-4" />
+                        Settings
+                      </Link>
+                      <div className="h-[1px] bg-slate-100 my-1 mx-2" />
+                      <button onClick={handleLogout} className="flex w-full items-center gap-3 px-3 py-2 text-sm font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors text-left">
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
+                        <LogIn className="h-4 w-4" />
+                        Sign In
+                      </Link>
+                      <Link href="/login?mode=signup" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
+                        <UserPlus className="h-4 w-4" />
+                        Create Account
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Ask Tax AI Quick Call-To-Action Button */}
           <Link 
@@ -126,15 +190,14 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                 </Link>
               );
             })}
-            <div className="mt-6 pt-6 border-t px-3 flex flex-col gap-4">
-              <Link
-                href="/chat"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center rounded-xl bg-primary py-3.5 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-transform active:translate-y-0.5"
-              >
-                Ask Tax AI Assistant
-              </Link>
-            </div>
+              {isLoggedIn && (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+                  className="w-full text-center rounded-xl bg-rose-50 py-3.5 text-base font-bold text-rose-600 shadow-sm transition-transform active:translate-y-0.5"
+                >
+                  Logout
+                </button>
+              )}
           </nav>
         </div>
       )}
