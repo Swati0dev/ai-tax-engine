@@ -30,8 +30,12 @@ export default function ForgotPasswordPage() {
       if (!res.ok) throw new Error(data.error || "Failed to request password reset");
 
       setMessage(data.message || "Reset link sent to your email.");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
