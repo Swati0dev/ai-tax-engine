@@ -22,6 +22,7 @@ import { getUserProgress } from "@/actions/gamification";
 import { getCompletedComplianceDocs, toggleComplianceDoc } from "@/actions/compliance";
 import { generateTaxInsights, TaxAIInsight } from "@/actions/ai-recommendations";
 import { DocumentUploader } from "@/components/tools/DocumentUploader";
+import { MyITRQuest } from "@/components/dashboard/MyITRQuest";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { triggerConfetti } from "@/components/ui/Confetti";
@@ -458,6 +459,8 @@ export default function DashboardPage() {
         {/* Left Side: Planner & Lists (Col-8) */}
         <div className="lg:col-span-8 space-y-8">
           
+          <MyITRQuest />
+
           {/* Real-time tax savings planner widget */}
           <Card className="rounded-[2.5rem] border-primary/10 shadow-xl overflow-hidden bg-white">
             <div className="p-6 md:p-8 bg-slate-50 border-b border-slate-100 flex items-center justify-between">

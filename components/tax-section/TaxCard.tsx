@@ -14,20 +14,6 @@ interface TaxCardProps {
 export function TaxCard({ item, className }: TaxCardProps) {
   return (
     <article className={cn("soft-ui-card p-6 md:p-8 rounded-3xl flex flex-col gap-8 overflow-hidden", className)}>
-      {/* Cover Image */}
-      {item.imageUrl && (
-        <div className="relative w-full h-48 md:h-64 rounded-2xl overflow-hidden shadow-sm -mt-2 group">
-          <Image 
-            src={item.imageUrl} 
-            alt={item.title} 
-            fill 
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-        </div>
-      )}
-
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div className="space-y-2">
@@ -61,6 +47,18 @@ export function TaxCard({ item, className }: TaxCardProps) {
       <p className="text-lg text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-6 py-2">
         {item.summary}
       </p>
+
+      {/* Cover Image */}
+      <div className="relative w-full h-48 md:h-64 rounded-2xl overflow-hidden shadow-sm my-4 group bg-slate-100 flex items-center justify-center">
+        <Image 
+          src={item.imageUrl || "/hero-tax.png"} 
+          alt={item.title} 
+          fill 
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+      </div>
 
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
