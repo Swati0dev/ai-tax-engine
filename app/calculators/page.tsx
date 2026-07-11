@@ -11,7 +11,8 @@ import {
   Calendar, 
   PiggyBank, 
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Building2
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -20,6 +21,15 @@ export const metadata: Metadata = {
 };
 
 const calculators = [
+  {
+    title: "Business Entity Recommendation Engine",
+    description: "An AI-powered tool to decide between Pvt Ltd, LLP, or Proprietorship based on your funding and liability needs.",
+    href: "/calculators/business-registration",
+    icon: Building2,
+    category: "Business Setup",
+    badge: "AI Powered",
+    badgeColor: "bg-purple-500/10 text-purple-600 border-purple-500/20"
+  },
   {
     title: "Income Tax Regime Comparator",
     description: "Compare tax liability under the Old and New tax regimes with the latest July 2024 Budget updates.",

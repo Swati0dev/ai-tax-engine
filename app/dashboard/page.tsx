@@ -21,6 +21,8 @@ import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
 import { getUserProgress } from "@/actions/gamification";
 import { getCompletedComplianceDocs, toggleComplianceDoc } from "@/actions/compliance";
 import { generateTaxInsights, TaxAIInsight } from "@/actions/ai-recommendations";
+import { getUserProfile, UserProfileData } from "@/actions/profile";
+import { getDynamicComplianceDates, getDynamicChecklist } from "@/lib/compliance-engine";
 import { DocumentUploader } from "@/components/tools/DocumentUploader";
 import { MyITRQuest } from "@/components/dashboard/MyITRQuest";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,20 +30,8 @@ import { Button } from "@/components/ui/button";
 import { triggerConfetti } from "@/components/ui/Confetti";
 import { cn } from "@/lib/utils";
 
-// Compliance actions/checklist data structure
-const DEFAULT_DASHBOARD_CHECKLIST = [
-  { id: "c1", label: "Download Form 16 from employer", category: "Salary Exemption" },
-  { id: "c2", label: "Verify Form 26AS for TDS entries", category: "Verification" },
-  { id: "c3", label: "Review Annual Information Statement (AIS)", category: "Verification" },
-  { id: "c4", label: "Collect Interest Certificates from Banks", category: "Income Proof" },
-  { id: "c5", label: "Gather investment proofs (ELSS, PPF, Insurance)", category: "80C Deductions" },
-];
+// Dynamic compliance is now imported from lib/compliance-engine
 
-const DASHBOARD_DUE_DATES = [
-  { id: "t2", title: "Advance Tax 1st Installment", date: "June 15, 2024", category: "DIRECT", warning: "Sec 234C 1% interest applies for delay" },
-  { id: "t4", title: "ITR Filing for Individuals", date: "July 31, 2024", category: "DIRECT", warning: "Sec 234F late fee of up to ₹5,000" },
-  { id: "t5", title: "TDS Q1 Quarterly Return", date: "July 31, 2024", category: "TDS", warning: "Sec 234E late fee of ₹200/day" }
-];
 
 interface SavedCalculationInputs {
   grossSalary: number;
@@ -83,6 +73,14 @@ export default function DashboardPage() {
   const [aiInsight, setAiInsight] = useState<TaxAIInsight | null>(null);
   const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
 
+  // Profile completion state
+  const [profileCompleted, setProfileCompleted] = useState<boolean | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
+
+  // Dynamic engine calculations
+  const dashboardChecklist = useMemo(() => getDynamicChecklist(userProfile).slice(0, 5), [userProfile]);
+  const dashboardDueDates = useMemo(() => getDynamicComplianceDates(userProfile).slice(0, 3), [userProfile]);
+
   // Hydration safety check
   useEffect(() => {
     setMounted(true);
@@ -98,6 +96,23 @@ export default function DashboardPage() {
           localStorage.setItem("userXp", progress.xp.toString());
         }
       });
+
+      // Check User Profile
+      const localProfile = localStorage.getItem("tax-user-profile");
+      if (localProfile) {
+        setProfileCompleted(true);
+        try { setUserProfile(JSON.parse(localProfile)); } catch {}
+      } else {
+        getUserProfile().then(res => {
+          if (res.success && res.data) {
+            setProfileCompleted(true);
+            setUserProfile(res.data);
+            localStorage.setItem("tax-user-profile", JSON.stringify(res.data));
+          } else {
+            setProfileCompleted(false);
+          }
+        }).catch(() => setProfileCompleted(false));
+      }
 
       // 2 & 3. Compliance Docs DB Sync
       getCompletedComplianceDocs().then(docs => {
@@ -252,7 +267,7 @@ export default function DashboardPage() {
         addXp(15).then(newState => setGamerState(newState));
         
         // Confetti triggers if they complete all items
-        if (updated.length === DEFAULT_DASHBOARD_CHECKLIST.length) {
+        if (updated.length === dashboardChecklist.length) {
           triggerConfetti();
         }
       }
@@ -299,17 +314,17 @@ export default function DashboardPage() {
 
   // Calculate overall filing progress percentage
   const checklistProgress = useMemo(() => {
-    if (DEFAULT_DASHBOARD_CHECKLIST.length === 0) return 0;
-    return Math.round((checkedItems.length / DEFAULT_DASHBOARD_CHECKLIST.length) * 100);
-  }, [checkedItems]);
+    if (dashboardChecklist.length === 0) return 0;
+    return Math.round((checkedItems.length / dashboardChecklist.length) * 100);
+  }, [checkedItems, dashboardChecklist]);
 
   // Calculate dynamic compliance score health based on completed timeline items
   const complianceHealth = useMemo(() => {
-    const activeDue = DASHBOARD_DUE_DATES.length;
+    const activeDue = dashboardDueDates.length;
     if (activeDue === 0) return 100;
-    const completedCount = DASHBOARD_DUE_DATES.filter(d => completedEvents.includes(d.id)).length;
+    const completedCount = dashboardDueDates.filter(d => completedEvents.includes(d.id)).length;
     return Math.round((completedCount / activeDue) * 100);
-  }, [completedEvents]);
+  }, [completedEvents, dashboardDueDates]);
 
   if (!mounted) {
     return (
@@ -360,6 +375,27 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Profile Prompt Banner */}
+      {profileCompleted === false && (
+        <section className="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+              <BadgeAlert className="h-6 w-6" />
+            </div>
+            <div>
+              <h3 className="font-bold text-amber-900 text-lg">Your Tax Profile is Incomplete</h3>
+              <p className="text-sm text-amber-700 font-medium">Complete your profile to unlock personalized AI guidance, tailored compliance dates, and accurate tax calculations.</p>
+            </div>
+          </div>
+          <Link href="/onboarding" className="shrink-0">
+            <Button className="bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl px-8 py-6 h-auto shadow-lg shadow-amber-500/20 w-full sm:w-auto">
+              Complete Profile Now
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </section>
+      )}
 
       {/* 2. Top Stats Matrix */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -420,7 +456,7 @@ export default function DashboardPage() {
                 />
               </div>
               <span className="text-[10px] text-muted-foreground font-bold mt-1 block">
-                {checkedItems.length} of {DEFAULT_DASHBOARD_CHECKLIST.length} preparation tasks done
+                {checkedItems.length} of {dashboardChecklist.length} preparation tasks done
               </span>
             </div>
           </CardContent>
@@ -682,7 +718,7 @@ export default function DashboardPage() {
 
             <Card className="rounded-[2.5rem] border-primary/10 shadow-lg bg-white">
               <CardContent className="p-6 md:p-8 space-y-4">
-                {DEFAULT_DASHBOARD_CHECKLIST.map((item) => {
+                {dashboardChecklist.map((item) => {
                   const isChecked = checkedItems.includes(item.id);
                   return (
                     <button

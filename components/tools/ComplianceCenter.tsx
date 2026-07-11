@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toggleComplianceDoc } from "@/actions/compliance";
+import { getUserProfile, UserProfileData } from "@/actions/profile";
+import { getDynamicComplianceDates, getDynamicChecklist } from "@/lib/compliance-engine";
 
 type Category = "ALL" | "DIRECT" | "INDIRECT" | "TDS";
 type EstimatorType = "itr" | "gst" | "tds";
@@ -43,92 +45,18 @@ interface ComplianceCenterProps {
   initialCompletedDocs?: string[];
 }
 
-const TIMELINE_EVENTS = [
-  {
-    id: "t1",
-    title: "GST GSTR-1 Filing",
-    date: "June 11, 2024",
-    category: "INDIRECT",
-    description: "Monthly return of outward supplies for taxpayers with turnover > ₹5 Crores or non-QRMP.",
-    warning: "Late fee of ₹50/day (₹20/day for Nil returns) applies after due date."
-  },
-  {
-    id: "t2",
-    title: "Advance Tax 1st Installment",
-    date: "June 15, 2024",
-    category: "DIRECT",
-    description: "Payment of 15% of estimated tax liability for FY 2024-25.",
-    warning: "Interest under Section 234C (1% per month) applies for defaults."
-  },
-  {
-    id: "t3",
-    title: "GST GSTR-3B Filing",
-    date: "June 20, 2024",
-    category: "INDIRECT",
-    description: "Monthly summary return and tax payment for outward & inward supplies.",
-    warning: "Interest of 18% p.a. on unpaid tax liability + late fees."
-  },
-  {
-    id: "t4",
-    title: "ITR Filing for Individuals",
-    date: "July 31, 2024",
-    category: "DIRECT",
-    description: "Deadline to file Income Tax Return for individuals, HUFs, and non-audit cases.",
-    warning: "Section 234F penalty of up to ₹5,000 + 1% per month interest under Section 234A."
-  },
-  {
-    id: "t5",
-    title: "TDS Q1 Quarterly Return (Form 26Q)",
-    date: "July 31, 2024",
-    category: "TDS",
-    description: "Filing of quarterly TDS return for non-salary payments for Q1 (April - June).",
-    warning: "Section 234E late fee of ₹200 per day up to the TDS amount."
-  },
-  {
-    id: "t6",
-    title: "Advance Tax 2nd Installment",
-    date: "September 15, 2024",
-    category: "DIRECT",
-    description: "Payment of 45% of estimated tax liability for FY 2024-25.",
-    warning: "Interest under Section 234C applies for defaults."
-  },
-  {
-    id: "t7",
-    title: "Advance Tax 3rd Installment",
-    date: "December 15, 2024",
-    category: "DIRECT",
-    description: "Payment of 75% of estimated tax liability for FY 2024-25.",
-    warning: "Interest under Section 234C applies for defaults."
-  },
-  {
-    id: "t8",
-    title: "Advance Tax 4th Installment",
-    date: "March 15, 2025",
-    category: "DIRECT",
-    description: "Payment of 100% of estimated tax liability for FY 2024-25.",
-    warning: "Interest under Section 234C/234B applies for defaults."
-  }
-];
-
-const DEFAULT_CHECKLIST = [
-  { id: "c1", label: "Download Form 16 from employer", category: "ITR" },
-  { id: "c2", label: "Verify Form 26AS for TDS entries", category: "ITR" },
-  { id: "c3", label: "Review Annual Information Statement (AIS)", category: "ITR" },
-  { id: "c4", label: "Collect Interest Certificates from Banks", category: "ITR" },
-  { id: "c5", label: "Gather investment proofs (ELSS, PPF, Insurance)", category: "ITR" },
-  { id: "c6", label: "Check rent receipts & landlord PAN for HRA", category: "Salary" },
-  { id: "c7", label: "Consolidate GST sale registers", category: "GST" },
-  { id: "c8", label: "Reconcile Input Tax Credit (ITC) with GSTR-2B", category: "GST" },
-  { id: "c9", label: "Prepare TDS deduction invoices and collect vendor PANs", category: "TDS" }
-];
-
 export function ComplianceCenter({ initialDbForms = [], initialCompletedDocs = [] }: ComplianceCenterProps) {
   const [timelineFilter, setTimelineFilter] = useState<Category>("ALL");
   const [completedEvents, setCompletedEvents] = useState<string[]>([]);
   const [alertsEnabled, setAlertsEnabled] = useState<string[]>([]);
 
+  const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
+
+  // Dynamic lists based on user profile
+  const timelineEvents = useMemo(() => getDynamicComplianceDates(userProfile), [userProfile]);
+  const checklist = useMemo(() => getDynamicChecklist(userProfile), [userProfile]);
+
   // Checklist states
-  const [checklist, setChecklist] = useState<typeof DEFAULT_CHECKLIST>(DEFAULT_CHECKLIST);
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
 
   // Penalty Estimator states
@@ -164,6 +92,15 @@ export function ComplianceCenter({ initialDbForms = [], initialCompletedDocs = [
 
       const savedAlerts = localStorage.getItem("tax-compliance-alerts");
       if (savedAlerts) setAlertsEnabled(JSON.parse(savedAlerts));
+
+      const localProfile = localStorage.getItem("tax-user-profile");
+      if (localProfile) {
+        try { setUserProfile(JSON.parse(localProfile)); } catch {}
+      } else {
+        getUserProfile().then(res => {
+          if (res.success && res.data) setUserProfile(res.data);
+        }).catch(() => {});
+      }
     }
   }, [initialCompletedDocs]);
 
@@ -199,9 +136,9 @@ export function ComplianceCenter({ initialDbForms = [], initialCompletedDocs = [
 
   // Timeline events filter
   const filteredEvents = useMemo(() => {
-    if (timelineFilter === "ALL") return TIMELINE_EVENTS;
-    return TIMELINE_EVENTS.filter(e => e.category === timelineFilter);
-  }, [timelineFilter]);
+    if (timelineFilter === "ALL") return timelineEvents;
+    return timelineEvents.filter(e => e.category === timelineFilter);
+  }, [timelineFilter, timelineEvents]);
 
   // Checklist statistics
   const progressPercent = useMemo(() => {

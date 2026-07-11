@@ -72,3 +72,11 @@ A card-based central index that maps to individual SEO-friendly routes:
 * **Dashboard (`/dashboard`):** Saved chats, recent calculator history, checklist progression, and live reminders tracked through `localStorage`.
 * **Pricing (`/pricing`):** Premium fintech subscription plans.
 * **Login (`/login`):** Glassmorphic, modern login gateway.
+
+---
+
+## 🧠 Strategic Additions (Product Audit)
+* **Smart Tax Calculation:** Move beyond static forms to guided question flows with conditional logic.
+* **Business Registration Recommendation:** Interactive engine for entity types based on risk, liability, and funding.
+* **Compliance Tracking:** Highly personalized timeline for GST, ROC, TDS, and ITR.
+* **Admin No-Code Rules:** Ability for CAs/Admins to update rules, slabs, and limits without code changes.

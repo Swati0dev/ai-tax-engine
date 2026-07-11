@@ -80,6 +80,7 @@ model User {
   
   // Custom platform fields
   progress      UserProgress?
+  profile       UserProfile?
   calculations  SavedCalculation[]
   chats         ChatConversation[]
   
@@ -183,3 +184,22 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
+model UserProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  occupation            String?  // Salaried, Freelancer, Business Owner, Student, Retired, Investor, Creator
+  businessStatus        String?  // No business, planning to start, already registered, unregistered
+  ageBracket            String?  // Below 60, 60-80, Above 80
+  annualIncomeEstimate  String?
+  filingExperience      String?  // First-time, Experienced
+  state                 String?
+  taxGoals              String[] // File ITR, Save Tax, Start Business, GST, Learn
+  guidanceLevel         String?  // Beginner, Detailed
+  existingRegistrations String[] // PAN, GST, MSME, LLP, Pvt Ltd
+  preferredLanguage     String?  // English, Hindi, Hinglish
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

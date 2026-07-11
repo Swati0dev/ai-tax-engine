@@ -72,3 +72,10 @@ Detailed checklist of tasks to implement the Premium AI-Powered Tax Platform red
 - [ ] Phase 10.2: Refactor gamification and compliance checklist to persist to database.
 - [ ] Phase 10.3: Form 16 / PDF Upload Parsing Pipeline.
 - [ ] Phase 10.4: AI-Powered Tax Regime Recommendation Engine.
+
+## 🤖 Phase 11: Intelligent Assistant Transformation
+- [ ] Phase 11.1: Build User Profiling Onboarding (Salaried, Business, Freelancer).
+- [ ] Phase 11.2: Refactor `DASHBOARD_DUE_DATES` to use dynamic, profile-based deadlines.
+- [ ] Phase 11.3: Build the Business Registration Recommendation logic engine.
+- [ ] Phase 11.4: Refactor calculators into step-by-step conversational flows.
+- [ ] Phase 11.5: Expand Admin Dashboard with No-Code Tax Rules Editor.

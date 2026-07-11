@@ -75,3 +75,12 @@ This document outlines the phased strategy for revamping the UI, structure, feat
 * **Goal:** Create Pricing and Login pages to complete the platform's professional SaaS presentation.
 * **Pricing (`/pricing`):** Showcase plans with gold accents, plan comparisons, and feature lists.
 * **Login (`/login`):** A modern glassmorphic credentials portal.
+
+---
+
+## Phase 11: Intelligent Assistant Transformation (Strategic Audit)
+* **Goal:** Shift the platform from static forms to a guided intelligent assistant.
+* **User Profiling Engine:** Implement a mandatory onboarding flow to classify the user (Salaried, Freelancer, Business Owner).
+* **Dynamic Compliance Engine:** Connect the user profile to the dashboard to show personalized compliance dates.
+* **Business Registration Engine:** Build an interactive recommendation engine for business entity types based on risk/funding.
+* **Conversational Data Gathering:** Shift static forms to "Typeform-style" conditional questioning.
