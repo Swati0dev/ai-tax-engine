@@ -79,8 +79,11 @@ function LoginContent() {
 
           triggerConfetti();
           
-          const session = await getSession();
-          const role = (session?.user as { role?: string })?.role;
+          // Fetch fresh session directly from API to bypass client-side cache delays
+          const req = await fetch("/api/auth/session");
+          const session = await req.json();
+          const role = session?.user?.role;
+
           if (role === "ADMIN") {
             router.push("/admin");
           } else {
