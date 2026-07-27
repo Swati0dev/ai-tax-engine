@@ -2,24 +2,41 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Landmark, Menu, X, ChevronRight, User, LogOut, LayoutDashboard, Settings, UserPlus, LogIn } from "lucide-react";
+import { Landmark, Menu, X, ChevronRight, User, LogOut, LayoutDashboard, Settings, UserPlus, LogIn, Search, ChevronDown, Bot } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-
 import { cn } from "@/lib/utils";
-import { GamificationBadge } from "./GamificationBadge";
 
-const desktopNavigationItems = [
-  { href: "/direct-tax", label: "Direct Tax" },
-  { href: "/indirect-tax", label: "Indirect Tax" },
-  { href: "/calculators", label: "Calculators" },
-  { href: "/compliance", label: "Compliance" },
-  { href: "/knowledge-hub", label: "Knowledge Hub" }
+// --- Desktop Dropdown Data ---
+const learnItems = [
+  { href: "/learn/tax-basics", label: "Tax Basics" },
+  { href: "/learn/income-tax", label: "Income Tax" },
+  { href: "/learn/gst", label: "GST" },
+  { href: "/learn/tds", label: "TDS" },
+  { href: "/learn/business-tax", label: "Business Tax" },
+  { href: "/learn/company-tax", label: "Company Tax" },
+  { href: "/learn/international-tax", label: "International Tax" },
+  { href: "/learn/roadmap", label: "Learning Roadmap" },
 ];
 
-const allNavigationItems = [
-  { href: "/", label: "Home" },
-  ...desktopNavigationItems,
-  { href: "/pricing", label: "Pricing" }
+const solutionItems = [
+  { href: "/solutions/start-business", label: "Start Business" },
+  { href: "/solutions/register-gst", label: "Register GST" },
+  { href: "/solutions/file-itr", label: "File ITR" },
+  { href: "/solutions/save-tax", label: "Save Tax" },
+  { href: "/solutions/business-compliance", label: "Business Compliance" },
+  { href: "/solutions/tax-notices", label: "Tax Notices" },
+  { href: "/solutions/business-registration", label: "Business Registration" },
+  { href: "/solutions/export-business", label: "Export Business" },
+];
+
+const toolItems = [
+  { href: "/tools/income-tax-calculator", label: "Income Tax Calculator" },
+  { href: "/tools/gst-calculator", label: "GST Calculator" },
+  { href: "/tools/hra-calculator", label: "HRA Calculator" },
+  { href: "/tools/tax-planner", label: "Tax Planner" },
+  { href: "/tools/ai-document-reader", label: "AI Document Reader" },
+  { href: "/tools/due-date-calendar", label: "Due Date Calendar" },
+  { href: "/downloads", label: "Downloads" },
 ];
 
 type SiteHeaderProps = {
@@ -31,15 +48,18 @@ export function SiteHeader({ className }: SiteHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Dropdown states
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsLoggedIn(localStorage.getItem("tax-logged-in") === "true");
     
-    // Close dropdown on outside click
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
         setProfileOpen(false);
+        setActiveDropdown(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -51,113 +71,143 @@ export function SiteHeader({ className }: SiteHeaderProps) {
     setIsLoggedIn(false);
     setProfileOpen(false);
     
-    // Dynamic import to avoid SSR errors if not wrapped in provider
+    // Dynamic import to avoid SSR errors
     const { signOut } = await import("next-auth/react");
     signOut({ callbackUrl: "/" });
   };
 
+  const toggleDropdown = (name: string) => {
+    if (activeDropdown === name) setActiveDropdown(null);
+    else setActiveDropdown(name);
+  };
+
   return (
-    <header className={cn("sticky top-0 z-50 w-full glass-navbar transition-all duration-300", className)}>
-      <div className="mx-auto flex h-[4.5rem] w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header ref={headerRef} className={cn("sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300", className)}>
+      <div className="mx-auto flex h-[4.5rem] w-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
+        
         {/* Brand Logo */}
         <Link 
-          className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg p-1" 
+          className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary flex-shrink-0" 
           href="/"
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={() => { setMobileMenuOpen(false); setActiveDropdown(null); }}
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
-            <Landmark className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-sm">
+            <Landmark className="h-5 w-5" />
           </span>
-          <span className="font-heading text-xl font-bold tracking-tight text-primary">Tax AI Platform</span>
+          <span className="font-heading text-xl font-bold hidden sm:inline-block">Tax AI</span>
         </Link>
         
-        {/* Desktop Nav */}
-        <nav aria-label="Main navigation" className="hidden lg:flex lg:items-center lg:gap-1">
-          {desktopNavigationItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                className={cn(
-                  "px-3.5 py-2 text-sm font-semibold rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  isActive 
-                    ? "bg-primary/10 text-primary font-bold" 
-                    : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                )}
-                href={item.href}
-                key={item.href}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Search Bar (Desktop) */}
+        <div className="hidden lg:flex flex-1 max-w-md items-center relative">
+            <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+            <input 
+                type="text" 
+                placeholder="Search taxes, tools, or ask a question..." 
+                className="w-full bg-slate-100/80 border-transparent rounded-full py-2 pl-10 pr-4 text-sm focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+            />
+        </div>
 
-        {/* Right Action Items */}
-        <div className="flex items-center gap-2 sm:gap-4">
-          <GamificationBadge />
-          
-          {/* Profile Dropdown Menu */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="p-2 text-muted-foreground hover:text-primary rounded-xl hover:bg-primary/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring flex items-center justify-center"
-              title="Profile Menu"
+        {/* Desktop Nav Links */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {/* Learn Dropdown */}
+          <div className="relative">
+            <button 
+                onClick={() => toggleDropdown("learn")}
+                className={cn("flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-slate-100", activeDropdown === "learn" ? "bg-slate-100 text-primary" : "text-slate-600")}
             >
-              <User className="h-5 w-5" />
+                Learn <ChevronDown className={cn("h-4 w-4 transition-transform", activeDropdown === "learn" && "rotate-180")} />
             </button>
-            
-            {profileOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Account</p>
+            {activeDropdown === "learn" && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 grid gap-1 animate-in fade-in slide-in-from-top-2">
+                    <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider border-b mb-1">Learn</div>
+                    {learnItems.map(item => (
+                        <Link key={item.href} href={item.href} onClick={() => setActiveDropdown(null)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                            {item.label}
+                        </Link>
+                    ))}
                 </div>
-                <div className="p-2 flex flex-col gap-1">
-                  {isLoggedIn ? (
-                    <>
-                      <Link href="/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
-                        <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
-                      </Link>
-                      <Link href="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
-                        <Settings className="h-4 w-4" />
-                        Settings
-                      </Link>
-                      <div className="h-[1px] bg-slate-100 my-1 mx-2" />
-                      <button onClick={handleLogout} className="flex w-full items-center gap-3 px-3 py-2 text-sm font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors text-left">
-                        <LogOut className="h-4 w-4" />
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/login" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
-                        <LogIn className="h-4 w-4" />
-                        Sign In
-                      </Link>
-                      <Link href="/login?mode=signup" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-primary/10 hover:text-primary rounded-xl transition-colors">
-                        <UserPlus className="h-4 w-4" />
-                        Create Account
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </div>
             )}
           </div>
 
-          {/* Ask Tax AI Quick Call-To-Action Button */}
-          <Link 
-            href="/chat"
-            className="hidden sm:inline-flex items-center justify-center rounded-full bg-secondary px-5 py-2 text-sm font-bold text-secondary-foreground shadow-lg shadow-secondary/20 transition-transform hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            Ask Tax AI
+          {/* Solutions Dropdown */}
+          <div className="relative">
+            <button 
+                onClick={() => toggleDropdown("solutions")}
+                className={cn("flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-slate-100", activeDropdown === "solutions" ? "bg-slate-100 text-primary" : "text-slate-600")}
+            >
+                Solutions <ChevronDown className={cn("h-4 w-4 transition-transform", activeDropdown === "solutions" && "rotate-180")} />
+            </button>
+            {activeDropdown === "solutions" && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 grid gap-1 animate-in fade-in slide-in-from-top-2">
+                    <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider border-b mb-1">Solutions</div>
+                    {solutionItems.map(item => (
+                        <Link key={item.href} href={item.href} onClick={() => setActiveDropdown(null)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                            {item.label}
+                        </Link>
+                    ))}
+                </div>
+            )}
+          </div>
+
+          {/* Tools Dropdown */}
+          <div className="relative">
+            <button 
+                onClick={() => toggleDropdown("tools")}
+                className={cn("flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-slate-100", activeDropdown === "tools" ? "bg-slate-100 text-primary" : "text-slate-600")}
+            >
+                Tools <ChevronDown className={cn("h-4 w-4 transition-transform", activeDropdown === "tools" && "rotate-180")} />
+            </button>
+            {activeDropdown === "tools" && (
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 grid gap-1 animate-in fade-in slide-in-from-top-2">
+                    <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider border-b mb-1">Tools</div>
+                    {toolItems.map(item => (
+                        <Link key={item.href} href={item.href} onClick={() => setActiveDropdown(null)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                            {item.label}
+                        </Link>
+                    ))}
+                </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Right Action Items */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          
+          <Link href="/chat" className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 transition-colors">
+             <Bot className="h-4 w-4 text-emerald-400" />
+             AI Advisor
           </Link>
 
-          {/* Mobile Menu Hamburger */}
+          {/* Profile Logic */}
+          {isLoggedIn ? (
+             <div className="relative">
+               <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2 px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors">
+                  <User className="h-4 w-4 text-slate-600" />
+                  <span className="hidden sm:inline-block text-sm font-medium text-slate-700">Dashboard</span>
+               </button>
+               {profileOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95">
+                    <div className="p-2 flex flex-col gap-1">
+                      <Link href="/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl">
+                        <LayoutDashboard className="h-4 w-4 text-primary" /> My Dashboard
+                      </Link>
+                      <button onClick={handleLogout} className="flex w-full items-center gap-3 px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 rounded-xl text-left">
+                        <LogOut className="h-4 w-4" /> Logout
+                      </button>
+                    </div>
+                  </div>
+               )}
+             </div>
+          ) : (
+            <Link href="/login" className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 hover:text-primary transition-colors">
+              Login
+            </Link>
+          )}
+
+          {/* Mobile Hamburger */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Toggle menu"
+            className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -166,39 +216,71 @@ export function SiteHeader({ className }: SiteHeaderProps) {
 
       {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[4.5rem] z-40 w-full bg-background/95 backdrop-blur-md animate-in fade-in slide-in-from-top-5 duration-200">
-          <nav className="flex flex-col gap-1 p-6 border-b shadow-2xl bg-white max-h-[calc(100vh-4.5rem)] overflow-y-auto">
-            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 px-3">
-              Navigation Menu
+        <div className="lg:hidden fixed inset-0 top-[4.5rem] z-40 bg-white overflow-y-auto animate-in slide-in-from-right-full pb-20">
+            <div className="p-4 border-b">
+                <div className="relative">
+                    <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+                    <input type="text" placeholder="Search..." className="w-full bg-slate-100 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
             </div>
-            {allNavigationItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/"));
-              return (
-                <Link
-                  className={cn(
-                    "flex items-center justify-between px-4 py-3.5 rounded-xl text-base font-semibold transition-all focus-visible:outline-none",
-                    isActive 
-                      ? "bg-primary/10 text-primary font-bold" 
-                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                  )}
-                  href={item.href}
-                  key={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.label}
-                  <ChevronRight className="h-4 w-4 opacity-55" />
-                </Link>
-              );
-            })}
-              {isLoggedIn && (
-                <button
-                  onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
-                  className="w-full text-center rounded-xl bg-rose-50 py-3.5 text-base font-bold text-rose-600 shadow-sm transition-transform active:translate-y-0.5"
-                >
-                  Logout
-                </button>
-              )}
-          </nav>
+
+            <nav className="p-4 flex flex-col gap-6">
+                <Link href="/" onClick={() => setMobileMenuOpen(false)} className="text-lg font-bold text-slate-900">Home</Link>
+                
+                <div className="flex flex-col gap-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">📚 LEARN</h3>
+                    <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
+                        {learnItems.map(item => (
+                            <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">💼 SOLUTIONS</h3>
+                    <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
+                        {solutionItems.map(item => (
+                            <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">🧮 TOOLS</h3>
+                    <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
+                        {toolItems.map(item => (
+                            <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">🤖 AI</h3>
+                    <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
+                        <Link href="/chat" onClick={() => setMobileMenuOpen(false)} className="text-base text-primary font-bold py-1">Ask AI Advisor</Link>
+                        <Link href="/tools/decision-assistant" onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">Decision Assistant</Link>
+                        <Link href="/tools/notice-explainer" onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">Notice Explainer</Link>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">👤 ACCOUNT</h3>
+                    <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
+                        {isLoggedIn ? (
+                            <>
+                                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">Dashboard</Link>
+                                <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">Profile</Link>
+                                <button onClick={handleLogout} className="text-base text-rose-600 font-bold py-1 text-left">Logout</button>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">Login</Link>
+                                <Link href="/login?mode=signup" onClick={() => setMobileMenuOpen(false)} className="text-base text-primary font-bold py-1">Create Account</Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </nav>
         </div>
       )}
     </header>
