@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Landmark, ShieldCheck, Mail, Lock, ArrowRight, Chrome, Sparkles, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,7 +78,15 @@ function LoginContent() {
           }
 
           triggerConfetti();
-          router.push("/dashboard");
+          
+          const session = await getSession();
+          const role = (session?.user as any)?.role;
+          if (role === "ADMIN") {
+            router.push("/admin");
+          } else {
+            router.push("/dashboard");
+          }
+          
           router.refresh();
         }
       }
