@@ -25,24 +25,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
         
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
-        })
-        
-        if (!user || !user.password) {
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string }
+          })
+          
+          if (!user || !user.password) {
+            return null
+          }
+          
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          )
+          
+          if (!isPasswordValid) {
+            return null
+          }
+          
+          return user
+        } catch (error) {
+          console.error("Database connection or authorization error:", error)
           return null
         }
-        
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        )
-        
-        if (!isPasswordValid) {
-          return null
-        }
-        
-        return user
       }
     })
   ],
