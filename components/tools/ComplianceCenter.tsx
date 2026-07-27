@@ -98,7 +98,7 @@ export function ComplianceCenter({ initialDbForms = [], initialCompletedDocs = [
         try { setUserProfile(JSON.parse(localProfile)); } catch {}
       } else {
         getUserProfile().then(res => {
-          if (res.success && res.data) setUserProfile(res.data);
+          if (res.success && res.data) setUserProfile(res.data as unknown as UserProfileData);
         }).catch(() => {});
       }
     }

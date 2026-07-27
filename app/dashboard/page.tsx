@@ -851,7 +851,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="space-y-4">
-              {DASHBOARD_DUE_DATES.map((evt) => {
+              {dashboardDueDates.map((evt) => {
                 const isCompleted = completedEvents.includes(evt.id);
                 return (
                   <Card 
