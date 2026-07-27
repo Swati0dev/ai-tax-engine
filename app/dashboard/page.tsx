@@ -106,7 +106,7 @@ export default function DashboardPage() {
         getUserProfile().then(res => {
           if (res.success && res.data) {
             setProfileCompleted(true);
-            setUserProfile(res.data);
+            setUserProfile(res.data as unknown as UserProfileData);
             localStorage.setItem("tax-user-profile", JSON.stringify(res.data));
           } else {
             setProfileCompleted(false);

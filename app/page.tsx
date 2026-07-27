@@ -132,9 +132,9 @@ export default function HomePage() {
                 <Lightbulb className="h-8 w-8 animate-pulse" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-amber-600 uppercase tracking-wider mb-1">Today's Tax Tip</h3>
+                <h3 className="text-sm font-bold text-amber-600 uppercase tracking-wider mb-1">Today&apos;s Tax Tip</h3>
                 <p className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
-                  If your taxable income is strictly below ₹12 Lakhs and you don't have a home loan, the <span className="text-primary font-extrabold">New Tax Regime</span> will almost always save you more money in FY 2026-27.
+                  If your taxable income is strictly below ₹12 Lakhs and you don&apos;t have a home loan, the <span className="text-primary font-extrabold">New Tax Regime</span> will almost always save you more money in FY 2026-27.
                 </p>
                 <Link href="/learn/tax-basics/old-vs-new-regime" className="inline-flex items-center mt-3 text-sm font-bold text-amber-700 hover:underline">
                   Read the detailed comparison <ChevronRight className="h-4 w-4" />

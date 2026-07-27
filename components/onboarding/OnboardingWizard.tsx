@@ -69,6 +69,7 @@ export function OnboardingWizard() {
     setMounted(true);
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateData = (key: keyof UserProfileData, value: any) => {
     setData((prev) => ({ ...prev, [key]: value }));
   };
@@ -161,7 +162,7 @@ export function OnboardingWizard() {
                   Hi there! 👋 What do you do?
                 </h2>
                 <p className="text-muted-foreground font-medium">
-                  We'll customize your tax recommendations based on your primary source of income.
+                  We&apos;ll customize your tax recommendations based on your primary source of income.
                 </p>
               </div>
 
@@ -257,7 +258,7 @@ export function OnboardingWizard() {
             >
               <div>
                 <h2 className="font-heading text-3xl font-bold text-foreground mb-3">
-                  Let's talk numbers 📊
+                  Let&apos;s talk numbers 📊
                 </h2>
                 <p className="text-muted-foreground font-medium">
                   Tax slabs vary by age and income. We never share this data.
@@ -336,7 +337,7 @@ export function OnboardingWizard() {
                   What brings you here? 🎯
                 </h2>
                 <p className="text-muted-foreground font-medium">
-                  Select all that apply. We'll prioritize these tools for you.
+                  Select all that apply. We&apos;ll prioritize these tools for you.
                 </p>
               </div>
 
@@ -396,7 +397,7 @@ export function OnboardingWizard() {
                   Profile Personalized! ✨
                 </h2>
                 <p className="text-muted-foreground font-medium max-w-md mx-auto">
-                  We've tailored the dashboard, compliance calendar, and calculators based on your profile.
+                  We&apos;ve tailored the dashboard, compliance calendar, and calculators based on your profile.
                 </p>
               </div>
 
