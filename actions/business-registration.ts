@@ -92,7 +92,7 @@ export async function calculateBestEntity(answers: RegistrationAnswers): Promise
 
 export async function generateRegistrationAdvice(answers: RegistrationAnswers) {
   try {
-    const { recommended } = calculateBestEntity(answers);
+    const { recommended } = await calculateBestEntity(answers);
 
     // AI Personalization Layer
     if (!process.env.GEMINI_API_KEY) {
