@@ -15,7 +15,7 @@ export type RegistrationAnswers = {
 export type EntityType = "Sole Proprietorship" | "Partnership" | "LLP" | "Private Limited Company" | "One Person Company (OPC)";
 
 // Deterministic Scoring Engine
-export function calculateBestEntity(answers: RegistrationAnswers): { recommended: EntityType; scores: Record<EntityType, number> } {
+export async function calculateBestEntity(answers: RegistrationAnswers): Promise<{ recommended: EntityType; scores: Record<EntityType, number> }> {
   const scores: Record<EntityType, number> = {
     "Sole Proprietorship": 0,
     "Partnership": 0,
