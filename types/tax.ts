@@ -32,6 +32,8 @@ export type TaxKnowledgeItem = {
   effectiveFrom: string | Date | null;
   lastReviewed: string | Date;
   reviewStatus: ReviewStatus;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 };
 
 export type TaxSearchQuery = {

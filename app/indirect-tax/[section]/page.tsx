@@ -46,9 +46,9 @@ export default async function IndirectTaxSectionPage({ params }: IndirectTaxSect
             generateArticleJsonLd({
               headline: item.title,
               description: item.summary,
-              authorName: item.reviewerId || "AI Tax Engine Expert",
-              datePublished: item.createdAt,
-              dateModified: item.updatedAt,
+              authorName: "Platform Editor",
+              datePublished: typeof item.createdAt === "string" ? item.createdAt : item.createdAt.toISOString(),
+              dateModified: typeof item.updatedAt === "string" ? item.updatedAt : item.updatedAt.toISOString(),
             })
           ),
         }}
