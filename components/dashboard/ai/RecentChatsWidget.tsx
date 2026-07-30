@@ -30,7 +30,7 @@ export function RecentChatsWidget({ recentChats }: RecentChatsWidgetProps) {
           recentChats.map((chat) => (
             <Link 
               key={chat.id} 
-              href={`/chat`}
+              href={`/chat?id=${chat.id}`}
               className="p-5 bg-white border border-primary/5 rounded-[2rem] hover:shadow-md hover:border-primary/20 transition-all flex flex-col justify-between h-36 group relative overflow-hidden"
             >
               <div className="absolute right-0 top-0 h-10 w-10 rounded-bl-[2rem] bg-slate-50 flex items-center justify-center group-hover:bg-primary/5 transition-colors">
