@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "Stay ahead of Indian tax deadlines. Reconcile due dates, download checklists, and estimate penalties with our interactive timeline.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CompliancePage() {
   // Fetch forms and procedures dynamically from Neon Postgres database
   const res = await getFormsAndProcedures();

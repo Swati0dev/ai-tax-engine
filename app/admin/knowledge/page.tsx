@@ -1,6 +1,8 @@
 import { getAdminKnowledgeItems } from "@/actions/admin";
 import { KnowledgeCMSClient } from "@/components/admin/KnowledgeCMSClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function KnowledgeCMSPage() {
   const result = await getAdminKnowledgeItems();
   
