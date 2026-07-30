@@ -46,6 +46,7 @@ export interface DashboardRecommendation {
 import { SavedCalculationViewModel } from "../calculations/calculation.types";
 
 import { ComplianceEventViewModel } from "../compliance/compliance.types";
+import { ActivityViewModel } from "../activity/activity.types";
 
 export interface DashboardData {
   user: DashboardUser;
@@ -58,4 +59,5 @@ export interface DashboardData {
   savedSections: DashboardRecommendation[]; // Reusing type for now
   calculations: SavedCalculationViewModel[];
   complianceEvents: ComplianceEventViewModel[];
+  activities: ActivityViewModel[];
 }

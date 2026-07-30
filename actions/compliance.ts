@@ -56,8 +56,8 @@ export async function updateComplianceEventStatusAction(eventId: string, status:
     const updated = await updateComplianceEventStatus(session.user.id, eventId, status);
     revalidatePath('/dashboard');
     return { success: true, data: updated };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
 
@@ -69,8 +69,8 @@ export async function createCustomEventAction(request: CreateComplianceEventRequ
     const created = await createCustomComplianceEvent(session.user.id, request);
     revalidatePath('/dashboard');
     return { success: true, data: created };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
 

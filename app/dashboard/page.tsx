@@ -9,6 +9,7 @@ import { KnowledgeRecommendationsWidget } from "@/components/dashboard/knowledge
 import { DailyCheckInWidget } from "@/components/dashboard/productivity/DailyCheckInWidget";
 import { FinancialWorkspace } from "@/components/dashboard/financial/FinancialWorkspace";
 import { ComplianceWorkspace } from "@/components/dashboard/compliance/ComplianceWorkspace";
+import { RecentActivityWidget } from "@/components/dashboard/notifications/RecentActivityWidget";
 import { requiresProfileCompletion } from "@/src/engines/dashboard/dashboard.permissions";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
@@ -27,7 +28,8 @@ export default async function DashboardPage() {
     checklist,
     recentChats,
     calculations,
-    complianceEvents
+    complianceEvents,
+    activities
   } = dashboardData;
 
   const isProfileComplete = !requiresProfileCompletion(user);
@@ -84,6 +86,10 @@ export default async function DashboardPage() {
         {/* Right Side: Productivity, Links (Col-4) */}
         <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
           
+          <ErrorBoundary fallbackTitle="Activity Error">
+            <RecentActivityWidget activities={activities} />
+          </ErrorBoundary>
+
           <ErrorBoundary fallbackTitle="Daily Reward Error">
             <DailyCheckInWidget />
           </ErrorBoundary>

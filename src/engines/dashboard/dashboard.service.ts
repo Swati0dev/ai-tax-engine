@@ -8,6 +8,7 @@ import { DASHBOARD_CONSTANTS } from "./dashboard.constants";
 import { sortComplianceItemsByDate } from "./dashboard.utils";
 import { getUserCalculations } from "../calculations/calculation.service";
 import { getUserComplianceEvents, seedDefaultComplianceEvents } from "../compliance/compliance.service";
+import { getUserActivities } from "../activity/activity.service";
 import { auth } from "@/auth";
 
 export async function getDashboardData(): Promise<DashboardData | null> {
@@ -23,12 +24,13 @@ export async function getDashboardData(): Promise<DashboardData | null> {
   await seedDefaultComplianceEvents(userId);
 
   // Rule 2: Parallel Data Fetching
-  const [profileResult, progressResult, completedDocs, calculations, complianceEvents] = await Promise.all([
+  const [profileResult, progressResult, completedDocs, calculations, complianceEvents, activities] = await Promise.all([
     getUserProfile(),
     getUserProgress(),
     getCompletedComplianceDocs(),
     getUserCalculations(userId),
-    getUserComplianceEvents(userId)
+    getUserComplianceEvents(userId),
+    getUserActivities(userId)
   ]);
 
   const profileData: UserProfileData | null = (profileResult.success && profileResult.data) ? (profileResult.data as unknown as UserProfileData) : null;
@@ -74,5 +76,6 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     savedSections: savedSections,
     calculations: calculations,
     complianceEvents: complianceEvents,
+    activities: activities,
   };
 }
