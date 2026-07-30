@@ -1,5 +1,17 @@
 import { Metadata } from "next";
-import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
+import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
+
+const OnboardingWizard = dynamic(
+  () => import("@/components/onboarding/OnboardingWizard").then((mod) => mod.OnboardingWizard),
+  {
+    loading: () => (
+      <div className="flex h-96 w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    ),
+  }
+);
 
 export const metadata: Metadata = {
   title: "Personalize Your Tax Profile | AI Tax Engine",

@@ -1,7 +1,9 @@
 import { TaxKnowledgeItem } from "@prisma/client";
 import { KnowledgeRecommendationViewModel } from "./knowledge.types";
 
-export function toKnowledgeRecommendationViewModel(item: TaxKnowledgeItem): KnowledgeRecommendationViewModel {
+type KnowledgeItemSubset = Pick<TaxKnowledgeItem, 'id' | 'slug' | 'title' | 'category' | 'summary' | 'explanation'>;
+
+export function toKnowledgeRecommendationViewModel(item: KnowledgeItemSubset): KnowledgeRecommendationViewModel {
   // Simple word count to estimate read time. Assume 200 words per minute.
   const wordCount = (item.explanation + item.summary).split(/\s+/).length;
   const readTimeMins = Math.max(1, Math.ceil(wordCount / 200));
@@ -22,6 +24,6 @@ export function toKnowledgeRecommendationViewModel(item: TaxKnowledgeItem): Know
   };
 }
 
-export function toKnowledgeRecommendationViewModels(items: TaxKnowledgeItem[]): KnowledgeRecommendationViewModel[] {
+export function toKnowledgeRecommendationViewModels(items: KnowledgeItemSubset[]): KnowledgeRecommendationViewModel[] {
   return items.map(toKnowledgeRecommendationViewModel);
 }

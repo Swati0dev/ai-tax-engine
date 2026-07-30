@@ -1,7 +1,19 @@
 import { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
-import { InvestmentPlanner80C } from "@/components/tools/InvestmentPlanner80C";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
+
+const InvestmentPlanner80C = dynamic(
+  () => import("@/components/tools/InvestmentPlanner80C").then((mod) => mod.InvestmentPlanner80C),
+  {
+    loading: () => (
+      <div className="flex h-96 w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    ),
+  }
+);
 import { Sparkles } from "lucide-react";
 import Image from "next/image";
 

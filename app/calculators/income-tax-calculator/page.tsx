@@ -1,7 +1,19 @@
 import { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
-import { TaxCalculator } from "@/components/tools/TaxCalculator";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
+
+const TaxCalculator = dynamic(
+  () => import("@/components/tools/TaxCalculator").then((mod) => mod.TaxCalculator),
+  {
+    loading: () => (
+      <div className="flex h-96 w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    ),
+  }
+);
 
 export const metadata: Metadata = {
   title: "Tax Regime Comparator | AI Tax Platform",

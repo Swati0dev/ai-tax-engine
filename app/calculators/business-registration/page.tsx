@@ -1,7 +1,19 @@
 import { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
-import { BusinessRegistrationEngine } from "@/components/tools/BusinessRegistrationEngine";
+import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
+
+const BusinessRegistrationEngine = dynamic(
+  () => import("@/components/tools/BusinessRegistrationEngine").then((mod) => mod.BusinessRegistrationEngine),
+  {
+    loading: () => (
+      <div className="flex h-96 w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    ),
+  }
+);
 
 export const metadata: Metadata = {
   title: "Business Entity Selection Engine | AI Tax Platform",

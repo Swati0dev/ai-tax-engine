@@ -32,6 +32,7 @@ model TaxKnowledgeItem {
 
   @@index([category])
   @@index([reviewStatus])
+  @@index([category, reviewStatus])
 }
 
 model SourceReference {
@@ -68,25 +69,25 @@ enum SourceType {
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  email         String?         @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   password      String?
-  role          UserRole        @default(USER)
+  role          UserRole  @default(USER)
   accounts      Account[]
   sessions      Session[]
-  
+
   // Custom platform fields
-  progress      UserProgress?
-  profile       UserProfile?
-  calculations  SavedCalculation[]
-  chats         ChatConversation[]
+  progress         UserProgress?
+  profile          UserProfile?
+  calculations     SavedCalculation[]
+  chats            ChatConversation[]
   complianceEvents ComplianceEvent[]
-  notifications Notification[]
-  savedContents SavedContent[]
-  
+  notifications    Notification[]
+  savedContents    SavedContent[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -104,22 +105,22 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@unique([provider, providerAccountId])
 }
- 
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -142,32 +143,32 @@ enum TaxRegime {
 }
 
 model SavedCalculation {
-  id              String   @id @default(cuid())
-  userId          String
-  financialYear   String   @default("2024-25")
-  engineVersion   String   @default("1.0.0")
-  
+  id            String @id @default(cuid())
+  userId        String
+  financialYear String @default("2024-25")
+  engineVersion String @default("1.0.0")
+
   // Stored inputs (flattened for now, but keeping data Json for future complex categories)
-  grossSalary     Float
-  hraExemption    Float
-  section80C      Float
-  section80D      Float
-  otherDeductions Float
+  grossSalary        Float
+  hraExemption       Float
+  section80C         Float
+  section80D         Float
+  otherDeductions    Float
   interestOnHomeLoan Float
-  
+
   // A generic data field for future extensibility without breaking schema
   additionalDeductions Json?
 
   // Calculated Results
-  recommendedRegime TaxRegime 
+  recommendedRegime TaxRegime
   taxUnderOld       Float
   taxUnderNew       Float
   taxSavings        Float
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
@@ -179,7 +180,7 @@ model ChatConversation {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
 }
 
@@ -191,7 +192,7 @@ model ChatMessage {
   sources        Json?
   createdAt      DateTime         @default(now())
   conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  
+
   @@index([conversationId])
 }
 
@@ -214,19 +215,19 @@ model PasswordResetToken {
 model UserProfile {
   id                    String   @id @default(cuid())
   userId                String   @unique
-  occupation            String?  // Salaried, Freelancer, Business Owner, Student, Retired, Investor, Creator
-  businessStatus        String?  // No business, planning to start, already registered, unregistered
-  ageBracket            String?  // Below 60, 60-80, Above 80
+  occupation            String? // Salaried, Freelancer, Business Owner, Student, Retired, Investor, Creator
+  businessStatus        String? // No business, planning to start, already registered, unregistered
+  ageBracket            String? // Below 60, 60-80, Above 80
   annualIncomeEstimate  String?
-  filingExperience      String?  // First-time, Experienced
+  filingExperience      String? // First-time, Experienced
   state                 String?
   taxGoals              String[] // File ITR, Save Tax, Start Business, GST, Learn
-  guidanceLevel         String?  // Beginner, Detailed
+  guidanceLevel         String? // Beginner, Detailed
   existingRegistrations String[] // PAN, GST, MSME, LLP, Pvt Ltd
-  preferredLanguage     String?  // English, Hindi, Hinglish
-  
+  preferredLanguage     String? // English, Hindi, Hinglish
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -297,23 +298,23 @@ enum NotificationSeverity {
 }
 
 model Notification {
-  id          String   @id @default(cuid())
-  userId      String
+  id     String @id @default(cuid())
+  userId String
 
-  type        NotificationType
-  severity    NotificationSeverity
+  type     NotificationType
+  severity NotificationSeverity
 
-  title       String
-  message     String
+  title   String
+  message String
 
-  isRead      Boolean @default(false)
+  isRead Boolean @default(false)
 
-  actionUrl   String?
+  actionUrl String?
 
-  metadata    Json?
+  metadata Json?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -330,19 +331,19 @@ enum SavedContentType {
 }
 
 model SavedContent {
-  id          String   @id @default(cuid())
-  userId      String
+  id     String @id @default(cuid())
+  userId String
 
   type        SavedContentType
   title       String
   description String?
   referenceId String? // e.g., knowledge item ID, or calculation ID
 
-  tags        String[]
-  metadata    Json?
+  tags     String[]
+  metadata Json?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

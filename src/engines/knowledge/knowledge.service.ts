@@ -13,6 +13,14 @@ export async function getKnowledgeRecommendations(userId: string, limit: number 
       orderBy: {
         updatedAt: "desc"
       },
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        category: true,
+        slug: true,
+        explanation: true // Needed for word count in mapper
+      },
       take: limit,
     });
     
