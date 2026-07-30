@@ -85,6 +85,7 @@ model User {
   chats         ChatConversation[]
   complianceEvents ComplianceEvent[]
   notifications Notification[]
+  savedContents SavedContent[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -318,4 +319,33 @@ model Notification {
 
   @@index([userId])
   @@index([isRead])
+}
+
+enum SavedContentType {
+  KNOWLEDGE_ARTICLE
+  AI_CONVERSATION
+  CALCULATION
+  CHECKLIST
+  TEMPLATE
+}
+
+model SavedContent {
+  id          String   @id @default(cuid())
+  userId      String
+
+  type        SavedContentType
+  title       String
+  description String?
+  referenceId String? // e.g., knowledge item ID, or calculation ID
+
+  tags        String[]
+  metadata    Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
 }

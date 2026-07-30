@@ -27,6 +27,7 @@ export default async function DashboardPage() {
     dueDates,
     checklist,
     recentChats,
+    savedSections,
     calculations,
     complianceEvents,
     activities
@@ -78,7 +79,7 @@ export default async function DashboardPage() {
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Saved Sections Error">
-            <SavedSectionsWidget />
+            <SavedSectionsWidget savedSections={savedSections} />
           </ErrorBoundary>
 
         </div>

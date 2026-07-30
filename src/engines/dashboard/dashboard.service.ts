@@ -10,6 +10,7 @@ import { getUserCalculations } from "../calculations/calculation.service";
 import { getUserComplianceEvents, seedDefaultComplianceEvents } from "../compliance/compliance.service";
 import { getUserActivities } from "../activity/activity.service";
 import { getUserRecentChats } from "../chat/chat.service";
+import { getUserSavedContent } from "../saved-content/saved-content.service";
 import { auth } from "@/auth";
 
 export async function getDashboardData(): Promise<DashboardData | null> {
@@ -25,14 +26,15 @@ export async function getDashboardData(): Promise<DashboardData | null> {
   await seedDefaultComplianceEvents(userId);
 
   // Rule 2: Parallel Data Fetching
-  const [profileResult, progressResult, completedDocs, calculations, complianceEvents, activities, recentChatsData] = await Promise.all([
+  const [profileResult, progressResult, completedDocs, calculations, complianceEvents, activities, recentChatsData, savedContentsData] = await Promise.all([
     getUserProfile(),
     getUserProgress(),
     getCompletedComplianceDocs(),
     getUserCalculations(userId),
     getUserComplianceEvents(userId),
     getUserActivities(userId),
-    getUserRecentChats(userId, 3)
+    getUserRecentChats(userId, 3),
+    getUserSavedContent(userId, 4)
   ]);
 
   const profileData: UserProfileData | null = (profileResult.success && profileResult.data) ? (profileResult.data as unknown as UserProfileData) : null;
@@ -69,7 +71,14 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     timestamp: c.timestamp,
   }));
   const recommendations: DashboardRecommendation[] = [];
-  const savedSections: DashboardRecommendation[] = [];
+  const savedSections: DashboardRecommendation[] = savedContentsData.map(c => ({
+    id: c.id,
+    title: c.title,
+    description: c.description || "Saved item",
+    href: c.referenceId ? `/knowledge-hub/${c.referenceId}` : `/knowledge-hub`,
+    category: c.type === "KNOWLEDGE_ARTICLE" ? "Tax Section" : "Saved Item",
+    readTime: c.createdAt, // We can just overload readTime with date, or adapt UI
+  }));
 
   return {
     user: dashboardUser,
