@@ -45,6 +45,8 @@ export interface DashboardRecommendation {
 
 import { SavedCalculationViewModel } from "../calculations/calculation.types";
 
+import { ComplianceEventViewModel } from "../compliance/compliance.types";
+
 export interface DashboardData {
   user: DashboardUser;
   gamification: DashboardGamification;
@@ -55,4 +57,5 @@ export interface DashboardData {
   recommendations: DashboardRecommendation[];
   savedSections: DashboardRecommendation[]; // Reusing type for now
   calculations: SavedCalculationViewModel[];
+  complianceEvents: ComplianceEventViewModel[];
 }

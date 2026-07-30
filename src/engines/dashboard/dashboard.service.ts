@@ -7,6 +7,7 @@ import { mapDashboardUser, mapGamificationState, mapComplianceMetrics } from "./
 import { DASHBOARD_CONSTANTS } from "./dashboard.constants";
 import { sortComplianceItemsByDate } from "./dashboard.utils";
 import { getUserCalculations } from "../calculations/calculation.service";
+import { getUserComplianceEvents, seedDefaultComplianceEvents } from "../compliance/compliance.service";
 import { auth } from "@/auth";
 
 export async function getDashboardData(): Promise<DashboardData | null> {
@@ -18,12 +19,16 @@ export async function getDashboardData(): Promise<DashboardData | null> {
   const userEmail = session.user.email;
   const userName = session.user.name;
 
+  // Ensure default events exist for the user
+  await seedDefaultComplianceEvents(userId);
+
   // Rule 2: Parallel Data Fetching
-  const [profileResult, progressResult, completedDocs, calculations] = await Promise.all([
+  const [profileResult, progressResult, completedDocs, calculations, complianceEvents] = await Promise.all([
     getUserProfile(),
     getUserProgress(),
     getCompletedComplianceDocs(),
-    getUserCalculations(userId)
+    getUserCalculations(userId),
+    getUserComplianceEvents(userId)
   ]);
 
   const profileData: UserProfileData | null = (profileResult.success && profileResult.data) ? (profileResult.data as unknown as UserProfileData) : null;
@@ -68,5 +73,6 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     recommendations: recommendations,
     savedSections: savedSections,
     calculations: calculations,
+    complianceEvents: complianceEvents,
   };
 }

@@ -1,16 +1,14 @@
 import { redirect } from "next/navigation";
 import { getDashboardData } from "@/src/engines/dashboard/dashboard.service";
-import { MyITRQuest } from "@/components/dashboard/compliance/MyITRQuest";
 import { WelcomeWidget } from "@/components/dashboard/overview/WelcomeWidget";
 import { ProfilePromptWidget } from "@/components/dashboard/overview/ProfilePromptWidget";
 import { QuickActionsWidget } from "@/components/dashboard/overview/QuickActionsWidget";
-import { FilingChecklistWidget } from "@/components/dashboard/compliance/FilingChecklistWidget";
-import { DueDateTrackerWidget } from "@/components/dashboard/compliance/DueDateTrackerWidget";
 import { RecentChatsWidget } from "@/components/dashboard/ai/RecentChatsWidget";
 import { SavedSectionsWidget } from "@/components/dashboard/knowledge/SavedSectionsWidget";
 import { KnowledgeRecommendationsWidget } from "@/components/dashboard/knowledge/KnowledgeRecommendationsWidget";
 import { DailyCheckInWidget } from "@/components/dashboard/productivity/DailyCheckInWidget";
 import { FinancialWorkspace } from "@/components/dashboard/financial/FinancialWorkspace";
+import { ComplianceWorkspace } from "@/components/dashboard/compliance/ComplianceWorkspace";
 import { requiresProfileCompletion } from "@/src/engines/dashboard/dashboard.permissions";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
@@ -28,7 +26,8 @@ export default async function DashboardPage() {
     dueDates,
     checklist,
     recentChats,
-    calculations
+    calculations,
+    complianceEvents
   } = dashboardData;
 
   const isProfileComplete = !requiresProfileCompletion(user);
@@ -57,19 +56,20 @@ export default async function DashboardPage() {
         />
       </ErrorBoundary>
 
-      {/* 3. Main Dashboard Grid splits */}
+      {/* 2. Compliance Workspace */}
+      <ErrorBoundary fallbackTitle="Compliance Workspace Error">
+        <ComplianceWorkspace 
+          initialEvents={complianceEvents}
+          checklist={checklist}
+          dueDates={dueDates}
+        />
+      </ErrorBoundary>
+
+      {/* 3. Main Dashboard Grid splits (Other widgets) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Side: Financial & Compliance (Col-8) */}
+        {/* Left Side (Col-8) */}
         <div className="lg:col-span-8 space-y-8">
-          
-          <ErrorBoundary fallbackTitle="ITR Quest Error">
-            <MyITRQuest />
-          </ErrorBoundary>
-          
-          <ErrorBoundary fallbackTitle="Checklist Error">
-            <FilingChecklistWidget initialChecklist={checklist} />
-          </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="AI Chats Error">
             <RecentChatsWidget recentChats={recentChats} />
@@ -81,15 +81,11 @@ export default async function DashboardPage() {
 
         </div>
 
-        {/* Right Side: Productivity, Compliance tracking, Links (Col-4) */}
+        {/* Right Side: Productivity, Links (Col-4) */}
         <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
           
           <ErrorBoundary fallbackTitle="Daily Reward Error">
             <DailyCheckInWidget />
-          </ErrorBoundary>
-          
-          <ErrorBoundary fallbackTitle="Tracker Error">
-            <DueDateTrackerWidget initialDueDates={dueDates} />
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Quick Actions Error">
