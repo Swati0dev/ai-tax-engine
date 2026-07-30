@@ -4,6 +4,10 @@ import { prisma } from "@/lib/db";
 import { ReviewStatus } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { auth } from "@/auth";
+import { z } from "zod";
+
+const QuerySchema = z.string().min(2, "Please enter a more specific question (at least 2 characters).").max(1000);
 
 const EVASION_KEYWORDS = [
   "hide income", "black money", "evade tax", "avoid tax illegally", 
@@ -47,29 +51,27 @@ CRITICAL INSTRUCTIONS FOR CONVERSATIONAL TONE AND LANGUAGE:
 `;
 
 export async function processAIChat(query: string) {
-  const normalizedQuery = query.toLowerCase();
-  
-  // 1. Safety Guardrail
-  if (EVASION_KEYWORDS.some(keyword => normalizedQuery.includes(keyword))) {
-    logger.safety("Safety guardrail triggered", { query });
-    return {
-      success: true,
-      data: {
-        role: "assistant",
-        content: "I cannot assist with requests related to tax evasion, fraud, or illegal financial activities. My purpose is to provide information on lawful tax compliance and source-grounded guidance in accordance with Indian tax laws. I recommend consulting a certified tax professional for legal tax planning.",
-        sources: []
-      }
-    };
-  }
-
-  if (!query || query.trim().length < 2) {
-    return { 
-      success: false, 
-      error: "Please enter a more specific question (at least 2 characters)." 
-    };
-  }
-
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Unauthorized. Please log in to use the AI Assistant." };
+    }
+
+    const validatedQuery = QuerySchema.parse(query);
+    const normalizedQuery = validatedQuery.toLowerCase();
+    
+    // 1. Safety Guardrail
+    if (EVASION_KEYWORDS.some(keyword => normalizedQuery.includes(keyword))) {
+      logger.safety("Safety guardrail triggered", { query: validatedQuery });
+      return {
+        success: true,
+        data: {
+          role: "assistant",
+          content: "I cannot assist with requests related to tax evasion, fraud, or illegal financial activities. My purpose is to provide information on lawful tax compliance and source-grounded guidance in accordance with Indian tax laws. I recommend consulting a certified tax professional for legal tax planning.",
+          sources: []
+        }
+      };
+    }
     // 2. Retrieval Step (Grounding)
     // Extract keywords to run a broader check
     const cleanKeywords = query
@@ -165,7 +167,7 @@ Please formulate a helpful, accurate response matching the user's language and s
     };
 
   } catch (error) {
-    logger.error("AI Chat Error via Gemini", { error, query });
-    return { success: false, error: "I encountered an error while processing your request. Please check that GEMINI_API_KEY is active." };
+    logger.error("AI Chat Error", { error, query });
+    return { success: false, error: "I encountered an error while processing your request. Please try again." };
   }
 }

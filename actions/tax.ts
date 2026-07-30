@@ -4,6 +4,10 @@ import { prisma } from "@/lib/db";
 import { TaxCategory, ReviewStatus } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import { logger } from "@/lib/logger";
+import { z } from "zod";
+
+const CategorySchema = z.nativeEnum(TaxCategory).optional();
+const SlugSchema = z.string().min(1).max(200);
 
 function toISO(date: string | Date | number | null | undefined): string {
   if (!date) return "";
@@ -21,6 +25,8 @@ function toISOOrNull(date: string | Date | number | null | undefined): string | 
 
 export async function getKnowledgeItems(category?: TaxCategory) {
   try {
+    const parsedCategory = CategorySchema.parse(category);
+    
     const fetchItems = unstable_cache(
       async (cat?: TaxCategory) => {
         return await prisma.taxKnowledgeItem.findMany({
@@ -40,7 +46,7 @@ export async function getKnowledgeItems(category?: TaxCategory) {
       { tags: ['tax-content'], revalidate: 60 } // Cache for 1 minute
     );
 
-    const items = await fetchItems(category);
+    const items = await fetchItems(parsedCategory);
 
 
     // Serialize Dates for Client Components
@@ -69,10 +75,12 @@ export async function getKnowledgeItems(category?: TaxCategory) {
 
 export async function getKnowledgeItemBySlug(slug: string) {
   try {
+    const parsedSlug = SlugSchema.parse(slug);
+
     const fetchItem = unstable_cache(
-      async (itemSlug: string) => {
+      async (s: string) => {
         return await prisma.taxKnowledgeItem.findUnique({
-          where: { slug: itemSlug },
+          where: { slug: s },
           include: {
             sourceReferences: true
           }
@@ -82,7 +90,7 @@ export async function getKnowledgeItemBySlug(slug: string) {
       { tags: ['tax-content'], revalidate: 60 } // Cache for 1 minute for faster updates
     );
 
-    const item = await fetchItem(slug);
+    const item = await fetchItem(parsedSlug);
 
 
     if (!item) {
@@ -107,7 +115,7 @@ export async function getKnowledgeItemBySlug(slug: string) {
 
     return { success: true, data: serializedItem };
   } catch (error) {
-    logger.error("Error fetching knowledge item by slug", { error, slug });
+    logger.error("[Action] getKnowledgeItemBySlug Error:", { error, slug });
     return { success: false, error: "Failed to fetch tax knowledge item." };
   }
 
@@ -151,7 +159,7 @@ export async function getFormsAndProcedures() {
 
     return { success: true, data: items };
   } catch (error) {
-    console.error("Error fetching forms and procedures:", error);
+    console.error("[Action] getFormsAndProcedures Error:", error);
     return { success: false, error: "Failed to fetch forms and procedures." };
   }
 }

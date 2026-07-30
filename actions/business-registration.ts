@@ -1,6 +1,18 @@
 "use server";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { auth } from "@/auth";
+import { z } from "zod";
+
+const RegistrationAnswersSchema = z.object({
+  founders: z.enum(["solo", "multiple"]),
+  funding: z.enum(["yes", "no"]),
+  liability: z.enum(["limited", "dont_care"]),
+  scale: z.enum(["local", "national_global"]),
+  priority: z.enum(["compliance", "credibility"]),
+  employees: z.enum(["yes", "no"]),
+  foreignClients: z.enum(["yes", "no"]),
+});
 
 export type RegistrationAnswers = {
   founders: "solo" | "multiple";
@@ -92,7 +104,14 @@ export async function calculateBestEntity(answers: RegistrationAnswers): Promise
 
 export async function generateRegistrationAdvice(answers: RegistrationAnswers) {
   try {
-    const { recommended } = await calculateBestEntity(answers);
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized. Please log in to generate advice." };
+    }
+
+    const parsedAnswers = RegistrationAnswersSchema.parse(answers);
+
+    const { recommended } = await calculateBestEntity(parsedAnswers as RegistrationAnswers);
 
     // AI Personalization Layer
     if (!process.env.GEMINI_API_KEY) {
@@ -136,10 +155,10 @@ export async function generateRegistrationAdvice(answers: RegistrationAnswers) {
     };
 
   } catch (error) {
-    console.error("AI Generation error:", error);
+    console.error("[Action] generateRegistrationAdvice Error:", error);
     return {
       success: false,
-      message: "Failed to generate recommendation."
+      message: "Failed to generate recommendation. Please try again."
     };
   }
 }

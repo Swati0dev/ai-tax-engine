@@ -2,19 +2,23 @@
 
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
+import { z } from "zod";
 
-export type UserProfileData = {
-  occupation?: string;
-  businessStatus?: string;
-  ageBracket?: string;
-  annualIncomeEstimate?: string;
-  filingExperience?: string;
-  state?: string;
-  taxGoals?: string[];
-  guidanceLevel?: string;
-  existingRegistrations?: string[];
-  preferredLanguage?: string;
-};
+const UserProfileSchema = z.object({
+  occupation: z.string().optional(),
+  businessStatus: z.string().optional(),
+  ageBracket: z.string().optional(),
+  annualIncomeEstimate: z.string().optional(),
+  filingExperience: z.string().optional(),
+  state: z.string().optional(),
+  taxGoals: z.array(z.string()).optional(),
+  guidanceLevel: z.string().optional(),
+  existingRegistrations: z.array(z.string()).optional(),
+  preferredLanguage: z.string().optional(),
+});
+
+export type UserProfileData = z.infer<typeof UserProfileSchema>;
+
 
 export async function getUserProfile() {
   try {
@@ -29,7 +33,7 @@ export async function getUserProfile() {
 
     return { success: true, data: profile };
   } catch (error) {
-    console.error("Failed to get user profile", error);
+    console.error("[Action] getUserProfile Error:", error);
     return { success: false, data: null, message: "Server error" };
   }
 }
@@ -42,6 +46,7 @@ export async function saveUserProfile(data: UserProfileData) {
     }
 
     const userId = session.user.id;
+    const parsedData = UserProfileSchema.parse(data);
 
     // Check if profile exists
     const existing = await prisma.userProfile.findUnique({
@@ -52,13 +57,13 @@ export async function saveUserProfile(data: UserProfileData) {
       // Update existing
       await prisma.userProfile.update({
         where: { userId },
-        data
+        data: parsedData
       });
     } else {
       // Create new
       await prisma.userProfile.create({
         data: {
-          ...data,
+          ...parsedData,
           user: { connect: { id: userId } }
         }
       });
@@ -66,7 +71,7 @@ export async function saveUserProfile(data: UserProfileData) {
 
     return { success: true, message: "Profile saved successfully" };
   } catch (error) {
-    console.error("Failed to save user profile", error);
+    console.error("[Action] saveUserProfile Error:", error);
     return { success: false, message: "Server error" };
   }
 }

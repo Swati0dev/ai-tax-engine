@@ -3,10 +3,17 @@
 
 import { searchTaxKnowledge } from "@/lib/search/tax-search";
 import { TaxCategory } from "@prisma/client";
+import { z } from "zod";
+
+const QuerySchema = z.string().max(200);
+const CategorySchema = z.nativeEnum(TaxCategory).optional();
 
 export async function performTaxSearch(query: string, category?: TaxCategory) {
   try {
-    const results = await searchTaxKnowledge(query, category) as any[];
+    const parsedQuery = QuerySchema.parse(query);
+    const parsedCategory = CategorySchema.parse(category);
+
+    const results = await searchTaxKnowledge(parsedQuery, parsedCategory) as any[];
     
     // Serialize for client
     const serializedResults = results.map((item: any) => ({
@@ -27,7 +34,8 @@ export async function performTaxSearch(query: string, category?: TaxCategory) {
 
 
     return { success: true, data: serializedResults };
-  } catch {
+  } catch (error) {
+    console.error("[Action] performTaxSearch Error:", error);
     return { success: false, error: "Search failed." };
   }
 }
