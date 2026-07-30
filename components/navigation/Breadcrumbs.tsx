@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
+import { generateBreadcrumbJsonLd } from "@/lib/jsonld";
 
 export function Breadcrumbs() {
   const pathname = usePathname();
@@ -51,6 +52,21 @@ export function Breadcrumbs() {
           );
         })}
       </ol>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            generateBreadcrumbJsonLd([
+              { name: "Home", item: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/` },
+              ...paths.map((path, index) => {
+                const label = path.replace(/-/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+                const href = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/${paths.slice(0, index + 1).join("/")}`;
+                return { name: label, item: href };
+              }),
+            ])
+          ),
+        }}
+      />
     </nav>
   );
 }

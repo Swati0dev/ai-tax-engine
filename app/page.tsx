@@ -20,6 +20,12 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { constructMetadata } from "@/lib/seo";
+
+export const metadata = constructMetadata({
+  title: "AI Tax Engine | Simplified Indian Tax Compliance",
+  description: "Navigate Indian tax compliance, filing, and learning with ease using the AI Tax Engine.",
+});
 
 export default function HomePage() {
   return (

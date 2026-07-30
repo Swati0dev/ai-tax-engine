@@ -22,10 +22,10 @@ const sora = Sora({
   display: "swap"
 });
 
-export const metadata: Metadata = {
-  title: "Tax AI Platform",
-  description: "A source-grounded tax assistance platform for clear Indian tax guidance."
-};
+import { constructMetadata } from "@/lib/seo";
+import { generateOrganizationJsonLd, generateWebsiteJsonLd } from "@/lib/jsonld";
+
+export const metadata: Metadata = constructMetadata();
 
 type RootLayoutProps = {
   children: ReactNode;
@@ -35,6 +35,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} ${sora.variable} font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(generateOrganizationJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(generateWebsiteJsonLd()) }}
+        />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground">
           Skip to main content
         </a>
