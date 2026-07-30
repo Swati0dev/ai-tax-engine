@@ -11,6 +11,7 @@ import { getUserComplianceEvents, seedDefaultComplianceEvents } from "../complia
 import { getUserActivities } from "../activity/activity.service";
 import { getUserRecentChats } from "../chat/chat.service";
 import { getUserSavedContent } from "../saved-content/saved-content.service";
+import { getKnowledgeRecommendations } from "../knowledge/knowledge.service";
 import { auth } from "@/auth";
 
 export async function getDashboardData(): Promise<DashboardData | null> {
@@ -26,7 +27,7 @@ export async function getDashboardData(): Promise<DashboardData | null> {
   await seedDefaultComplianceEvents(userId);
 
   // Rule 2: Parallel Data Fetching
-  const [profileResult, progressResult, completedDocs, calculations, complianceEvents, activities, recentChatsData, savedContentsData] = await Promise.all([
+  const [profileResult, progressResult, completedDocs, calculations, complianceEvents, activities, recentChatsData, savedContentsData, knowledgeRecommendations] = await Promise.all([
     getUserProfile(),
     getUserProgress(),
     getCompletedComplianceDocs(),
@@ -34,7 +35,8 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     getUserComplianceEvents(userId),
     getUserActivities(userId),
     getUserRecentChats(userId, 3),
-    getUserSavedContent(userId, 4)
+    getUserSavedContent(userId, 4),
+    getKnowledgeRecommendations(userId, 3)
   ]);
 
   const profileData: UserProfileData | null = (profileResult.success && profileResult.data) ? (profileResult.data as unknown as UserProfileData) : null;
@@ -70,7 +72,7 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     title: c.title,
     timestamp: c.timestamp,
   }));
-  const recommendations: DashboardRecommendation[] = [];
+
   const savedSections: DashboardRecommendation[] = savedContentsData.map(c => ({
     id: c.id,
     title: c.title,
@@ -80,6 +82,15 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     readTime: c.createdAt, // We can just overload readTime with date, or adapt UI
   }));
 
+  const mappedRecommendations: DashboardRecommendation[] = knowledgeRecommendations.map(r => ({
+    id: r.id,
+    title: r.title,
+    description: r.summary,
+    category: r.category,
+    href: `/knowledge-hub/${r.slug}`,
+    readTime: r.readTime
+  }));
+
   return {
     user: dashboardUser,
     gamification: dashboardGamification,
@@ -87,7 +98,7 @@ export async function getDashboardData(): Promise<DashboardData | null> {
     dueDates: sortedDueDates,
     checklist: checklist,
     recentChats: recentChats,
-    recommendations: recommendations,
+    recommendations: mappedRecommendations,
     savedSections: savedSections,
     calculations: calculations,
     complianceEvents: complianceEvents,

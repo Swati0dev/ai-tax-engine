@@ -30,7 +30,8 @@ export default async function DashboardPage() {
     savedSections,
     calculations,
     complianceEvents,
-    activities
+    activities,
+    recommendations
   } = dashboardData;
 
   const isProfileComplete = !requiresProfileCompletion(user);
@@ -100,7 +101,7 @@ export default async function DashboardPage() {
           </ErrorBoundary>
           
           <ErrorBoundary fallbackTitle="Recommendations Error">
-            <KnowledgeRecommendationsWidget />
+            <KnowledgeRecommendationsWidget recommendations={recommendations} />
           </ErrorBoundary>
 
         </div>
