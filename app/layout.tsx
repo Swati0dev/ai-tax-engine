@@ -35,10 +35,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.variable} ${sora.variable} font-sans antialiased`}>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground">
+          Skip to main content
+        </a>
         <ReadingProgressBar />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
-          <main className="flex-1">
+          <main id="main-content" className="flex-1 focus:outline-none" tabIndex={-1}>
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
               <Breadcrumbs />
             </div>

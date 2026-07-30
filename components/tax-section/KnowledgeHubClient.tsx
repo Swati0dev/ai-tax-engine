@@ -147,6 +147,7 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
           <input
             type="text"
             className="block w-full pl-12 pr-10 py-4 bg-slate-50 border border-primary/10 rounded-2xl text-sm font-semibold placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-inner"
+            aria-label="Search tax guides"
             placeholder="Search tax sections, forms, compliance guidelines..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -154,6 +155,7 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
               className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
@@ -165,7 +167,7 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
 
         {/* Tab Controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex bg-slate-100/80 p-1.5 rounded-2xl border w-fit">
+          <div className="flex bg-slate-100/80 p-1.5 rounded-2xl border w-fit" role="tablist" aria-label="Tax Categories">
             {[
               { id: "ALL", label: "All Topics" },
               { id: "DIRECT_TAX", label: "Direct Tax" },
@@ -173,6 +175,8 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
             ].map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeCategory === tab.id}
                 type="button"
                 onClick={() => {
                   setActiveCategory(tab.id as CategoryTab);
@@ -197,13 +201,14 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
         </div>
 
         {/* Sub-topic Filter Chips */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Sub-topic filters">
           {TOPIC_TAGS.map((tag) => {
             const isActive = activeTag === tag.id;
             return (
               <button
                 key={tag.id}
                 onClick={() => setActiveTag(tag.id)}
+                aria-pressed={isActive}
                 className={cn(
                   "px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer",
                   isActive

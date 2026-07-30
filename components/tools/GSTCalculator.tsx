@@ -65,6 +65,7 @@ export function GSTCalculator() {
               <div className="flex justify-between items-center text-sm font-bold">
                 <label htmlFor="baseAmount" className="text-foreground">Base Amount (₹)</label>
                 <input
+                  id="baseAmount"
                   type="number"
                   value={amount === 0 ? "" : amount}
                   onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
@@ -72,8 +73,8 @@ export function GSTCalculator() {
                 />
               </div>
               <input
-                id="baseAmount"
                 type="range"
+                aria-label="Base Amount Range"
                 min="100"
                 max="500000"
                 step="500"
@@ -89,10 +90,11 @@ export function GSTCalculator() {
 
             {/* Inclusive/Exclusive Mode */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground block">GST Calculation Mode</label>
-              <div className="grid grid-cols-2 gap-4">
+              <label id="gst-mode-label" className="text-sm font-bold text-foreground block">GST Calculation Mode</label>
+              <div className="grid grid-cols-2 gap-4" role="group" aria-labelledby="gst-mode-label">
                 <button
                   type="button"
+                  aria-pressed={mode === "exclusive"}
                   onClick={() => setMode("exclusive")}
                   className={cn(
                     "p-3.5 rounded-2xl border-2 font-bold text-sm text-center transition-all",
@@ -106,6 +108,7 @@ export function GSTCalculator() {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={mode === "inclusive"}
                   onClick={() => setMode("inclusive")}
                   className={cn(
                     "p-3.5 rounded-2xl border-2 font-bold text-sm text-center transition-all",
@@ -122,12 +125,13 @@ export function GSTCalculator() {
 
             {/* Slabs */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground block">GST Slab Rates</label>
-              <div className="grid grid-cols-4 gap-2">
+              <label id="gst-slab-label" className="text-sm font-bold text-foreground block">GST Slab Rates</label>
+              <div className="grid grid-cols-4 gap-2" role="group" aria-labelledby="gst-slab-label">
                 {([5, 12, 18, 28] as Slab[]).map((rate) => (
                   <button
                     key={rate}
                     type="button"
+                    aria-pressed={slab === rate}
                     onClick={() => setSlab(rate)}
                     className={cn(
                       "py-3 rounded-xl border-2 font-bold text-sm text-center transition-all",
@@ -144,10 +148,11 @@ export function GSTCalculator() {
 
             {/* Region / GST Split */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground block">Supply Destination</label>
-              <div className="grid grid-cols-2 gap-4">
+              <label id="gst-dest-label" className="text-sm font-bold text-foreground block">Supply Destination</label>
+              <div className="grid grid-cols-2 gap-4" role="group" aria-labelledby="gst-dest-label">
                 <button
                   type="button"
+                  aria-pressed={location === "intra"}
                   onClick={() => setLocation("intra")}
                   className={cn(
                     "p-3.5 rounded-2xl border-2 font-bold text-sm text-center transition-all",
@@ -161,6 +166,7 @@ export function GSTCalculator() {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={location === "inter"}
                   onClick={() => setLocation("inter")}
                   className={cn(
                     "p-3.5 rounded-2xl border-2 font-bold text-sm text-center transition-all",

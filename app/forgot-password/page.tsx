@@ -61,14 +61,14 @@ export default function ForgotPasswordPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {error && <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">{error}</div>}
-            {message && <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">{message}</div>}
+            {error && <div role="alert" aria-live="polite" className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">{error}</div>}
+            {message && <div role="status" aria-live="polite" className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">{message}</div>}
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-[10px] font-black text-slate-300 uppercase tracking-widest block pl-1">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                <Input id="email" type="email" placeholder="name@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white/5 border-white/10 focus:border-accent text-white placeholder-slate-500 pl-10 rounded-xl h-11" required />
+                <Input id="email" type="email" placeholder="name@company.com" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white/5 border-white/10 focus:border-accent text-white placeholder-slate-500 pl-10 rounded-xl h-11" required aria-required="true" />
               </div>
             </div>
 

@@ -19,7 +19,7 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
     <div className="space-y-8 p-6 bg-background/50 backdrop-blur-xl rounded-3xl border border-primary/10 shadow-xl">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <Label className="text-base font-bold">Gross Annual Salary</Label>
+          <Label htmlFor="grossSalary" className="text-base font-bold">Gross Annual Salary</Label>
           <span className="text-primary font-mono font-bold">₹{inputs.grossSalary.toLocaleString()}</span>
         </div>
         <Slider
@@ -28,8 +28,10 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
           step={50000}
           onValueChange={([v]) => handleChange("grossSalary", v)}
           className="py-4"
+          aria-label="Gross Annual Salary"
         />
         <Input 
+          id="grossSalary"
           type="number" 
           value={inputs.grossSalary} 
           onChange={(e) => handleChange("grossSalary", Number(e.target.value))}
@@ -49,6 +51,7 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
             max={500000}
             step={5000}
             onValueChange={([v]) => handleChange("hraExemption", v)}
+            aria-label="HRA Exemption"
           />
         </div>
 
@@ -63,6 +66,7 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
             max={150000}
             step={5000}
             onValueChange={([v]) => handleChange("section80C", v)}
+            aria-label="Section 80C"
           />
         </div>
 
@@ -77,6 +81,7 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
             max={100000}
             step={1000}
             onValueChange={([v]) => handleChange("section80D", v)}
+            aria-label="Section 80D"
           />
         </div>
 
@@ -91,6 +96,7 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
             max={200000}
             step={5000}
             onValueChange={([v]) => handleChange("interestOnHomeLoan", v)}
+            aria-label="Home Loan Interest"
           />
         </div>
       </div>
@@ -105,6 +111,7 @@ export function CalculatorInputs({ inputs, setInputs }: Props) {
           max={200000}
           step={5000}
           onValueChange={([v]) => handleChange("otherDeductions", v)}
+          aria-label="Other Deductions"
         />
       </div>
     </div>

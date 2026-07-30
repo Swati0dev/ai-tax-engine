@@ -113,6 +113,8 @@ export function SiteHeader({ className }: SiteHeaderProps) {
           <div className="relative">
             <button 
                 onClick={() => toggleDropdown("learn")}
+                aria-expanded={activeDropdown === "learn"}
+                aria-haspopup="true"
                 className={cn("flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-slate-100", activeDropdown === "learn" ? "bg-slate-100 text-primary" : "text-slate-600")}
             >
                 Learn <ChevronDown className={cn("h-4 w-4 transition-transform", activeDropdown === "learn" && "rotate-180")} />
@@ -133,6 +135,8 @@ export function SiteHeader({ className }: SiteHeaderProps) {
           <div className="relative">
             <button 
                 onClick={() => toggleDropdown("solutions")}
+                aria-expanded={activeDropdown === "solutions"}
+                aria-haspopup="true"
                 className={cn("flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-slate-100", activeDropdown === "solutions" ? "bg-slate-100 text-primary" : "text-slate-600")}
             >
                 Solutions <ChevronDown className={cn("h-4 w-4 transition-transform", activeDropdown === "solutions" && "rotate-180")} />
@@ -153,6 +157,8 @@ export function SiteHeader({ className }: SiteHeaderProps) {
           <div className="relative">
             <button 
                 onClick={() => toggleDropdown("tools")}
+                aria-expanded={activeDropdown === "tools"}
+                aria-haspopup="true"
                 className={cn("flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-slate-100", activeDropdown === "tools" ? "bg-slate-100 text-primary" : "text-slate-600")}
             >
                 Tools <ChevronDown className={cn("h-4 w-4 transition-transform", activeDropdown === "tools" && "rotate-180")} />
@@ -181,7 +187,12 @@ export function SiteHeader({ className }: SiteHeaderProps) {
           {/* Profile Logic */}
           {isLoggedIn ? (
              <div className="relative">
-               <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-2 px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors">
+               <button 
+                 onClick={() => setProfileOpen(!profileOpen)} 
+                 aria-expanded={profileOpen}
+                 aria-haspopup="true"
+                 className="flex items-center gap-2 px-3 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors"
+               >
                   <User className="h-4 w-4 text-slate-600" />
                   <span className="hidden sm:inline-block text-sm font-medium text-slate-700">Dashboard</span>
                </button>
@@ -207,6 +218,8 @@ export function SiteHeader({ className }: SiteHeaderProps) {
           {/* Mobile Hamburger */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Menu"
+            aria-expanded={mobileMenuOpen}
             className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

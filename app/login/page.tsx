@@ -149,13 +149,13 @@ function LoginContent() {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
             {errorMsg && (
-              <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
+              <div role="alert" aria-live="polite" className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold">
                 {errorMsg}
               </div>
             )}
             
             {successMsg && (
-              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+              <div role="status" aria-live="polite" className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
                 {successMsg}
               </div>
             )}
@@ -175,6 +175,7 @@ function LoginContent() {
                     onChange={(e) => setName(e.target.value)}
                     className="bg-white/5 border-white/10 focus:border-accent text-white placeholder-slate-500 pl-10 rounded-xl h-11"
                     required={isSignUp}
+                    aria-required={isSignUp}
                   />
                 </div>
               </div>
@@ -194,6 +195,7 @@ function LoginContent() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-white/5 border-white/10 focus:border-accent text-white placeholder-slate-500 pl-10 rounded-xl h-11"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
@@ -219,6 +221,7 @@ function LoginContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-white/5 border-white/10 focus:border-accent text-white placeholder-slate-500 pl-10 rounded-xl h-11"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
