@@ -21,7 +21,7 @@ export async function toggleComplianceDoc(docId: string, isCompleted: boolean) {
   if (!session?.user?.id) return false;
 
   // Ensure progress exists
-  let progress = await getUserProgress();
+  const progress = await getUserProgress();
   if (!progress) return false;
 
   let newDocs = [...progress.completedDocs];

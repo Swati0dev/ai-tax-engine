@@ -5,14 +5,14 @@ import { TaxCategory, ReviewStatus } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import { logger } from "@/lib/logger";
 
-function toISO(date: any): string {
+function toISO(date: string | Date | number | null | undefined): string {
   if (!date) return "";
   if (typeof date === "string") return date;
   if (date instanceof Date) return date.toISOString();
   return new Date(date).toISOString();
 }
 
-function toISOOrNull(date: any): string | null {
+function toISOOrNull(date: string | Date | number | null | undefined): string | null {
   if (!date) return null;
   if (typeof date === "string") return date;
   if (date instanceof Date) return date.toISOString();

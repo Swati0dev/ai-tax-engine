@@ -1,4 +1,14 @@
-import NextAuth from "next-auth"
+import NextAuth, { DefaultSession } from "next-auth"
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      role: string
+    } & DefaultSession["user"]
+  }
+}
+
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
@@ -64,7 +74,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string
         // Note: The types for next-auth might need extending to include role,
         // but for now we map it.
-        (session.user as any).role = token.role as string
+        session.user.role = token.role as string
       }
       return session
     }
