@@ -27,7 +27,8 @@ export default async function DashboardPage() {
     complianceMetrics,
     dueDates,
     checklist,
-    recentChats
+    recentChats,
+    calculations
   } = dashboardData;
 
   const isProfileComplete = !requiresProfileCompletion(user);
@@ -52,6 +53,7 @@ export default async function DashboardPage() {
           dashboardChecklistLength={complianceMetrics.totalChecklist}
           checkedItemsLength={complianceMetrics.checkedItems}
           completedEventsLength={complianceMetrics.completedDue}
+          initialCalculations={calculations}
         />
       </ErrorBoundary>
 

@@ -43,6 +43,8 @@ export interface DashboardRecommendation {
   category: string;
 }
 
+import { SavedCalculationViewModel } from "../calculations/calculation.types";
+
 export interface DashboardData {
   user: DashboardUser;
   gamification: DashboardGamification;
@@ -52,4 +54,5 @@ export interface DashboardData {
   recentChats: DashboardChat[];
   recommendations: DashboardRecommendation[];
   savedSections: DashboardRecommendation[]; // Reusing type for now
+  calculations: SavedCalculationViewModel[];
 }

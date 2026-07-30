@@ -9,11 +9,13 @@ import { compareRegimes, TaxInputs } from "@/lib/tax-calculations";
 import { generateTaxInsights, TaxAIInsight } from "@/actions/ai-recommendations";
 import { cn } from "@/lib/utils";
 
-interface SavedCalculationInputs {
+export interface SavedCalculationInputs {
   grossSalary: number;
   section80C: number;
   hraExemption: number;
   section80D: number;
+  otherDeductions: number;
+  interestOnHomeLoan: number;
 }
 
 import { ComparisonResult } from "@/lib/tax-calculations";
@@ -21,15 +23,20 @@ import { ComparisonResult } from "@/lib/tax-calculations";
 interface CalculatorWidgetProps {
   onXpEarned: (amount: number, reason?: string) => void;
   onCalculate?: (results: ComparisonResult) => void;
+  loadedInputs?: SavedCalculationInputs | null;
+  onSave?: (inputs: SavedCalculationInputs, results: ComparisonResult) => void;
+  isSaving?: boolean;
 }
 
-export function CalculatorWidget({ onXpEarned, onCalculate }: CalculatorWidgetProps) {
+export function CalculatorWidget({ onXpEarned, onCalculate, loadedInputs, onSave, isSaving }: CalculatorWidgetProps) {
   // Interactive inputs for tax planner
   const [plannerInputs, setPlannerInputs] = useState<SavedCalculationInputs>({
     grossSalary: 1200000,
     section80C: 150000,
     hraExemption: 50000,
-    section80D: 25000
+    section80D: 25000,
+    otherDeductions: 0,
+    interestOnHomeLoan: 0
   });
 
   // Saved tax regime state preference
@@ -39,10 +46,17 @@ export function CalculatorWidget({ onXpEarned, onCalculate }: CalculatorWidgetPr
   const [aiInsight, setAiInsight] = useState<TaxAIInsight | null>(null);
   const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
 
+  // Sync loadedInputs if provided
+  useEffect(() => {
+    if (loadedInputs) {
+      setPlannerInputs(loadedInputs);
+    }
+  }, [loadedInputs]);
+
   // Load from local storage on mount
   useEffect(() => {
     const savedCalc = localStorage.getItem("tax-dashboard-calculation");
-    if (savedCalc) {
+    if (savedCalc && !loadedInputs) {
       try {
         setPlannerInputs(JSON.parse(savedCalc));
       } catch {}
@@ -51,7 +65,7 @@ export function CalculatorWidget({ onXpEarned, onCalculate }: CalculatorWidgetPr
     if (savedRegime === "OLD" || savedRegime === "NEW") {
       setPreferredRegime(savedRegime);
     }
-  }, []);
+  }, [loadedInputs]);
 
   // Clear old AI insight if inputs change
   useEffect(() => {
@@ -119,6 +133,8 @@ export function CalculatorWidget({ onXpEarned, onCalculate }: CalculatorWidgetPr
       section80C: data.section80C || plannerInputs.section80C,
       hraExemption: data.hraExemption || plannerInputs.hraExemption,
       section80D: data.section80D || plannerInputs.section80D,
+      otherDeductions: data.otherDeductions || plannerInputs.otherDeductions,
+      interestOnHomeLoan: data.interestOnHomeLoan || plannerInputs.interestOnHomeLoan,
     };
     setPlannerInputs(nextInputs);
     if (typeof window !== "undefined") {
@@ -280,12 +296,12 @@ export function CalculatorWidget({ onXpEarned, onCalculate }: CalculatorWidgetPr
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleGenerateInsight}
                   disabled={isGeneratingInsight}
                   className={cn(
-                    "w-full rounded-2xl py-3 text-xs font-bold text-white transition-all shadow-md flex items-center justify-center gap-2",
+                    "flex-1 rounded-2xl py-3 text-xs font-bold text-white transition-all shadow-md flex items-center justify-center gap-2",
                     isGeneratingInsight 
                       ? "bg-slate-400 cursor-not-allowed shadow-none" 
                       : "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 shadow-purple-500/20"
@@ -294,15 +310,37 @@ export function CalculatorWidget({ onXpEarned, onCalculate }: CalculatorWidgetPr
                   {isGeneratingInsight ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Analyzing your tax profile...
+                      Analyzing...
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-4 w-4" />
-                      Ask AI for Insights ✨
+                      AI Insights ✨
                     </>
                   )}
                 </button>
+                
+                {onSave && (
+                  <button
+                    onClick={() => onSave(plannerInputs, taxResults)}
+                    disabled={isSaving}
+                    className={cn(
+                      "flex-1 rounded-2xl py-3 text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 border",
+                      isSaving 
+                        ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed shadow-none" 
+                        : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50 shadow-blue-500/10"
+                    )}
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Calculation"
+                    )}
+                  </button>
+                )}
               </div>
             </div>
 

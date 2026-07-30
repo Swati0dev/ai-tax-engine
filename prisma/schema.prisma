@@ -132,14 +132,38 @@ model UserProgress {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum TaxRegime {
+  OLD
+  NEW
+  EQUAL
+}
+
 model SavedCalculation {
-  id           String   @id @default(cuid())
-  userId       String
-  type         String
-  data         Json
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String   @id @default(cuid())
+  userId          String
+  financialYear   String   @default("2024-25")
+  engineVersion   String   @default("1.0.0")
+  
+  // Stored inputs (flattened for now, but keeping data Json for future complex categories)
+  grossSalary     Float
+  hraExemption    Float
+  section80C      Float
+  section80D      Float
+  otherDeductions Float
+  interestOnHomeLoan Float
+  
+  // A generic data field for future extensibility without breaking schema
+  additionalDeductions Json?
+
+  // Calculated Results
+  recommendedRegime TaxRegime 
+  taxUnderOld       Float
+  taxUnderNew       Float
+  taxSavings        Float
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@index([userId])
 }

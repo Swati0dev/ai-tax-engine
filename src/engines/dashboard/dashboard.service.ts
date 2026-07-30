@@ -6,6 +6,7 @@ import { DashboardData, DashboardComplianceItem, DashboardChat, DashboardRecomme
 import { mapDashboardUser, mapGamificationState, mapComplianceMetrics } from "./dashboard.mapper";
 import { DASHBOARD_CONSTANTS } from "./dashboard.constants";
 import { sortComplianceItemsByDate } from "./dashboard.utils";
+import { getUserCalculations } from "../calculations/calculation.service";
 import { auth } from "@/auth";
 
 export async function getDashboardData(): Promise<DashboardData | null> {
@@ -18,10 +19,11 @@ export async function getDashboardData(): Promise<DashboardData | null> {
   const userName = session.user.name;
 
   // Rule 2: Parallel Data Fetching
-  const [profileResult, progressResult, completedDocs] = await Promise.all([
+  const [profileResult, progressResult, completedDocs, calculations] = await Promise.all([
     getUserProfile(),
     getUserProgress(),
-    getCompletedComplianceDocs()
+    getCompletedComplianceDocs(),
+    getUserCalculations(userId)
   ]);
 
   const profileData: UserProfileData | null = (profileResult.success && profileResult.data) ? (profileResult.data as unknown as UserProfileData) : null;
@@ -59,11 +61,12 @@ export async function getDashboardData(): Promise<DashboardData | null> {
   return {
     user: dashboardUser,
     gamification: dashboardGamification,
-    complianceMetrics,
+    complianceMetrics: complianceMetrics,
     dueDates: sortedDueDates,
-    checklist,
-    recentChats,
-    recommendations,
-    savedSections
+    checklist: checklist,
+    recentChats: recentChats,
+    recommendations: recommendations,
+    savedSections: savedSections,
+    calculations: calculations,
   };
 }
