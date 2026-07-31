@@ -12,7 +12,7 @@ async function main() {
     authority: 'Example Authority',
     url: 'https://example.com',
     type: 'WEBSITE',
-    category: 'GENERAL_TAX',
+    category: 'GENERAL_TAX' as any,
     enabled: true,
     frequency: 'DAILY',
     priority: 1,
@@ -43,11 +43,11 @@ async function main() {
         orderBy: { createdAt: 'desc' }
       });
       
-      let previousDoc = previousDbDoc;
+      let previousDoc: any = previousDbDoc;
       if (previousDoc && typeof previousDoc.content === 'string') {
         try {
-          previousDoc = { ...previousDoc, content: JSON.parse(previousDoc.content as any) };
-        } catch(e) {
+          previousDoc = { ...previousDoc, content: JSON.parse(previousDoc.content) };
+        } catch(e: unknown) {
           previousDoc = { ...previousDoc, content: [] };
         }
       }
@@ -84,7 +84,7 @@ async function main() {
       
       report += `- **Diff Engine (ChangeSet):** ${changeSet ? '✅ SUCCESS' : '⏭️ SKIPPED (No previous doc)'}\n`;
       if (changeSet) {
-         report += `  - Severity: ${changeSet.severity}\n`;
+         report += `  - Severity: ${(changeSet as any).changeSeverity || (changeSet as any).severity}\n`;
       }
 
     } catch (err: any) {

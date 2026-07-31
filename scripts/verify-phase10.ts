@@ -19,7 +19,7 @@ async function runVerification() {
         method: 'GET',
         headers: {},
         startTime: Date.now()
-      });
+      } as any);
       console.log(`   Status: SUCCESS (Document fetched)`);
       console.log(`   Content-Length: ${response.contentLength} bytes`);
     } catch (error: any) {

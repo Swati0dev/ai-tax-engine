@@ -16,16 +16,21 @@ export class HTMLParserStrategy implements IParserStrategy {
     return context.rawBuffer && context.rawBuffer.length > 0;
   }
 
-  public extractMetadata(context: ParserContext, $: cheerio.CheerioAPI): ExtractedMetadata {
+  public extractMetadata(context: ParserContext): ExtractedMetadata {
     const baseMetadata = ParserUtils.extractBaseMetadata(context);
     
-    // Attempt heuristic extraction for typical government sites
-    const title = $('title').text().trim() || $('h1').first().text().trim() || 'Untitled Document';
-    const textContent = $('body').text();
+    let title = 'Untitled Document';
+    let notificationNumber = undefined;
     
-    // Look for things resembling notification numbers
-    const notifMatch = textContent.match(/No\.\s*([A-Za-z0-9-/]+)/i) || textContent.match(/Notification\s*No\.?\s*([A-Za-z0-9-/]+)/i);
-    const notificationNumber = notifMatch ? notifMatch[1] : undefined;
+    try {
+      const htmlString = context.rawBuffer.toString('utf-8');
+      const $ = cheerio.load(htmlString);
+      title = $('title').text().trim() || $('h1').first().text().trim() || 'Untitled Document';
+      const textContent = $('body').text();
+      
+      const notifMatch = textContent.match(/No\.\s*([A-Za-z0-9-/]+)/i) || textContent.match(/Notification\s*No\.?\s*([A-Za-z0-9-/]+)/i);
+      notificationNumber = notifMatch ? notifMatch[1] : undefined;
+    } catch(e: unknown) { void e; }
     
     return {
       ...baseMetadata,
@@ -33,7 +38,7 @@ export class HTMLParserStrategy implements IParserStrategy {
       customData: {
         notificationNumber,
       }
-    };
+    } as unknown as ExtractedMetadata;
   }
 
   public async parse(context: ParserContext): Promise<ParserResult> {
@@ -55,10 +60,10 @@ export class HTMLParserStrategy implements IParserStrategy {
       $('script, style, noscript, iframe, svg, nav, footer, header').remove();
 
       // Extract main text content, compressing whitespace
-      let contentText = $('body').text().replace(/\s+/g, ' ').trim();
+      const contentText = $('body').text().replace(/\s+/g, ' ').trim();
       
       // Extract links & attachments
-      const links: any[] = [];
+      const links: { text: string; href: string }[] = [];
       $('a').each((i, el) => {
         const href = $(el).attr('href');
         const text = $(el).text().trim();
@@ -69,15 +74,15 @@ export class HTMLParserStrategy implements IParserStrategy {
 
       result.extractedContent = contentText;
       
-      const metadata = this.extractMetadata(context, $);
+      const metadata = this.extractMetadata(context);
       result.extractedMetadata = {
         ...metadata,
         customData: {
-          ...metadata.customData,
+          ...((metadata as Record<string, unknown>).customData as Record<string, unknown> || {}),
           extractedLinksCount: links.length,
           hasAttachments: links.some(l => l.href.toLowerCase().endsWith('.pdf'))
         }
-      };
+      } as unknown as ExtractedMetadata;
       
       result.success = true;
     } catch (e: unknown) {

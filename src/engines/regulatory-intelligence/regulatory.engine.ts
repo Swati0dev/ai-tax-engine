@@ -50,7 +50,6 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
             url: source.url,
             type: source.type,
             enabled: source.enabled,
-            // @ts-ignore
             frequency: source.frequency,
             priority: source.priority,
             parserName: source.parserName,
@@ -66,12 +65,12 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
         name: finalSource.name,
         authority: finalSource.authority,
         url: finalSource.url,
-        type: finalSource.type as any,
+        type: finalSource.type as never,
         category: source.category, // Kept in memory only
         enabled: finalSource.enabled,
-        frequency: finalSource.frequency as any,
+        frequency: finalSource.frequency as never,
         priority: finalSource.priority,
-        parserName: finalSource.parserName || undefined,
+        parserName: (finalSource.parserName || undefined) as never,
         accessStrategy: finalSource.accessStrategy,
       });
     }
@@ -213,7 +212,7 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
         url: url,
         publishedAt: canonicalDoc.issuedDate ? new Date(canonicalDoc.issuedDate) : null,
         effectiveFrom: canonicalDoc.effectiveDate ? new Date(canonicalDoc.effectiveDate) : null,
-        metadata: canonicalDoc.metadata as any,
+        metadata: canonicalDoc.metadata as never,
         contentHash: canonicalDoc.checksum || '',
       }
     });
@@ -273,8 +272,8 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
         sourceId,
         oldDocumentId: previousDoc.id,
         newDocumentId: newDoc.id,
-        severity: changeSet.changeSeverity as any,
-        changes: { summary: changeSet.summary, type: changeSet.changeType } as any,
+        severity: changeSet.changeSeverity as never,
+        changes: { summary: changeSet.summary, type: changeSet.changeType } as never,
         isProcessedByAI: false,
       }
     });
@@ -298,7 +297,7 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
         let previousDoc: ICanonicalDocument | null = null;
         if (previousDbDoc) {
            let parsedContent = [];
-           try { parsedContent = JSON.parse(previousDbDoc.content); } catch (e) {}
+           try { parsedContent = JSON.parse(previousDbDoc.content); } catch (e: unknown) { void e; }
            
            previousDoc = {
              id: previousDbDoc.id,
@@ -312,9 +311,9 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
              issuedDate: previousDbDoc.publishedAt ? previousDbDoc.publishedAt.toISOString() : null,
              effectiveDate: previousDbDoc.effectiveFrom ? previousDbDoc.effectiveFrom.toISOString() : null,
              issuingAuthority: previousDbDoc.authority || null,
-             category: 'UNKNOWN' as any,
-             authorityLevel: 'UNKNOWN' as any,
-             jurisdiction: 'UNKNOWN' as any,
+             category: 'UNKNOWN' as never,
+             authorityLevel: 'UNKNOWN' as never,
+             jurisdiction: 'UNKNOWN' as never,
              summary: null,
              content: parsedContent,
              attachments: [],

@@ -20,7 +20,7 @@ export class AiAnalysisService {
   /**
    * Processes an existing ChangeSet through the AI analysis pipeline.
    */
-  public async analyzeChangeSet(changeSetId: string): Promise<any> {
+  public async analyzeChangeSet(changeSetId: string): Promise<Record<string, unknown> | void> {
     console.log(`[AiAnalysisService] Starting analysis for ChangeSet: ${changeSetId}`);
     
     // 1. Fetch ChangeSet and Documents
@@ -108,7 +108,7 @@ export class AiAnalysisService {
       console.log(`[AiAnalysisService] Analysis completed for ChangeSet: ${changeSetId}`);
       return parsed;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`[AiAnalysisService] Analysis failed for ChangeSet: ${changeSetId}`, error);
       
       // Update record to FAILED
@@ -116,7 +116,7 @@ export class AiAnalysisService {
         where: { id: analysisRecord.id },
         data: {
           status: "FAILED",
-          errorMessage: error.message || "Unknown error"
+          errorMessage: error instanceof Error ? error.message : "Unknown error"
         }
       });
 

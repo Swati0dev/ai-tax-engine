@@ -91,7 +91,7 @@ export class HttpFetchStrategy implements IFetchStrategy {
         hash: null, // Will be computed by caller if needed
         rawBody,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearTimeout(timeoutId);
       
       // Determine error type based on FetchError or Node native error
@@ -99,13 +99,13 @@ export class HttpFetchStrategy implements IFetchStrategy {
         throw error;
       }
       
-      if (error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         console.warn(`[HttpFetchStrategy] Request timeout to ${context.url}`);
         throw new FetchError(FetchFailureType.TIMEOUT, 'Request timed out');
       }
       
-      if (error.cause) {
-        const causeCode = (error.cause as any).code;
+      if (error instanceof Error && error.cause) {
+        const causeCode = (error.cause as Record<string, unknown>).code as string | undefined;
         if (causeCode === 'ENOTFOUND' || causeCode === 'EAI_AGAIN') {
           throw new FetchError(FetchFailureType.DNS_FAILURE, 'DNS resolution failed');
         }
@@ -121,7 +121,7 @@ export class HttpFetchStrategy implements IFetchStrategy {
         }
       }
 
-      throw new FetchError(FetchFailureType.UNKNOWN, `Unknown fetch error: ${error.message}`);
+      throw new FetchError(FetchFailureType.UNKNOWN, `Unknown fetch error: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }

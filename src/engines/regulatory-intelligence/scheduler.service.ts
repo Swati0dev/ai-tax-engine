@@ -2,6 +2,7 @@ import { ISchedulerOptions } from './interfaces';
 import * as cron from 'node-cron';
 import { prisma } from '@/lib/db';
 import { regulatoryEngine } from './regulatory.engine';
+import { ICanonicalDocument } from './canonical';
 
 export class SchedulerService {
   private activeJobs: Map<string, cron.ScheduledTask> = new Map();
@@ -53,10 +54,10 @@ export class SchedulerService {
           orderBy: { createdAt: 'desc' }
         });
         
-        let previousDoc: any = null;
+        let previousDoc: Record<string, unknown> | null = null;
         if (previousDbDoc) {
            let parsedContent = [];
-           try { parsedContent = JSON.parse(previousDbDoc.content); } catch (e) {}
+           try { parsedContent = JSON.parse(previousDbDoc.content); } catch (e: unknown) { void e; }
            previousDoc = {
              id: previousDbDoc.id,
              sourceSnapshotId: previousDbDoc.snapshotId,
@@ -69,9 +70,9 @@ export class SchedulerService {
              issuedDate: previousDbDoc.publishedAt ? previousDbDoc.publishedAt.toISOString() : null,
              effectiveDate: previousDbDoc.effectiveFrom ? previousDbDoc.effectiveFrom.toISOString() : null,
              issuingAuthority: previousDbDoc.authority || null,
-             category: 'UNKNOWN' as any,
-             authorityLevel: 'UNKNOWN' as any,
-             jurisdiction: 'UNKNOWN' as any,
+             category: 'UNKNOWN' as never,
+             authorityLevel: 'UNKNOWN' as never,
+             jurisdiction: 'UNKNOWN' as never,
              summary: null,
              content: parsedContent,
              attachments: [],
@@ -80,7 +81,7 @@ export class SchedulerService {
            };
         }
         
-        await regulatoryEngine.compareLatest(sourceId, previousDoc);
+        await regulatoryEngine.compareLatest(sourceId, previousDoc as unknown as ICanonicalDocument);
         
         await prisma.schedulerJob.update({
           where: { id: job.id },
@@ -98,11 +99,11 @@ export class SchedulerService {
           }
         });
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`[SchedulerService] Job failed for source ${sourceId}`, error);
         
-        const errorType = error.type ? `[${error.type}] ` : '';
-        const errorMessage = `${errorType}${error.message}`;
+        const errorType = error instanceof Error && 'type' in error ? `[${error.type as string}] ` : '';
+        const errorMessage = `${errorType}${error instanceof Error ? error.message : String(error)}`;
         
         await prisma.schedulerJob.update({
           where: { id: job.id },
@@ -118,7 +119,7 @@ export class SchedulerService {
             action: 'JOB_FAILED',
             entityId: job.id,
             entityType: 'SchedulerJob',
-            details: { error: errorMessage, type: error.type || 'UNKNOWN' }
+            details: { error: errorMessage, type: error instanceof Error && 'type' in error ? error.type as string : 'UNKNOWN' }
           }
         });
       }
