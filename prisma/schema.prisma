@@ -21,11 +21,6 @@ model TaxKnowledgeItem {
   relatedForms         String[]
   filingProcedure      String[]
   relatedItems         String[]
-  relatedCalculators   String[]
-  tags                 String[]
-  financialYear        String?
-  assessmentYear       String?
-  faqs                 FAQ[]
   effectiveFrom        DateTime?
   lastReviewed         DateTime          @default(now())
   reviewStatus         ReviewStatus      @default(DRAFT)
@@ -33,6 +28,11 @@ model TaxKnowledgeItem {
   updatedAt            DateTime          @updatedAt
   slug                 String            @unique
   imageUrl             String?
+  assessmentYear       String?
+  financialYear        String?
+  relatedCalculators   String[]
+  tags                 String[]
+  faqs                 FAQ[]
   sourceReferences     SourceReference[]
 
   @@index([category])
@@ -58,13 +58,330 @@ model SourceReference {
 model FAQ {
   id              String           @id @default(cuid())
   question        String
-  answer          String           @db.Text
+  answer          String
   knowledgeItemId String
-  knowledgeItem   TaxKnowledgeItem @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  knowledgeItem   TaxKnowledgeItem @relation(fields: [knowledgeItemId], references: [id], onDelete: Cascade)
 
   @@index([knowledgeItemId])
+}
+
+model User {
+  id               String             @id @default(cuid())
+  name             String?
+  email            String?            @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  role             UserRole           @default(USER)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  accounts         Account[]
+  chats            ChatConversation[]
+  complianceEvents ComplianceEvent[]
+  notifications    Notification[]
+  calculations     SavedCalculation[]
+  savedContents    SavedContent[]
+  sessions         Session[]
+  profile          UserProfile?
+  progress         UserProgress?
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  title         String   @default("Tax Novice")
+  completedDocs String[]
+  checkInDates  String[]
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SavedCalculation {
+  id                   String    @id @default(cuid())
+  userId               String
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  additionalDeductions Json?
+  engineVersion        String    @default("1.0.0")
+  financialYear        String    @default("2024-25")
+  grossSalary          Float
+  hraExemption         Float
+  interestOnHomeLoan   Float
+  otherDeductions      Float
+  recommendedRegime    TaxRegime
+  section80C           Float
+  section80D           Float
+  taxSavings           Float
+  taxUnderNew          Float
+  taxUnderOld          Float
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ChatConversation {
+  id        String        @id @default(cuid())
+  userId    String
+  title     String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id             String           @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  sources        Json?
+  createdAt      DateTime         @default(now())
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model UserProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  occupation            String?
+  businessStatus        String?
+  ageBracket            String?
+  annualIncomeEstimate  String?
+  filingExperience      String?
+  state                 String?
+  taxGoals              String[]
+  guidanceLevel         String?
+  existingRegistrations String[]
+  preferredLanguage     String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ComplianceEvent {
+  id                String              @id @default(cuid())
+  userId            String
+  title             String
+  description       String?
+  eventType         ComplianceEventType
+  dueDate           DateTime
+  status            ComplianceStatus    @default(PENDING)
+  priority          CompliancePriority  @default(MEDIUM)
+  source            EventSource         @default(SYSTEM)
+  isSystemGenerated Boolean             @default(true)
+  reminderAt        DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([dueDate])
+}
+
+model Notification {
+  id        String               @id @default(cuid())
+  userId    String
+  type      NotificationType
+  severity  NotificationSeverity
+  title     String
+  message   String
+  isRead    Boolean              @default(false)
+  actionUrl String?
+  metadata  Json?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model SavedContent {
+  id          String           @id @default(cuid())
+  userId      String
+  type        SavedContentType
+  title       String
+  description String?
+  referenceId String?
+  tags        String[]
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+}
+
+model OfficialSource {
+  id                 String              @id @default(cuid())
+  name               String
+  authority          String
+  url                String
+  type               String              @default("WEBSITE")
+  enabled            Boolean             @default(true)
+  frequency          SourceFrequency     @default(DAILY)
+  priority           Int                 @default(1)
+  parserName         String?
+  healthStatus       SourceHealthStatus  @default(UNKNOWN)
+  lastChecked        DateTime?
+  lastSuccessfulRun  DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  accessStrategy     AccessStrategy      @default(HTTP_FETCH)
+  canonicalDocuments CanonicalDocument[]
+  changeSets         ChangeSet[]
+  jobs               SchedulerJob[]
+  healthMetrics      SourceHealth[]
+  snapshots          SourceSnapshot[]
+}
+
+model SourceSnapshot {
+  id                String             @id @default(cuid())
+  sourceId          String
+  contentHash       String
+  metadata          Json?
+  capturedAt        DateTime           @default(now())
+  canonicalDocument CanonicalDocument?
+  source            OfficialSource     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+}
+
+model SchedulerJob {
+  id           String         @id @default(cuid())
+  sourceId     String
+  status       JobStatus      @default(PENDING)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  source       OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+  @@index([status])
+}
+
+model SourceHealth {
+  id           String             @id @default(cuid())
+  sourceId     String
+  status       SourceHealthStatus
+  latencyMs    Int?
+  errorMessage String?
+  recordedAt   DateTime           @default(now())
+  source       OfficialSource     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  action     AuditAction
+  entityId   String?
+  entityType String?
+  details    Json?
+  createdAt  DateTime    @default(now())
+
+  @@index([action])
+}
+
+model CanonicalDocument {
+  id            String         @id @default(cuid())
+  sourceId      String
+  snapshotId    String         @unique
+  title         String
+  authority     String?
+  content       String
+  url           String
+  publishedAt   DateTime?
+  effectiveFrom DateTime?
+  metadata      Json?
+  contentHash   String
+  createdAt     DateTime       @default(now())
+  snapshot      SourceSnapshot @relation(fields: [snapshotId], references: [id])
+  source        OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+}
+
+model ChangeSet {
+  id              String             @id @default(cuid())
+  sourceId        String
+  oldDocumentId   String?
+  newDocumentId   String
+  severity        ChangeSeverity     @default(LOW)
+  changes         Json
+  isProcessedByAI Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  source          OfficialSource     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  analysis        ChangeSetAnalysis?
+
+  @@index([sourceId])
+  @@index([isProcessedByAI])
+}
+
+model ChangeSetAnalysis {
+  id              String         @id @default(cuid())
+  changeSetId     String         @unique
+  summary         String
+  impact          String
+  recommendations String
+  provider        String
+  model           String
+  status          AnalysisStatus @default(PENDING)
+  errorMessage    String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  changeSet       ChangeSet      @relation(fields: [changeSetId], references: [id], onDelete: Cascade)
+
+  @@index([changeSetId])
+  @@index([status])
 }
 
 enum TaxCategory {
@@ -78,6 +395,7 @@ enum TaxCategory {
   STARTUP_COMPLIANCE
   INTERNATIONAL_TAX
   BUSINESS_TAX
+  GENERAL
 }
 
 enum ReviewStatus {
@@ -93,168 +411,17 @@ enum SourceType {
   ORIENTATION_ONLY
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole  @default(USER)
-  accounts      Account[]
-  sessions      Session[]
-
-  // Custom platform fields
-  progress         UserProgress?
-  profile          UserProfile?
-  calculations     SavedCalculation[]
-  chats            ChatConversation[]
-  complianceEvents ComplianceEvent[]
-  notifications    Notification[]
-  savedContents    SavedContent[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model UserProgress {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  xp            Int      @default(0)
-  level         Int      @default(1)
-  title         String   @default("Tax Novice")
-  completedDocs String[]
-  checkInDates  String[]
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 enum TaxRegime {
   OLD
   NEW
   EQUAL
 }
 
-model SavedCalculation {
-  id            String @id @default(cuid())
-  userId        String
-  financialYear String @default("2024-25")
-  engineVersion String @default("1.0.0")
-
-  // Stored inputs (flattened for now, but keeping data Json for future complex categories)
-  grossSalary        Float
-  hraExemption       Float
-  section80C         Float
-  section80D         Float
-  otherDeductions    Float
-  interestOnHomeLoan Float
-
-  // A generic data field for future extensibility without breaking schema
-  additionalDeductions Json?
-
-  // Calculated Results
-  recommendedRegime TaxRegime
-  taxUnderOld       Float
-  taxUnderNew       Float
-  taxSavings        Float
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model ChatConversation {
-  id        String        @id @default(cuid())
-  userId    String
-  title     String
-  messages  ChatMessage[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model ChatMessage {
-  id             String           @id @default(cuid())
-  conversationId String
-  role           String
-  content        String           @db.Text
-  sources        Json?
-  createdAt      DateTime         @default(now())
-  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId])
-}
-
 enum UserRole {
   USER
   ADMIN
-  SUPER_ADMIN
   CA
-}
-
-model PasswordResetToken {
-  id      String   @id @default(cuid())
-  email   String
-  token   String   @unique
-  expires DateTime
-
-  @@unique([email, token])
-}
-
-model UserProfile {
-  id                    String   @id @default(cuid())
-  userId                String   @unique
-  occupation            String? // Salaried, Freelancer, Business Owner, Student, Retired, Investor, Creator
-  businessStatus        String? // No business, planning to start, already registered, unregistered
-  ageBracket            String? // Below 60, 60-80, Above 80
-  annualIncomeEstimate  String?
-  filingExperience      String? // First-time, Experienced
-  state                 String?
-  taxGoals              String[] // File ITR, Save Tax, Start Business, GST, Learn
-  guidanceLevel         String? // Beginner, Detailed
-  existingRegistrations String[] // PAN, GST, MSME, LLP, Pvt Ltd
-  preferredLanguage     String? // English, Hindi, Hinglish
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  SUPER_ADMIN
 }
 
 enum ComplianceEventType {
@@ -286,26 +453,6 @@ enum EventSource {
   USER
 }
 
-model ComplianceEvent {
-  id                String              @id @default(cuid())
-  userId            String
-  title             String
-  description       String?
-  eventType         ComplianceEventType
-  dueDate           DateTime
-  status            ComplianceStatus    @default(PENDING)
-  priority          CompliancePriority  @default(MEDIUM)
-  source            EventSource         @default(SYSTEM)
-  isSystemGenerated Boolean             @default(true)
-  reminderAt        DateTime?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([dueDate])
-}
-
 enum NotificationType {
   SYSTEM
   ACTIVITY
@@ -322,31 +469,6 @@ enum NotificationSeverity {
   ERROR
 }
 
-model Notification {
-  id     String @id @default(cuid())
-  userId String
-
-  type     NotificationType
-  severity NotificationSeverity
-
-  title   String
-  message String
-
-  isRead Boolean @default(false)
-
-  actionUrl String?
-
-  metadata Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([isRead])
-}
-
 enum SavedContentType {
   KNOWLEDGE_ARTICLE
   AI_CONVERSATION
@@ -354,31 +476,6 @@ enum SavedContentType {
   CHECKLIST
   TEMPLATE
 }
-
-model SavedContent {
-  id     String @id @default(cuid())
-  userId String
-
-  type        SavedContentType
-  title       String
-  description String?
-  referenceId String? // e.g., knowledge item ID, or calculation ID
-
-  tags     String[]
-  metadata Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([type])
-}
-
-// ==========================================
-// REGULATORY INTELLIGENCE ENGINE (RIE)
-// ==========================================
 
 enum SourceFrequency {
   DAILY
@@ -408,82 +505,31 @@ enum AuditAction {
   JOB_STARTED
   JOB_COMPLETED
   JOB_FAILED
+  FETCH_STARTED
+  FETCH_COMPLETED
+  FETCH_FAILED
+  SNAPSHOT_CREATED
 }
 
-model OfficialSource {
-  id                String             @id @default(cuid())
-  name              String
-  authority         String
-  url               String
-  type              String             @default("WEBSITE")
-  enabled           Boolean            @default(true)
-  frequency         SourceFrequency    @default(DAILY)
-  priority          Int                @default(1)
-  parserName        String?
-  healthStatus      SourceHealthStatus @default(UNKNOWN)
-  lastChecked       DateTime?
-  lastSuccessfulRun DateTime?
-
-  snapshots     SourceSnapshot[]
-  jobs          SchedulerJob[]
-  healthMetrics SourceHealth[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum AccessStrategy {
+  HTTP_FETCH
+  RSS_FEED
+  XML_FEED
+  JSON_API
+  FILE_DOWNLOAD
+  HEADLESS_BROWSER
 }
 
-model SourceSnapshot {
-  id       String         @id @default(cuid())
-  sourceId String
-  source   OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-
-  contentHash String
-  metadata    Json?
-
-  capturedAt DateTime @default(now())
-
-  @@index([sourceId])
+enum ChangeSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
 
-model SchedulerJob {
-  id       String         @id @default(cuid())
-  sourceId String
-  source   OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-
-  status       JobStatus @default(PENDING)
-  startedAt    DateTime?
-  completedAt  DateTime?
-  errorMessage String?   @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([sourceId])
-  @@index([status])
-}
-
-model SourceHealth {
-  id       String         @id @default(cuid())
-  sourceId String
-  source   OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-
-  status       SourceHealthStatus
-  latencyMs    Int?
-  errorMessage String?            @db.Text
-
-  recordedAt DateTime @default(now())
-
-  @@index([sourceId])
-}
-
-model AuditLog {
-  id         String      @id @default(cuid())
-  action     AuditAction
-  entityId   String?
-  entityType String?
-  details    Json?
-
-  createdAt DateTime @default(now())
-
-  @@index([action])
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

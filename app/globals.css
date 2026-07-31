@@ -130,7 +130,7 @@
   }
   
   .prose-editorial a {
-    @apply text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-colors;
+    @apply text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary transition-all duration-200;
   }
   
   .prose-editorial ul {
@@ -162,20 +162,32 @@
   }
   
   .prose-editorial table {
-    @apply w-full mb-8 border-collapse text-left;
+    @apply w-full mb-8 border-collapse text-left overflow-hidden rounded-xl shadow-sm border border-border bg-white;
+  }
+  
+  .prose-editorial thead {
+    @apply bg-slate-50/80 backdrop-blur-sm sticky top-0 z-10;
   }
   
   .prose-editorial th {
-    @apply border-b-2 border-border py-3 px-4 font-bold text-foreground bg-muted/50;
+    @apply border-b border-border py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500;
+  }
+  
+  .prose-editorial tr:nth-child(even) {
+    @apply bg-slate-50/50;
+  }
+  
+  .prose-editorial tr:hover {
+    @apply bg-slate-50 transition-colors duration-200;
   }
   
   .prose-editorial td {
-    @apply border-b border-border py-3 px-4 align-top;
+    @apply border-b border-border py-4 px-6 align-top text-sm;
   }
   
   .prose-editorial img, 
   .prose-editorial figure {
-    @apply my-10 w-full rounded-2xl border border-border shadow-md object-cover;
+    @apply my-10 w-full rounded-2xl border border-border shadow-sm object-cover;
   }
   
   .prose-editorial figcaption {
@@ -184,5 +196,98 @@
   
   .prose-editorial hr {
     @apply my-12 border-border;
+  }
+}
+
+/* Professional Print & PDF Export Styles */
+@media print {
+  @page {
+    margin: 2cm;
+    size: A4 portrait;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Hide navigation, interactive elements, and helpers */
+  nav, header, footer:not(.print-footer), button, .print\:hidden,
+  .reading-progress-bar, .hover-effects {
+    display: none !important;
+  }
+
+  /* Expand all content for print */
+  main, article, .prose-editorial {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Typography formatting */
+  h1, h2, h3, h4, h5, h6 {
+    color: black !important;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+  
+  h1 { font-size: 24pt !important; border-bottom: 2px solid black !important; padding-bottom: 10px !important; margin-bottom: 20px !important; }
+  h2 { font-size: 18pt !important; margin-top: 20px !important; }
+  
+  p, li, td, th {
+    color: #333 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Show URLs after links */
+  .prose-editorial a::after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+    color: #555 !important;
+    word-wrap: break-word !important;
+  }
+  
+  /* Prevent showing # local links */
+  .prose-editorial a[href^="#"]::after {
+    content: "" !important;
+  }
+
+  /* Box styling for print */
+  .soft-ui-card, .bg-slate-50, .bg-muted {
+    background: transparent !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  
+  /* Table styling */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+  tr { page-break-inside: avoid; page-break-after: auto; }
+  th, td { border: 1px solid #ddd !important; }
+}
+
+/* Reusable Print Footer (Inject dynamically via React if needed, or styled here) */
+.print-footer {
+  display: none;
+}
+@media print {
+  .print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    font-size: 8pt;
+    color: #666;
+    text-align: center;
   }
 }

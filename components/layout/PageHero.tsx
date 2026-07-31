@@ -1,5 +1,5 @@
-import Image from "next/image";
-import { Clock, Calendar } from "lucide-react";
+import { EditorialImage } from "@/components/ui/EditorialImage";
+import { Clock, Calendar, BarChart2, ShieldCheck, Tag, FastForward } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PageHeroProps {
@@ -8,6 +8,11 @@ interface PageHeroProps {
   image?: string;
   readingTime?: string;
   updatedAt?: string;
+  publishedDate?: string;
+  difficultyLevel?: "Beginner" | "Intermediate" | "Advanced";
+  reviewedBy?: string;
+  version?: string;
+  nextReviewDate?: string;
   className?: string;
 }
 
@@ -17,45 +22,81 @@ export function PageHero({
   image,
   readingTime,
   updatedAt,
+  publishedDate,
+  difficultyLevel,
+  reviewedBy,
+  version,
+  nextReviewDate,
   className
 }: PageHeroProps) {
   return (
-    <div className={cn("relative w-full h-[60vh] lg:h-[70vh] overflow-visible", className)}>
+    <div className={cn("relative w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] overflow-visible", className)}>
       {/* Sticky Background Image Container */}
       {image && (
-        <div className="sticky top-0 left-0 w-full h-[60vh] lg:h-[70vh] -z-10 overflow-hidden">
-          <Image
+        <div className="sticky top-0 left-0 w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] -z-10 overflow-hidden bg-slate-900">
+          <EditorialImage
             src={image}
             alt={title}
             fill
-            className="object-cover"
+            variant="hero"
             priority
+            className="opacity-70"
           />
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" /> {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10 backdrop-blur-[1px]" />
         </div>
       )}
       
-      {!image && <div className="sticky top-0 left-0 w-full h-[60vh] lg:h-[70vh] -z-10 hero-gradient" />}
+      {!image && <div className="sticky top-0 left-0 w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] -z-10 hero-gradient" />}
 
       {/* Content that stays centered during scroll or moves up */}
-      <div className="absolute inset-0 flex items-center justify-center text-center px-4 sm:px-6 lg:px-8 z-10">
-        <div className="flex flex-col items-center space-y-8 max-w-4xl">
-          <div className="flex flex-wrap justify-center gap-4 text-xs font-bold tracking-widest uppercase">
+      <div className="absolute inset-0 flex flex-col justify-end text-center sm:text-left px-4 sm:px-6 lg:px-8 z-10 pb-12 sm:pb-16 lg:pb-20 max-w-7xl mx-auto">
+        <div className="flex flex-col items-center sm:items-start space-y-6 max-w-4xl">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2.5 text-[11px] font-bold tracking-widest uppercase text-white/90">
             {readingTime && (
-              <span className="flex items-center gap-1.5 bg-white/10 text-white px-4 py-2 rounded-full backdrop-blur-md border border-white/20">
+              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md backdrop-blur-md border border-white/10">
                 <Clock className="h-3.5 w-3.5" />
                 {readingTime} min read
               </span>
             )}
+            {difficultyLevel && (
+              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md backdrop-blur-md border border-white/10">
+                <BarChart2 className="h-3.5 w-3.5" />
+                {difficultyLevel}
+              </span>
+            )}
+            {publishedDate && (
+              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md backdrop-blur-md border border-white/10">
+                <Calendar className="h-3.5 w-3.5" />
+                Published {publishedDate}
+              </span>
+            )}
             {updatedAt && (
-              <span className="flex items-center gap-1.5 bg-accent/20 text-accent-foreground px-4 py-2 rounded-full backdrop-blur-md border border-accent/30">
+              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md backdrop-blur-md border border-white/10">
                 <Calendar className="h-3.5 w-3.5" />
                 Updated {updatedAt}
               </span>
             )}
+            {version && (
+              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md backdrop-blur-md border border-white/10">
+                <Tag className="h-3.5 w-3.5" />
+                v{version}
+              </span>
+            )}
+            {nextReviewDate && (
+              <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-md backdrop-blur-md border border-white/10">
+                <FastForward className="h-3.5 w-3.5" />
+                Next Review: {nextReviewDate}
+              </span>
+            )}
+            {reviewedBy && (
+              <span className="flex items-center gap-1.5 bg-emerald-900/40 px-3 py-1.5 rounded-md backdrop-blur-md border border-emerald-400/30 text-emerald-300">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Reviewed by {reviewedBy}
+              </span>
+            )}
           </div>
           
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.15]">
             {title}
           </h1>
           

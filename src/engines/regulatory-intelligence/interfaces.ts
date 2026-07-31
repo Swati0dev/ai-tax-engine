@@ -5,6 +5,8 @@ import {
   ParserStrategy 
 } from './types';
 
+import { AccessStrategy } from '@prisma/client';
+
 export interface IRegulatorySourceConfig {
   id?: string;
   name: string;
@@ -16,6 +18,7 @@ export interface IRegulatorySourceConfig {
   frequency: SourceFrequencyType;
   priority: number;
   parserName?: ParserStrategy;
+  accessStrategy?: AccessStrategy;
 }
 
 export interface ISourceSnapshotMetadata {

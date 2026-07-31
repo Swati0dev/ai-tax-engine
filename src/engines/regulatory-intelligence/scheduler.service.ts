@@ -1,41 +1,148 @@
 import { ISchedulerOptions } from './interfaces';
+import * as cron from 'node-cron';
+import { prisma } from '@/lib/db';
+import { regulatoryEngine } from './regulatory.engine';
 
 export class SchedulerService {
-  /**
-   * Initializes the scheduler engine
-   */
+  private activeJobs: Map<string, cron.ScheduledTask> = new Map();
+
   public async initialize(): Promise<void> {
     console.log('[SchedulerService] Initializing job scheduler...');
-    // Foundation for future chron job initiation
   }
 
-  /**
-   * Schedules a task based on the provided options
-   * @param sourceId The ID of the source to schedule
-   * @param options Scheduling configuration
-   */
   public async scheduleSourceCheck(sourceId: string, options: ISchedulerOptions): Promise<string> {
     console.log(`[SchedulerService] Scheduling check for source: ${sourceId} with frequency: ${options.frequency}`);
     
-    // In future phases, this will register a task with Agenda, BullMQ, or node-cron
-    const dummyJobId = `job_${Date.now()}_${sourceId}`;
-    return dummyJobId;
+    // Map frequency to cron expression
+    let cronExpression = '0 0 * * *'; // Default DAILY at midnight
+    if (options.frequency === 'WEEKLY') {
+      cronExpression = '0 0 * * 0'; // Sunday at midnight
+    } else if (options.frequency === 'MONTHLY') {
+      cronExpression = '0 0 1 * *'; // 1st of month at midnight
+    } else if (options.frequency === 'CRON') {
+      // In a real system, you'd pass a custom cron string. For now fallback to daily.
+      cronExpression = '0 0 * * *'; 
+    }
+
+    const task = cron.schedule(cronExpression, async () => {
+      console.log(`[SchedulerService] Executing cron job for source: ${sourceId}`);
+      
+      const job = await prisma.schedulerJob.create({
+        data: {
+          sourceId,
+          status: 'RUNNING',
+          startedAt: new Date(),
+        }
+      });
+      
+      await prisma.auditLog.create({
+        data: {
+          action: 'JOB_STARTED',
+          entityId: job.id,
+          entityType: 'SchedulerJob',
+        }
+      });
+
+      try {
+        // Trigger the engine to fetch and process this source
+        // Note: we can't directly call regulatoryEngine.fetchSource etc if we want full diff
+        // But the engine has `compareLatest` for end to end.
+        
+        const previousDbDoc = await prisma.canonicalDocument.findFirst({
+          where: { sourceId },
+          orderBy: { createdAt: 'desc' }
+        });
+        
+        let previousDoc: any = null;
+        if (previousDbDoc) {
+           let parsedContent = [];
+           try { parsedContent = JSON.parse(previousDbDoc.content); } catch (e) {}
+           previousDoc = {
+             id: previousDbDoc.id,
+             sourceSnapshotId: previousDbDoc.snapshotId,
+             schemaVersion: '1.0.0',
+             canonicalVersion: '1.0.0',
+             parserVersion: '1.0.0',
+             checksum: previousDbDoc.contentHash,
+             originalChecksum: null,
+             title: previousDbDoc.title,
+             issuedDate: previousDbDoc.publishedAt ? previousDbDoc.publishedAt.toISOString() : null,
+             effectiveDate: previousDbDoc.effectiveFrom ? previousDbDoc.effectiveFrom.toISOString() : null,
+             issuingAuthority: previousDbDoc.authority || null,
+             category: 'UNKNOWN' as any,
+             authorityLevel: 'UNKNOWN' as any,
+             jurisdiction: 'UNKNOWN' as any,
+             summary: null,
+             content: parsedContent,
+             attachments: [],
+             links: [],
+             metadata: (previousDbDoc.metadata as Record<string, unknown>) || {},
+           };
+        }
+        
+        await regulatoryEngine.compareLatest(sourceId, previousDoc);
+        
+        await prisma.schedulerJob.update({
+          where: { id: job.id },
+          data: {
+            status: 'COMPLETED',
+            completedAt: new Date(),
+          }
+        });
+        
+        await prisma.auditLog.create({
+          data: {
+            action: 'JOB_COMPLETED',
+            entityId: job.id,
+            entityType: 'SchedulerJob',
+          }
+        });
+
+      } catch (error: any) {
+        console.error(`[SchedulerService] Job failed for source ${sourceId}`, error);
+        
+        const errorType = error.type ? `[${error.type}] ` : '';
+        const errorMessage = `${errorType}${error.message}`;
+        
+        await prisma.schedulerJob.update({
+          where: { id: job.id },
+          data: {
+            status: 'FAILED',
+            completedAt: new Date(),
+            errorMessage: errorMessage,
+          }
+        });
+        
+        await prisma.auditLog.create({
+          data: {
+            action: 'JOB_FAILED',
+            entityId: job.id,
+            entityType: 'SchedulerJob',
+            details: { error: errorMessage, type: error.type || 'UNKNOWN' }
+          }
+        });
+      }
+    });
+
+    const jobId = `job_${Date.now()}_${sourceId}`;
+    this.activeJobs.set(jobId, task);
+    
+    return jobId;
   }
 
-  /**
-   * Cancels a scheduled job
-   * @param jobId The ID of the job to cancel
-   */
   public async cancelJob(jobId: string): Promise<boolean> {
     console.log(`[SchedulerService] Cancelling job: ${jobId}`);
-    return true;
+    const task = this.activeJobs.get(jobId);
+    if (task) {
+      task.stop();
+      this.activeJobs.delete(jobId);
+      return true;
+    }
+    return false;
   }
 
-  /**
-   * Returns all active scheduled jobs (placeholder)
-   */
-  public async getActiveJobs(): Promise<unknown[]> {
-    return [];
+  public async getActiveJobs(): Promise<string[]> {
+    return Array.from(this.activeJobs.keys());
   }
 }
 
