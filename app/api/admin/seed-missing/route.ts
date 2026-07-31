@@ -26,7 +26,7 @@ export async function GET() {
         tags: ['basics', 'direct tax', 'indirect tax', 'pan'],
         financialYear: '2024-25',
         assessmentYear: '2025-26',
-        reviewStatus: ReviewStatus.VERIFIED,
+        reviewStatus: ReviewStatus.DRAFT,
         slug: 'introduction-to-indian-taxation',
         faqs: {
           create: [
@@ -56,7 +56,7 @@ export async function GET() {
         tags: ['freelancer', '44ada', 'presumptive taxation', 'professionals'],
         financialYear: '2024-25',
         assessmentYear: '2025-26',
-        reviewStatus: ReviewStatus.VERIFIED,
+        reviewStatus: ReviewStatus.DRAFT,
         slug: 'presumptive-taxation-freelancers-44ada',
         faqs: {
           create: [
@@ -66,7 +66,7 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json({ success: true, message: 'Seeded missing categories successfully.' });
+    return NextResponse.json({ success: true, message: 'Seeded missing categories successfully as DRAFTS. Please go to the Admin Panel to approve them.' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message });
   }
