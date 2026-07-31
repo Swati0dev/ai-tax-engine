@@ -55,7 +55,23 @@ export function SiteHeader({ className }: SiteHeaderProps) {
   const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsLoggedIn(localStorage.getItem("tax-logged-in") === "true");
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/session");
+        const session = await res.json();
+        if (session && Object.keys(session).length > 0) {
+          setIsLoggedIn(true);
+          localStorage.setItem("tax-logged-in", "true");
+        } else {
+          setIsLoggedIn(false);
+          localStorage.removeItem("tax-logged-in");
+        }
+      } catch (error) {
+        setIsLoggedIn(localStorage.getItem("tax-logged-in") === "true");
+      }
+    };
+    
+    checkAuth();
     
     const handleClickOutside = (event: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {

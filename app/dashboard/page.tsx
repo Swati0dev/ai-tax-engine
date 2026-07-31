@@ -41,7 +41,7 @@ export default async function DashboardPage() {
       
       {/* 1. Overview Widgets */}
       <ErrorBoundary fallbackTitle="Welcome Error">
-        <WelcomeWidget gamerState={gamification} userName={user.occupation} />
+        <WelcomeWidget gamerState={gamification} userName={user.name || "Filer"} />
       </ErrorBoundary>
       
       <ErrorBoundary fallbackTitle="Profile Prompt Error">
