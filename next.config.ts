@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
       }
     ]
+  },
+  async redirects() {
+    return [
+      {
+        source: '/dashboard/admin',
+        destination: '/admin',
+        permanent: true,
+      },
+    ];
   }
 };
 
