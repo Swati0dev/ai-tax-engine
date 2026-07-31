@@ -67,7 +67,8 @@ export async function GET() {
     });
 
     return NextResponse.json({ success: true, message: 'Seeded missing categories successfully as DRAFTS. Please go to the Admin Panel to approve them.' });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ success: false, error: errorMessage });
   }
 }
