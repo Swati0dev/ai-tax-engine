@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Source_Sans_3, Merriweather } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -10,16 +10,17 @@ import { SafetyDisclaimer } from "@/components/layout/SafetyDisclaimer";
 
 import "./globals.css";
 
-const inter = Inter({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap"
+  variable: "--font-sans",
+  display: "swap",
 });
 
-const sora = Sora({
+const merriweather = Merriweather({
+  weight: ["400", "700"],
   subsets: ["latin"],
-  variable: "--font-sora",
-  display: "swap"
+  variable: "--font-heading",
+  display: "swap",
 });
 
 import { constructMetadata } from "@/lib/seo";
@@ -34,7 +35,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} ${sora.variable} font-sans antialiased`}>
+      <body className={`${sourceSans.variable} ${merriweather.variable} font-sans antialiased`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(generateOrganizationJsonLd()) }}
