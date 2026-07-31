@@ -30,7 +30,7 @@ export function TaxCard({ item, className }: TaxCardProps) {
             </span>
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight hover:text-primary transition-colors cursor-pointer">
-            <Link href={`${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}>
+            <Link href={`${item.category === "INCOME_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}>
               {item.title}
             </Link>
           </h2>

@@ -2,7 +2,9 @@ import { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
 import dynamic from "next/dynamic";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileText, ChevronRight, BookOpen } from "lucide-react";
+import { getKnowledgeItemsByCalculator } from "@/actions/tax";
+import Link from "next/link";
 
 const TaxCalculator = dynamic(
   () => import("@/components/tools/TaxCalculator").then((mod) => mod.TaxCalculator),
@@ -20,9 +22,16 @@ export const metadata: Metadata = {
   description: "Compare Old vs New Tax Regime for FY 2024-25 with our interactive real-time calculator.",
 };
 
-export default function IncomeTaxCalculatorPage() {
+export default async function IncomeTaxCalculatorPage() {
+  const { data: relatedArticles, success } = await getKnowledgeItemsByCalculator("income-tax-calculator");
+
+  // Collect FAQs from all related articles
+  const allFaqs = success && relatedArticles 
+    ? relatedArticles.flatMap(article => article.faqs || [])
+    : [];
+
   return (
-    <main className="flex flex-col w-full pb-24">
+    <main className="flex flex-col w-full pb-24 bg-slate-50 min-h-screen">
       <PageHero
         title="Tax Regime Comparator"
         description="Choose the right path for your financial savings. Compare liabilities under the latest July 2024 Budget updates."
@@ -33,34 +42,60 @@ export default function IncomeTaxCalculatorPage() {
         <Breadcrumbs />
         <TaxCalculator />
         
-        {/* Additional Info Section */}
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-8 md:p-12 rounded-[2.5rem] border shadow-sm">
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold tracking-tight">What&apos;s new in FY 2024-25?</h3>
-            <div className="space-y-4 text-muted-foreground font-medium leading-relaxed">
-              <p>
-                In the July 2024 Union Budget, the **New Tax Regime** was further incentivized to make it the default choice for most taxpayers.
-              </p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Standard Deduction increased from ₹50,000 to **₹75,000**.</li>
-                <li>Tax slabs revised: 5% rate now starts from ₹3 Lakh up to ₹7 Lakh.</li>
-                <li>Full rebate available for taxable income up to **₹7 Lakh**, meaning zero tax up to ₹7.75 Lakh (including standard deduction).</li>
-              </ul>
+        {/* Dynamic Related Knowledge Section */}
+        {success && relatedArticles && relatedArticles.length > 0 && (
+          <div className="mt-24 space-y-12">
+            
+            <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border shadow-sm">
+              <div className="flex items-center gap-3 mb-8">
+                <BookOpen className="h-8 w-8 text-primary" />
+                <h3 className="text-3xl font-bold tracking-tight">Understanding the Rules</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {relatedArticles.map((article) => (
+                  <Link 
+                    key={article.id} 
+                    href={`/knowledge-hub/${article.category.toLowerCase().replace('_', '-')}/${article.slug}`}
+                    className="group block bg-slate-50 p-6 rounded-3xl border border-slate-100 hover:border-primary/20 hover:shadow-md transition-all"
+                  >
+                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md mb-4 inline-block">
+                      {article.actName}
+                    </span>
+                    <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary transition-colors">
+                      {article.title}
+                    </h4>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">
+                      {article.summary}
+                    </p>
+                    <div className="flex items-center text-sm font-bold text-primary group-hover:gap-2 transition-all">
+                      Read Full Guide <ChevronRight className="h-4 w-4 ml-1" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
+
+            {allFaqs.length > 0 && (
+              <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border shadow-sm">
+                <h3 className="text-3xl font-bold tracking-tight mb-8">Frequently Asked Questions</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {allFaqs.map((faq, idx) => (
+                    <div key={idx} className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                      <div className="flex gap-4">
+                        <FileText className="h-6 w-6 text-slate-400 shrink-0" />
+                        <div>
+                          <h4 className="font-bold text-slate-900 mb-2">{faq.question}</h4>
+                          <p className="text-slate-600 text-sm leading-relaxed">{faq.answer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold tracking-tight">Should you choose the Old Regime?</h3>
-            <p className="text-muted-foreground font-medium leading-relaxed">
-              The Old Regime may still be beneficial if you have significant investments and expenses that qualify for deductions, such as:
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-muted-foreground font-medium">
-              <li>High HRA (House Rent Allowance) exemption.</li>
-              <li>Large Home Loan interest (Section 24b).</li>
-              <li>Maximum 80C, 80D, and NPS investments.</li>
-              <li>Education loan interest (Section 80E).</li>
-            </ul>
-          </div>
-        </div>
+        )}
       </div>
     </main>
   );

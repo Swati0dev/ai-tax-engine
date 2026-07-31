@@ -30,7 +30,7 @@ interface ComplianceFormItem {
   title: string;
   relatedForms: string[];
   filingProcedure: string[];
-  category: "DIRECT_TAX" | "INDIRECT_TAX";
+  category: string;
   sectionNumber?: string | null;
   explanation?: string;
   applicability?: string[];

@@ -1,4 +1,4 @@
-export type TaxCategory = "DIRECT_TAX" | "INDIRECT_TAX";
+export type TaxCategory = "INCOME_TAX" | "GST" | "TDS" | "CORPORATE_TAX" | "CAPITAL_GAINS" | "STARTUP_COMPLIANCE" | "INTERNATIONAL_TAX" | "BUSINESS_TAX";
 
 export type ReviewStatus = "VERIFIED" | "NEEDS_REVIEW" | "OUTDATED" | "DRAFT";
 
@@ -9,6 +9,12 @@ export type SourceReference = {
   sourceType: "OFFICIAL" | "PROJECT_APPROVED" | "ORIENTATION_ONLY";
   publishedAt?: string | Date | null;
   accessedAt: string | Date;
+};
+
+export type FAQ = {
+  id: string;
+  question: string;
+  answer: string;
 };
 
 export type TaxKnowledgeItem = {
@@ -29,6 +35,11 @@ export type TaxKnowledgeItem = {
   filingProcedure: string[];
   relatedItems: string[];
   sourceReferences: SourceReference[];
+  relatedCalculators: string[];
+  tags: string[];
+  faqs: FAQ[];
+  financialYear: string | null;
+  assessmentYear: string | null;
   effectiveFrom: string | Date | null;
   lastReviewed: string | Date;
   reviewStatus: ReviewStatus;

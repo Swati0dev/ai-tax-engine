@@ -22,7 +22,7 @@ interface KnowledgeHubClientProps {
   items: TaxKnowledgeItem[];
 }
 
-type CategoryTab = "ALL" | "DIRECT_TAX" | "INDIRECT_TAX";
+type CategoryTab = "ALL" | "INCOME_TAX" | "GST";
 type SubTopicTag = "ALL" | "DEDUCTIONS" | "GST" | "ITR" | "BUSINESS" | "CAPITAL_GAINS";
 
 interface TagConfig {
@@ -170,8 +170,8 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
           <div className="flex bg-slate-100/80 p-1.5 rounded-2xl border w-fit" role="tablist" aria-label="Tax Categories">
             {[
               { id: "ALL", label: "All Topics" },
-              { id: "DIRECT_TAX", label: "Direct Tax" },
-              { id: "INDIRECT_TAX", label: "Indirect Tax" }
+              { id: "INCOME_TAX", label: "Direct Tax" },
+              { id: "GST", label: "Indirect Tax" }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -250,7 +250,7 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
 
                 {/* Title */}
                 <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                  <Link href={`${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}>
+                  <Link href={`${item.category === "INCOME_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}>
                     {item.title}
                   </Link>
                 </h3>
@@ -283,7 +283,7 @@ export function KnowledgeHubClient({ items }: KnowledgeHubClientProps) {
                 </span>
 
                 <Link
-                  href={`${item.category === "DIRECT_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}
+                  href={`${item.category === "INCOME_TAX" ? "/direct-tax" : "/indirect-tax"}/${item.slug}`}
                   className="flex items-center gap-1 text-primary font-bold hover:gap-2 transition-all"
                 >
                   <span>Explore Guide</span>

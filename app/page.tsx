@@ -7,27 +7,38 @@ import {
   TrendingUp, 
   Sparkles, 
   Lightbulb, 
-  Briefcase, 
-  GraduationCap, 
-  Building2,
   Calculator,
   BrainCircuit,
   Newspaper,
   CheckCircle2,
   Clock,
-  ShieldCheck,
   ChevronRight
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { constructMetadata } from "@/lib/seo";
+import { getKnowledgeItems } from "@/actions/tax";
 
 export const metadata = constructMetadata({
   title: "AI Tax Engine | Simplified Indian Tax Compliance",
   description: "Navigate Indian tax compliance, filing, and learning with ease using the AI Tax Engine.",
 });
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { data: allItems } = await getKnowledgeItems();
+  
+  // Sort and filter for different sections
+  const safeItems = allItems || [];
+  
+  // Latest Updates (sorted by updatedAt)
+  const latestUpdates = [...safeItems].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4);
+  
+  // Featured / Knowledge Recommendations (just picking top 3 for now)
+  const recommendations = [...safeItems].slice(0, 3);
+  
+  // Extract unique categories for Popular Categories
+  const uniqueCategories = Array.from(new Set(safeItems.map(item => item.category)));
+
   return (
     <div className="flex flex-col w-full bg-slate-50 min-h-screen">
       
@@ -54,7 +65,7 @@ export default function HomePage() {
               <Search className="h-6 w-6 text-slate-400 ml-4" />
               <input 
                 type="text" 
-                placeholder="What do you want to learn today?" 
+                placeholder="Search across all official tax concepts..." 
                 className="w-full bg-transparent border-none py-3 px-4 text-slate-900 text-lg focus:outline-none placeholder:text-slate-400 font-medium"
               />
               <Button className="rounded-full bg-slate-900 hover:bg-slate-800 text-white px-8 py-6 font-bold text-base">
@@ -62,132 +73,77 @@ export default function HomePage() {
               </Button>
             </div>
           </div>
-
-          {/* Popular Searches */}
-          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-slate-300">
-            <span className="font-semibold text-slate-400">Popular Searches:</span>
-            {["GST", "Income Tax", "TDS", "Company Registration", "Startup", "ITR"].map((term) => (
-              <Link 
-                key={term} 
-                href={`/search?q=${term.toLowerCase()}`}
-                className="px-4 py-1.5 rounded-full border border-slate-700 bg-slate-800/50 hover:bg-slate-700 hover:text-white transition-colors font-medium"
-              >
-                {term}
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* 2. Continue Learning (Requires Auth - Showing generic for now) */}
+      {/* 2. Knowledge Recommendations (CMS Driven) */}
       <section className="py-16 -mt-8 relative z-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold font-heading flex items-center gap-2 text-slate-900">
-                <BookOpen className="h-6 w-6 text-primary" /> Continue Learning
+                <BookOpen className="h-6 w-6 text-primary" /> Knowledge Recommendations
               </h2>
-              <Link href="/dashboard" className="text-sm font-bold text-primary hover:underline flex items-center">
-                View Your Progress <ChevronRight className="h-4 w-4" />
+              <Link href="/knowledge-hub" className="text-sm font-bold text-primary hover:underline flex items-center">
+                View Knowledge Hub <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Progress Card */}
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Track</span>
-                    <span className="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded-md">60% Complete</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recommendations.map(article => (
+                <div key={article.id} className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">{article.category.replace('_', ' ')}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">{article.title}</h3>
+                    <p className="text-sm text-slate-600 font-medium mb-4 line-clamp-3">{article.summary}</p>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Freelancer Tax Masterclass</h3>
-                  <div className="w-full bg-slate-200 rounded-full h-2.5 mb-4 overflow-hidden">
-                    <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: "60%" }}></div>
-                  </div>
+                  <Button asChild className="w-full bg-primary hover:bg-primary/90 mt-4">
+                    <Link href={`/knowledge-hub/${article.category.toLowerCase().replace('_', '-')}/${article.slug}`}>Read Article</Link>
+                  </Button>
                 </div>
-                <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                  <Link href="/learn/freelancer">Resume Module</Link>
-                </Button>
-              </div>
-
-              {/* Recent Lesson */}
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between">
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Last Viewed</span>
-                    <span className="text-xs font-bold text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" /> 2h ago</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">How to calculate GSTR-1</h3>
-                  <p className="text-sm text-slate-600 font-medium mb-4 line-clamp-2">Understand the nuances of outward supplies and how to file your monthly GSTR-1 on the portal.</p>
-                </div>
-                <Button asChild variant="outline" className="w-full border-slate-300 hover:bg-slate-100">
-                  <Link href="/learn/gst/gstr-1">Read Again</Link>
-                </Button>
-              </div>
+              ))}
+              {recommendations.length === 0 && (
+                <div className="col-span-3 text-center text-muted-foreground py-8">No articles found in CMS.</div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Today's Tax Tip */}
-      <section className="py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-amber-100 to-orange-100 rounded-3xl p-1 shadow-sm">
-            <div className="bg-white/60 backdrop-blur-xl rounded-[23px] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 border border-amber-200/50">
-              <div className="h-16 w-16 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
-                <Lightbulb className="h-8 w-8 animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-amber-600 uppercase tracking-wider mb-1">Today&apos;s Tax Tip</h3>
-                <p className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
-                  If your taxable income is strictly below ₹12 Lakhs and you don&apos;t have a home loan, the <span className="text-primary font-extrabold">New Tax Regime</span> will almost always save you more money in FY 2026-27.
-                </p>
-                <Link href="/learn/tax-basics/old-vs-new-regime" className="inline-flex items-center mt-3 text-sm font-bold text-amber-700 hover:underline">
-                  Read the detailed comparison <ChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Learning Paths */}
+      {/* 3. Popular Categories (CMS Driven) */}
       <section className="py-20 bg-white border-y border-slate-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-heading font-extrabold text-slate-900 sm:text-4xl">
-              Choose Your Learning Path
+              Explore by Category
             </h2>
             <p className="text-slate-600 font-medium mt-4">
-              Curated roadmaps tailored to your specific profile and goals.
+              Browse official guidelines and articles organized by tax domains.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: "Beginner", icon: BookOpen, desc: "Start from scratch. Learn what tax is and how to file your first return.", color: "bg-blue-100 text-blue-600" },
-              { title: "Freelancer", icon: Briefcase, desc: "Manage GST, TDS, and claim business expenses to maximize your take-home pay.", color: "bg-emerald-100 text-emerald-600" },
-              { title: "Business Owner", icon: Building2, desc: "PGBP, company structures, and deep compliance for growing businesses.", color: "bg-indigo-100 text-indigo-600" },
-              { title: "Student", icon: GraduationCap, desc: "Master tax laws for exams (CA/CS/BCom) with section-wise breakdowns.", color: "bg-amber-100 text-amber-600" },
-              { title: "Startup", icon: Sparkles, desc: "Angel tax, ESOPs, and government funding schemes (Mudra, Stand-Up India).", color: "bg-rose-100 text-rose-600" },
-              { title: "Professional", icon: ShieldCheck, desc: "Advanced case studies and tax planning strategies for CAs and consultants.", color: "bg-slate-800 text-slate-100" }
-            ].map((path, idx) => (
-              <Link key={idx} href={`/path/${path.title.toLowerCase()}`} className="group relative bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div className={`h-12 w-12 rounded-xl flex items-center justify-center mb-6 ${path.color}`}>
-                  <path.icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">{path.title}</h3>
-                <p className="text-sm text-slate-600 font-medium mb-6">{path.desc}</p>
-                <div className="flex items-center text-sm font-bold text-primary group-hover:gap-2 transition-all">
-                  Start Path <ArrowRight className="h-4 w-4 ml-1" />
-                </div>
-              </Link>
-            ))}
+          <div className="flex flex-wrap justify-center gap-4">
+            {uniqueCategories.map((cat, idx) => {
+              const slug = cat.toLowerCase().replace('_', '-');
+              return (
+                <Link key={idx} href={`/knowledge-hub/${slug}`} className="group relative bg-slate-50 border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-[300px]">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors capitalize">{cat.replace('_', ' ')}</h3>
+                  <div className="flex items-center text-sm font-bold text-primary group-hover:gap-2 transition-all">
+                    View Articles <ArrowRight className="h-4 w-4 ml-1" />
+                  </div>
+                </Link>
+              )
+            })}
+            {uniqueCategories.length === 0 && (
+              <div className="text-center text-muted-foreground py-8">No categories found in CMS.</div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* 5. Interactive Tools & AI */}
+      {/* 4. Interactive Tools & AI */}
       <section className="py-20 bg-slate-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
@@ -199,17 +155,10 @@ export default function HomePage() {
                 Calculate, simulate, and get AI-driven answers in seconds.
               </p>
             </div>
-            <Link href="/tools" className="mt-4 md:mt-0 font-bold text-primary hover:underline flex items-center">
-              View all tools <ChevronRight className="h-4 w-4" />
-            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Link href="/tools/gst-calculator" className="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all text-center flex flex-col items-center justify-center gap-3">
-              <Calculator className="h-8 w-8 text-slate-400" />
-              <span className="font-bold text-slate-900">GST Calculator</span>
-            </Link>
-            <Link href="/tools/income-tax-calculator" className="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all text-center flex flex-col items-center justify-center gap-3">
+            <Link href="/calculators/income-tax-calculator" className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all text-center flex flex-col items-center justify-center gap-3">
               <Calculator className="h-8 w-8 text-slate-400" />
               <span className="font-bold text-slate-900">Income Tax Calc</span>
             </Link>
@@ -230,31 +179,11 @@ export default function HomePage() {
                 </div>
               </div>
             </Link>
-            
-            <Link href="/tools/tax-quiz" className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-900">Tax Quiz</h4>
-                <p className="text-xs text-slate-500 font-medium mt-1">Test your knowledge with 10 random questions.</p>
-              </div>
-            </Link>
-
-            <Link href="/tools/decision-tool" className="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                <TrendingUp className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-900">Tax Decision Tool</h4>
-                <p className="text-xs text-slate-500 font-medium mt-1">Interactive roadmaps to help you choose business structures or tax regimes.</p>
-              </div>
-            </Link>
           </div>
         </div>
       </section>
 
-      {/* 6. Latest Updates */}
+      {/* 5. Latest Government Updates (CMS Driven) */}
       <section className="py-20 bg-white border-t border-slate-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
@@ -264,17 +193,23 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { date: "Jul 25, 2026", title: "New GST Rates for E-commerce", tag: "GST" },
-              { date: "Jul 10, 2026", title: "Finance Bill 2026 Key Highlights", tag: "Income Tax" },
-              { date: "Jun 30, 2026", title: "TDS Changes for Freelancers", tag: "TDS" },
-              { date: "Jun 15, 2026", title: "How to claim Angel Tax exemption", tag: "Startup" }
-            ].map((news, idx) => (
-              <div key={idx} className="group cursor-pointer">
-                <div className="text-xs font-bold text-slate-400 mb-2">{news.date} • {news.tag}</div>
-                <h4 className="text-lg font-bold text-slate-900 group-hover:text-primary transition-colors leading-snug">{news.title}</h4>
-              </div>
+            {latestUpdates.map((news) => (
+              <Link 
+                key={news.id} 
+                href={`/knowledge-hub/${news.category.toLowerCase().replace('_', '-')}/${news.slug}`}
+                className="group cursor-pointer block"
+              >
+                <div className="text-xs font-bold text-slate-400 mb-2">
+                  {new Date(news.updatedAt).toLocaleDateString()} • {news.category.replace('_', ' ')}
+                </div>
+                <h4 className="text-lg font-bold text-slate-900 group-hover:text-primary transition-colors leading-snug">
+                  {news.title}
+                </h4>
+              </Link>
             ))}
+            {latestUpdates.length === 0 && (
+              <div className="col-span-4 text-muted-foreground">No updates available.</div>
+            )}
           </div>
         </div>
       </section>

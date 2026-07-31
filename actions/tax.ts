@@ -23,6 +23,14 @@ function toISOOrNull(date: string | Date | number | null | undefined): string | 
   return new Date(date).toISOString();
 }
 
+export async function slugToTaxCategory(slug: string): Promise<TaxCategory | undefined> {
+  const normalized = slug.toUpperCase().replace(/-/g, '_');
+  if (Object.values(TaxCategory).includes(normalized as TaxCategory)) {
+    return normalized as TaxCategory;
+  }
+  return undefined;
+}
+
 export async function getKnowledgeItems(category?: TaxCategory) {
   try {
     const parsedCategory = CategorySchema.parse(category);
@@ -35,7 +43,8 @@ export async function getKnowledgeItems(category?: TaxCategory) {
             reviewStatus: ReviewStatus.VERIFIED
           },
           include: {
-            sourceReferences: true
+            sourceReferences: true,
+            faqs: true
           },
           orderBy: {
             updatedAt: "desc"
@@ -47,7 +56,6 @@ export async function getKnowledgeItems(category?: TaxCategory) {
     );
 
     const items = await fetchItems(parsedCategory);
-
 
     // Serialize Dates for Client Components
     const serializedItems = items.map(item => ({
@@ -62,6 +70,11 @@ export async function getKnowledgeItems(category?: TaxCategory) {
         accessedAt: toISO(ref.accessedAt),
         createdAt: toISO(ref.createdAt),
         updatedAt: toISO(ref.updatedAt),
+      })),
+      faqs: item.faqs.map(faq => ({
+        ...faq,
+        createdAt: toISO(faq.createdAt),
+        updatedAt: toISO(faq.updatedAt),
       }))
     }));
 
@@ -70,7 +83,6 @@ export async function getKnowledgeItems(category?: TaxCategory) {
     logger.error("Error fetching knowledge items", { error, category });
     return { success: false, error: "Failed to fetch tax knowledge items." };
   }
-
 }
 
 export async function getKnowledgeItemBySlug(slug: string) {
@@ -82,7 +94,8 @@ export async function getKnowledgeItemBySlug(slug: string) {
         return await prisma.taxKnowledgeItem.findUnique({
           where: { slug: s },
           include: {
-            sourceReferences: true
+            sourceReferences: true,
+            faqs: true
           }
         });
       },
@@ -91,7 +104,6 @@ export async function getKnowledgeItemBySlug(slug: string) {
     );
 
     const item = await fetchItem(parsedSlug);
-
 
     if (!item) {
       return { success: false, error: "Knowledge item not found." };
@@ -110,6 +122,11 @@ export async function getKnowledgeItemBySlug(slug: string) {
         accessedAt: toISO(ref.accessedAt),
         createdAt: toISO(ref.createdAt),
         updatedAt: toISO(ref.updatedAt),
+      })),
+      faqs: item.faqs.map(faq => ({
+        ...faq,
+        createdAt: toISO(faq.createdAt),
+        updatedAt: toISO(faq.updatedAt),
       }))
     };
 
@@ -118,7 +135,40 @@ export async function getKnowledgeItemBySlug(slug: string) {
     logger.error("[Action] getKnowledgeItemBySlug Error:", { error, slug });
     return { success: false, error: "Failed to fetch tax knowledge item." };
   }
+}
 
+export async function getKnowledgeItemsByCalculator(calculatorId: string) {
+  try {
+    const items = await prisma.taxKnowledgeItem.findMany({
+      where: {
+        relatedCalculators: {
+          has: calculatorId
+        },
+        reviewStatus: ReviewStatus.VERIFIED
+      },
+      include: {
+        faqs: true
+      }
+    });
+
+    const serializedItems = items.map(item => ({
+      ...item,
+      effectiveFrom: toISOOrNull(item.effectiveFrom),
+      lastReviewed: toISO(item.lastReviewed),
+      createdAt: toISO(item.createdAt),
+      updatedAt: toISO(item.updatedAt),
+      faqs: item.faqs.map(faq => ({
+        ...faq,
+        createdAt: toISO(faq.createdAt),
+        updatedAt: toISO(faq.updatedAt),
+      }))
+    }));
+
+    return { success: true, data: serializedItems };
+  } catch (error) {
+    logger.error("[Action] getKnowledgeItemsByCalculator Error:", { error, calculatorId });
+    return { success: false, error: "Failed to fetch related articles." };
+  }
 }
 
 export async function getFormsAndProcedures() {
