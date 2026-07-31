@@ -25,9 +25,25 @@ function toISOOrNull(date: string | Date | number | null | undefined): string | 
 
 export async function slugToTaxCategory(slug: string): Promise<TaxCategory | undefined> {
   const normalized = slug.toUpperCase().replace(/-/g, '_');
+  
   if (Object.values(TaxCategory).includes(normalized as TaxCategory)) {
     return normalized as TaxCategory;
   }
+  
+  // Manual mappings for standard frontend routes to database enums
+  const manualMappings: Record<string, TaxCategory> = {
+    'TAX_BASICS': 'GENERAL',
+    'COMPANY_TAX': 'CORPORATE_TAX',
+    'FREELANCER': 'BUSINESS_TAX',
+    'SALARIED': 'INCOME_TAX',
+    'SELF_EMPLOYED': 'BUSINESS_TAX',
+    'ROADMAP': 'GENERAL'
+  };
+  
+  if (manualMappings[normalized]) {
+    return manualMappings[normalized];
+  }
+  
   return undefined;
 }
 

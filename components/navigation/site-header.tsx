@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Landmark, Menu, X, ChevronRight, User, LogOut, LayoutDashboard, Settings, UserPlus, LogIn, Search, ChevronDown, Bot } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -45,6 +45,7 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ className }: SiteHeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -81,6 +82,19 @@ export function SiteHeader({ className }: SiteHeaderProps) {
     else setActiveDropdown(name);
   };
 
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const query = formData.get("q")?.toString().toLowerCase().trim() || "";
+    if (!query) return;
+    
+    if (query.includes("direct tax")) router.push("/direct-tax");
+    else if (query.includes("indirect tax") || query.includes("gst")) router.push("/indirect-tax");
+    else if (query.includes("business") || query.includes("freelance") || query.includes("self employ")) router.push("/knowledge-hub/business-tax");
+    else if (query.includes("salary") || query.includes("income")) router.push("/knowledge-hub/income-tax");
+    else router.push(`/knowledge-hub/${query.replace(/\s+/g, '-')}`);
+  };
+
   return (
     <header ref={headerRef} className={cn("sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300", className)}>
       <div className="mx-auto flex h-[4.5rem] w-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
@@ -99,12 +113,15 @@ export function SiteHeader({ className }: SiteHeaderProps) {
         
         {/* Search Bar (Desktop) */}
         <div className="hidden lg:flex flex-1 max-w-md items-center relative">
-            <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+          <form onSubmit={handleSearch} className="w-full relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input 
                 type="text" 
+                name="q"
                 placeholder="Search taxes, tools, or ask a question..." 
                 className="w-full bg-slate-100/80 border-transparent rounded-full py-2 pl-10 pr-4 text-sm focus:bg-white focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
             />
+          </form>
         </div>
 
         {/* Desktop Nav Links */}
@@ -231,10 +248,10 @@ export function SiteHeader({ className }: SiteHeaderProps) {
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-[4.5rem] z-40 bg-white overflow-y-auto animate-in slide-in-from-right-full pb-20">
             <div className="p-4 border-b">
-                <div className="relative">
+                <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="relative">
                     <Search className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                    <input type="text" placeholder="Search..." className="w-full bg-slate-100 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-primary/20" />
-                </div>
+                    <input type="text" name="q" placeholder="Search..." className="w-full bg-slate-100 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-primary/20" />
+                </form>
             </div>
 
             <nav className="p-4 flex flex-col gap-6">
