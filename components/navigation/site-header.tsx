@@ -8,14 +8,14 @@ import { cn } from "@/lib/utils";
 
 // --- Desktop Dropdown Data ---
 const learnItems = [
-  { href: "/learn/tax-basics", label: "Tax Basics" },
-  { href: "/learn/income-tax", label: "Income Tax" },
-  { href: "/learn/gst", label: "GST" },
-  { href: "/learn/tds", label: "TDS" },
-  { href: "/learn/business-tax", label: "Business Tax" },
-  { href: "/learn/company-tax", label: "Company Tax" },
-  { href: "/learn/international-tax", label: "International Tax" },
-  { href: "/learn/roadmap", label: "Learning Roadmap" },
+  { href: "/knowledge-hub/tax-basics", label: "Tax Basics" },
+  { href: "/knowledge-hub/income-tax", label: "Income Tax" },
+  { href: "/knowledge-hub/gst", label: "GST" },
+  { href: "/knowledge-hub/tds", label: "TDS" },
+  { href: "/knowledge-hub/business-tax", label: "Business Tax" },
+  { href: "/knowledge-hub/company-tax", label: "Company Tax" },
+  { href: "/knowledge-hub/international-tax", label: "International Tax" },
+  { href: "/knowledge-hub/roadmap", label: "Learning Roadmap" },
 ];
 
 const solutionItems = [
@@ -23,19 +23,19 @@ const solutionItems = [
   { href: "/solutions/register-gst", label: "Register GST" },
   { href: "/solutions/file-itr", label: "File ITR" },
   { href: "/solutions/save-tax", label: "Save Tax" },
-  { href: "/solutions/business-compliance", label: "Business Compliance" },
-  { href: "/solutions/tax-notices", label: "Tax Notices" },
-  { href: "/solutions/business-registration", label: "Business Registration" },
-  { href: "/solutions/export-business", label: "Export Business" },
+  { href: "/business-compliance", label: "Business Compliance" },
+  { href: "/tax-notices", label: "Tax Notices" },
+  { href: "/calculators/business-registration", label: "Business Registration" },
+  { href: "/export-business", label: "Export Business" },
 ];
 
 const toolItems = [
-  { href: "/tools/income-tax-calculator", label: "Income Tax Calculator" },
-  { href: "/tools/gst-calculator", label: "GST Calculator" },
-  { href: "/tools/hra-calculator", label: "HRA Calculator" },
-  { href: "/tools/tax-planner", label: "Tax Planner" },
-  { href: "/tools/ai-document-reader", label: "AI Document Reader" },
-  { href: "/tools/due-date-calendar", label: "Due Date Calendar" },
+  { href: "/calculators/income-tax-calculator", label: "Income Tax Calculator" },
+  { href: "/calculators/gst-calculator", label: "GST Calculator" },
+  { href: "/calculators/hra-calculator", label: "HRA Calculator" },
+  { href: "/tax-planner", label: "Tax Planner" },
+  { href: "/ai-document-reader", label: "AI Document Reader" },
+  { href: "/due-date-calendar", label: "Due Date Calendar" },
   { href: "/downloads", label: "Downloads" },
 ];
 

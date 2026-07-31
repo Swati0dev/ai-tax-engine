@@ -57,7 +57,7 @@ export function TaxKnowledgeDetail({ item }: TaxKnowledgeDetailProps) {
               </div>
               
               <div className="space-y-8">
-                <div className="prose prose-slate dark:prose-invert max-w-none text-lg text-muted-foreground leading-relaxed space-y-6 bg-white p-8 md:p-10 rounded-[2.5rem] border shadow-sm relative overflow-hidden">
+                <div className="prose-editorial max-w-none text-lg text-muted-foreground leading-relaxed space-y-6 bg-white p-8 md:p-10 rounded-[2.5rem] border shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-2 h-full bg-primary/20" />
                   {item.explanation}
                 </div>
