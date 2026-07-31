@@ -375,3 +375,115 @@ model SavedContent {
   @@index([userId])
   @@index([type])
 }
+
+// ==========================================
+// REGULATORY INTELLIGENCE ENGINE (RIE)
+// ==========================================
+
+enum SourceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  CRON
+}
+
+enum SourceHealthStatus {
+  HEALTHY
+  DEGRADED
+  FAILING
+  UNKNOWN
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum AuditAction {
+  SOURCE_REGISTERED
+  SOURCE_ENABLED
+  SOURCE_DISABLED
+  JOB_STARTED
+  JOB_COMPLETED
+  JOB_FAILED
+}
+
+model OfficialSource {
+  id                String             @id @default(cuid())
+  name              String
+  authority         String
+  url               String
+  type              String             @default("WEBSITE")
+  enabled           Boolean            @default(true)
+  frequency         SourceFrequency    @default(DAILY)
+  priority          Int                @default(1)
+  parserName        String?
+  healthStatus      SourceHealthStatus @default(UNKNOWN)
+  lastChecked       DateTime?
+  lastSuccessfulRun DateTime?
+
+  snapshots     SourceSnapshot[]
+  jobs          SchedulerJob[]
+  healthMetrics SourceHealth[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SourceSnapshot {
+  id       String         @id @default(cuid())
+  sourceId String
+  source   OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  contentHash String
+  metadata    Json?
+
+  capturedAt DateTime @default(now())
+
+  @@index([sourceId])
+}
+
+model SchedulerJob {
+  id       String         @id @default(cuid())
+  sourceId String
+  source   OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  status       JobStatus @default(PENDING)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  errorMessage String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sourceId])
+  @@index([status])
+}
+
+model SourceHealth {
+  id       String         @id @default(cuid())
+  sourceId String
+  source   OfficialSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  status       SourceHealthStatus
+  latencyMs    Int?
+  errorMessage String?            @db.Text
+
+  recordedAt DateTime @default(now())
+
+  @@index([sourceId])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  action     AuditAction
+  entityId   String?
+  entityType String?
+  details    Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([action])
+}

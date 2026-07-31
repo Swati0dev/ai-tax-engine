@@ -1,0 +1,21 @@
+export const RIE_CONSTANTS = {
+  VERSION: '1.0.0',
+  DEFAULT_RETRY_COUNT: 3,
+  DEFAULT_TIMEOUT_MS: 30000,
+  
+  JOB_QUEUE_NAME: 'rie-scheduler-queue',
+  
+  ERROR_CODES: {
+    SOURCE_NOT_FOUND: 'RIE_001',
+    NETWORK_FAILURE: 'RIE_002',
+    PARSER_ERROR: 'RIE_003',
+    DATABASE_ERROR: 'RIE_004'
+  },
+
+  FREQUENCIES: {
+    DAILY: 'DAILY',
+    WEEKLY: 'WEEKLY',
+    MONTHLY: 'MONTHLY',
+    CRON: 'CRON'
+  }
+};
