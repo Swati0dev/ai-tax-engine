@@ -1,0 +1,25 @@
+import { MessageSquare } from "lucide-react";
+
+export default function PromptsAdminPage() {
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
+            <MessageSquare className="h-8 w-8 text-indigo-600" />
+            AI Prompts Management
+          </h1>
+          <p className="text-sm text-slate-500 font-medium mt-1">
+            Tune system prompts and view AI conversation logs.
+          </p>
+        </div>
+      </div>
+      <div className="flex h-[50vh] w-full items-center justify-center border border-dashed border-slate-300 rounded-2xl bg-slate-50">
+        <div className="text-center">
+          <p className="text-slate-600 font-medium">This module is locked under the Phase 10 Scope Freeze.</p>
+          <p className="text-slate-400 text-sm mt-2">AI Prompts are currently hardcoded in the codebase for production stability.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
