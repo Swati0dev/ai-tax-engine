@@ -1,4 +1,4 @@
-import { ITRWizard } from "@/components/tools/ITRWizard";
+import ITRWizard from "@/components/tools/ITRWizard";
 import { FileCheck2 } from "lucide-react";
 
 export default function FileITRPage() {
