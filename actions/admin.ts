@@ -124,11 +124,28 @@ export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
       };
     } else {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // Fallback to older model names that are widely supported if flash has issues on this SDK version
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+
+      let scrapedContent = "";
+      if (sourceUrl) {
+        try {
+          const cheerio = require("cheerio");
+          const response = await fetch(sourceUrl);
+          const html = await response.text();
+          const $ = cheerio.load(html);
+          // Remove scripts and styles
+          $('script, style').remove();
+          scrapedContent = $('body').text().replace(/\s+/g, ' ').substring(0, 15000); // Limit context size
+        } catch (scrapeErr) {
+          console.warn("Failed to scrape URL, continuing with AI knowledge:", scrapeErr);
+        }
+      }
 
       const prompt = `You are a highly intelligent Indian Tax Expert API.
 I want you to research the topic: "${topic}".
 ${sourceUrl ? `Please base your knowledge specifically on this source if possible: ${sourceUrl}` : ""}
+${scrapedContent ? `\n\nI have crawled the website for you. Here is the raw text from the website:\n\n${scrapedContent}\n\n` : ""}
 
 Return ONLY a pure JSON object (no markdown formatting, no \`\`\`json) with the following structure:
 {
@@ -148,7 +165,16 @@ Return ONLY a pure JSON object (no markdown formatting, no \`\`\`json) with the 
 
 Ensure the data is accurate for Indian taxation.`;
 
-      const result = await model.generateContent(prompt);
+      // Fallback if model fails, try gemini-pro
+      let result;
+      try {
+        result = await model.generateContent(prompt);
+      } catch (err) {
+        console.warn("gemini-1.5-pro-latest failed, falling back to gemini-pro", err);
+        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+        result = await fallbackModel.generateContent(prompt);
+      }
+
       const responseText = result.response.text().replace(/```json\n?|\n?```/g, '').trim();
       
       try {
