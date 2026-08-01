@@ -11,7 +11,7 @@ export default function TaxNoticesPage() {
           Tax Notice Explainer
         </h1>
         <p className="mt-4 text-xl text-slate-600 max-w-3xl">
-          Received a notice from the Income Tax Department or GST portal? Don't panic. Our AI can help you understand what it means and how to respond.
+          Received a notice from the Income Tax Department or GST portal? Don&apos;t panic. Our AI can help you understand what it means and how to respond.
         </p>
       </div>
 
@@ -44,7 +44,7 @@ export default function TaxNoticesPage() {
           
           <Link href="/knowledge-hub/income-tax" className="block p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all bg-white group">
             <h4 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Section 148 - Income Escaping Assessment</h4>
-            <p className="text-sm text-slate-500 mt-1">The department believes you haven't disclosed all your income. Requires a serious response.</p>
+            <p className="text-sm text-slate-500 mt-1">The department believes you haven&apos;t disclosed all your income. Requires a serious response.</p>
           </Link>
         </div>
       </div>
