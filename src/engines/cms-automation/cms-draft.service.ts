@@ -78,11 +78,11 @@ export class CmsDraftService {
 
     // 3. Map Fields
     const structuredOutput = (analysis.structuredOutput as Record<string, unknown>) || {};
-    const title = structuredOutput.title || canonicalDoc.title || "Untitled Regulation Update";
+    const title = (structuredOutput.title as string) || canonicalDoc.title || "Untitled Regulation Update";
     const summary = analysis.summary;
-    const explanation = structuredOutput.explanation || `**Impact:**\n${analysis.impact}\n\n**Recommendations:**\n${analysis.recommendations}`;
+    const explanation = (structuredOutput.explanation as string) || `**Impact:**\n${analysis.impact}\n\n**Recommendations:**\n${analysis.recommendations}`;
     const category = this.mapCategory(canonicalDoc.authority || "", analysis.changeSet.source.name);
-    const slug = this.generateSlug(title);
+    const slug = this.generateSlug(title as string);
 
     // 4. Create the TaxKnowledgeItem and SourceReference in a transaction
     const draftId = await prisma.$transaction(async (tx) => {
@@ -95,15 +95,15 @@ export class CmsDraftService {
           reviewStatus: ReviewStatus.DRAFT,
           slug,
           actName: canonicalDoc.authority || "Unknown Act", // Providing a fallback act name
-          applicability: structuredOutput.applicability || [],
-          benefitsOrDeductions: structuredOutput.benefitsOrDeductions || [],
-          restrictions: structuredOutput.restrictions || [],
-          examples: structuredOutput.examples || [],
-          relatedForms: structuredOutput.relatedForms || [],
-          filingProcedure: structuredOutput.filingProcedure || [],
+          applicability: (structuredOutput.applicability as string[]) || [],
+          benefitsOrDeductions: (structuredOutput.benefitsOrDeductions as string[]) || [],
+          restrictions: (structuredOutput.restrictions as string[]) || [],
+          examples: (structuredOutput.examples as string[]) || [],
+          relatedForms: (structuredOutput.relatedForms as string[]) || [],
+          filingProcedure: (structuredOutput.filingProcedure as string[]) || [],
           relatedItems: [],
           relatedCalculators: [],
-          tags: structuredOutput.tags || ["AI_GENERATED", category],
+          tags: (structuredOutput.tags as string[]) || ["AI_GENERATED", category],
           sourceReferences: {
             create: {
               title: canonicalDoc.title || analysis.changeSet.source.name,
@@ -116,8 +116,9 @@ export class CmsDraftService {
       });
 
       // Insert FAQs if any exist
-      if (structuredOutput.faqs && Array.isArray(structuredOutput.faqs)) {
-        for (const faq of structuredOutput.faqs) {
+      const faqs = structuredOutput.faqs as Array<{question: string, answer: string}>;
+      if (faqs && Array.isArray(faqs)) {
+        for (const faq of faqs) {
           if (faq.question && faq.answer) {
             await tx.fAQ.create({
               data: {
