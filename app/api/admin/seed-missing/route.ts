@@ -7,8 +7,10 @@ export async function GET() {
     console.log('Seeding missing categories (GENERAL, BUSINESS_TAX)...');
 
     // GENERAL Category (Tax Basics)
-    await prisma.taxKnowledgeItem.create({
-      data: {
+    await prisma.taxKnowledgeItem.upsert({
+      where: { slug: 'introduction-to-indian-taxation' },
+      update: {},
+      create: {
         category: 'GENERAL',
         actName: 'Income Tax Act, 1961',
         sectionNumber: 'Basics',
@@ -37,8 +39,10 @@ export async function GET() {
     });
 
     // BUSINESS_TAX Category (Freelancer)
-    await prisma.taxKnowledgeItem.create({
-      data: {
+    await prisma.taxKnowledgeItem.upsert({
+      where: { slug: 'presumptive-taxation-freelancers-44ada' },
+      update: {},
+      create: {
         category: 'BUSINESS_TAX',
         actName: 'Income Tax Act, 1961',
         sectionNumber: '44ADA',

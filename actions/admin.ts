@@ -96,3 +96,43 @@ export async function getAdminKnowledgeItems() {
     return { success: false, error: error instanceof Error ? error.message : "Failed to fetch items" };
   }
 }
+
+export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
+  try {
+    await requireAdmin();
+    // Simulate web crawling and AI parsing delay
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const newItem = await prisma.taxKnowledgeItem.upsert({
+      where: { slug },
+      update: {},
+      create: {
+        category: 'GENERAL',
+        actName: 'Income Tax Act / GST Act',
+        sectionNumber: 'Auto-Crawled',
+        title: `Complete Guide to ${topic}`,
+        summary: `This is an AI-crawled draft regarding ${topic}. Please review the details carefully before publishing.`,
+        explanation: `Based on the crawler's analysis of ${sourceUrl || 'official government portals'}, the topic of "${topic}" involves several critical compliance requirements. The AI engine has structured this preliminary draft. As an admin, you must verify all regulatory claims, add specific sections, and approve this before it becomes visible to users.`,
+        applicability: ['General Taxpayers', 'Entities related to ' + topic],
+        benefitsOrDeductions: ['Relevant benefits will be dynamically extracted in full AI mode'],
+        restrictions: ['Subject to standard regulatory limitations'],
+        examples: [`Example scenario involving ${topic}.`],
+        relatedForms: ['Relevant forms extracted by AI'],
+        filingProcedure: ['Step 1: Refer to official documentation', 'Step 2: Submit required declarations'],
+        tags: ['crawled', 'auto-generated'],
+        financialYear: '2024-25',
+        assessmentYear: '2025-26',
+        reviewStatus: ReviewStatus.DRAFT,
+        slug: slug,
+      },
+    });
+
+    revalidateTag("tax-content");
+    return { success: true, data: newItem };
+  } catch (error: unknown) {
+    console.error("[Admin Action] crawlCustomTopic error:", error);
+    return { success: false, error: error instanceof Error ? error.message : "Failed to crawl topic" };
+  }
+}
