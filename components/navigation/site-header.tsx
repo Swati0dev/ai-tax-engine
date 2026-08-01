@@ -116,11 +116,9 @@ export function SiteHeader({ className }: SiteHeaderProps) {
     setActiveDropdown(null);
     setMobileMenuOpen(false);
     
-    if (pathname === href) {
-      window.location.href = href; // Force reload if already on the page
-    } else {
-      router.push(href);
-    }
+    // The user explicitly requested to ALWAYS refresh/redirect no matter what.
+    // This forces a hard browser load, guaranteeing the page resets correctly.
+    window.location.href = href;
   };
 
   return (

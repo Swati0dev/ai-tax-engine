@@ -31,22 +31,22 @@ export function PageHero({
 }: PageHeroProps) {
   return (
     <div className={cn("relative w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] overflow-visible", className)}>
-      {/* Sticky Background Image Container */}
+      {/* Background Image Container */}
       {image && (
-        <div className="sticky top-0 left-0 w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] -z-10 overflow-hidden bg-slate-900">
+        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden bg-slate-900 rounded-b-[2.5rem]">
           <EditorialImage
             src={image}
             alt={title}
             fill
             variant="hero"
             priority
-            className="opacity-70"
+            className="opacity-70 object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
         </div>
       )}
       
-      {!image && <div className="sticky top-0 left-0 w-full h-[40vh] sm:h-[50vh] lg:h-[60vh] -z-10 hero-gradient" />}
+      {!image && <div className="absolute inset-0 w-full h-full z-0 hero-gradient rounded-b-[2.5rem]" />}
 
       {/* Content that stays centered during scroll or moves up */}
       <div className="absolute inset-0 flex flex-col justify-end text-center sm:text-left px-4 sm:px-6 lg:px-8 z-10 pb-12 sm:pb-16 lg:pb-20 max-w-7xl mx-auto">
