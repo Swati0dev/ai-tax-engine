@@ -80,10 +80,47 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
   }
 
   public async registerSource(config: IRegulatorySourceConfig): Promise<string> {
-    console.log(`[RegulatoryEngine] Registering new source: ${config.name}`);
-    const mockId = `src_${Date.now()}`;
-    this.sources.set(mockId, { ...config, id: mockId });
-    return mockId;
+    console.log(`[RegulatoryEngine] Registering source in DB: ${config.name}`);
+    
+    // Check if source already exists by URL
+    let dbSource = await prisma.officialSource.findFirst({
+      where: { url: config.url }
+    });
+
+    if (!dbSource) {
+      console.log(`[RegulatoryEngine] Creating new OfficialSource for URL: ${config.url}`);
+      dbSource = await prisma.officialSource.create({
+        data: {
+          name: config.name,
+          authority: config.authority,
+          url: config.url,
+          type: config.type,
+          enabled: config.enabled,
+          frequency: config.frequency as never,
+          priority: config.priority,
+          parserName: config.parserName,
+          accessStrategy: config.accessStrategy
+        }
+      });
+    } else {
+      console.log(`[RegulatoryEngine] Found existing OfficialSource: ${dbSource.id}`);
+    }
+
+    this.sources.set(dbSource.id, {
+        id: dbSource.id,
+        name: dbSource.name,
+        authority: dbSource.authority,
+        url: dbSource.url,
+        type: dbSource.type as never,
+        category: config.category,
+        enabled: dbSource.enabled,
+        frequency: dbSource.frequency as never,
+        priority: dbSource.priority,
+        parserName: (dbSource.parserName || undefined) as never,
+        accessStrategy: dbSource.accessStrategy,
+    });
+
+    return dbSource.id;
   }
 
   public async enableSource(sourceId: string): Promise<boolean> {
