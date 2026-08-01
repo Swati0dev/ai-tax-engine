@@ -20,10 +20,13 @@ export default function RegulatoryIntelligenceOverview() {
     setMessage("Initializing AI Crawler...");
 
     // Fake progress updates for UX
-    setTimeout(() => setMessage("Fetching from official portals..."), 800);
-    setTimeout(() => setMessage("Parsing legal documents..."), 1600);
+    const t1 = setTimeout(() => setMessage("Fetching from official portals..."), 800);
+    const t2 = setTimeout(() => setMessage("Parsing legal documents..."), 1600);
 
     const res = await crawlCustomTopic(topic, sourceUrl);
+    
+    clearTimeout(t1);
+    clearTimeout(t2);
 
     if (res.success) {
       setStatus("success");
