@@ -1,5 +1,6 @@
 "use server";
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { z } from "zod";
@@ -94,7 +95,8 @@ export async function getAdminKnowledgeItems() {
   } catch (error: unknown) {
     console.error("[Admin Action] getAdminKnowledgeItems error:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed to fetch items" };
-import { GoogleGenerativeAI } from "@google/generative-ai";
+  }
+}
 
 export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
   try {
