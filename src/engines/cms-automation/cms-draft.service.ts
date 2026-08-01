@@ -94,7 +94,9 @@ export class CmsDraftService {
           category,
           reviewStatus: ReviewStatus.DRAFT,
           slug,
-          actName: canonicalDoc.authority || "Unknown Act", // Providing a fallback act name
+          actName: (structuredOutput.actName as string) || canonicalDoc.authority || "Unknown Act",
+          sectionNumber: (structuredOutput.sectionNumber as string) || null,
+          effectiveFrom: structuredOutput.effectiveDate ? new Date(structuredOutput.effectiveDate as string) : canonicalDoc.effectiveFrom,
           applicability: (structuredOutput.applicability as string[]) || [],
           benefitsOrDeductions: (structuredOutput.benefitsOrDeductions as string[]) || [],
           restrictions: (structuredOutput.restrictions as string[]) || [],
