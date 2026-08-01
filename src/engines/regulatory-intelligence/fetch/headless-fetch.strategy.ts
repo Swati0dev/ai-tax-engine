@@ -19,6 +19,7 @@ export class HeadlessFetchStrategy implements IFetchStrategy {
       const run = await client.actor("apify/cheerio-scraper").call({
         startUrls: [{ url: context.url }],
         maxPagesPerCrawl: 1,
+        pageFunction: "async function pageFunction(context) { const { $ } = context; return { text: $('body').text() }; }"
       });
 
       const { items } = await client.dataset(run.defaultDatasetId).listItems();
