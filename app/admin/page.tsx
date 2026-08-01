@@ -116,13 +116,13 @@ export default async function AdminDashboardPage() {
                   <p className="text-xs text-slate-500">Review pending AI drafts</p>
                 </div>
               </Link>
-              <Link href="/api/admin/seed-missing" target="_blank" className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200 group text-left">
+              <Link href="/admin/regulatory-intelligence" className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200 group text-left">
                 <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <FileText className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">Trigger Crawl Sync</h4>
-                  <p className="text-xs text-slate-500">Run manual fetch override</p>
+                  <h4 className="text-sm font-bold text-slate-900">Manual AI Crawler</h4>
+                  <p className="text-xs text-slate-500">Command AI to fetch specific topics</p>
                 </div>
               </Link>
             </CardContent>
