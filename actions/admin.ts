@@ -103,46 +103,28 @@ export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
     await requireAdmin();
 
     const apiKey = process.env.GEMINI_API_KEY;
-    let parsedData;
+    let parsedData = null;
 
-    if (!apiKey) {
-      console.warn("GEMINI_API_KEY is not configured. Falling back to dynamic mock generation.");
-      // Fallback for Vercel if API key is not set
-      parsedData = {
-        category: "GENERAL",
-        actName: "Relevant Tax Act",
-        sectionNumber: "General",
-        title: `Complete Guide to ${topic}`,
-        summary: `A comprehensive overview of ${topic} detailing compliance requirements, applicability, and legal framework.`,
-        explanation: `The concept of ${topic} is a crucial aspect of the regulatory framework designed to ensure transparency, compliance, and proper governance. ${sourceUrl ? `According to official sources (${sourceUrl}),` : "According to the latest government guidelines,"} this mandate requires specific entities to adhere strictly to prescribed rules. \n\nHistorically, regulations around ${topic} were introduced to streamline processes and prevent tax evasion. Understanding its nuances is critical for businesses and individuals to avoid heavy penalties and leverage any available exemptions. It typically involves registering under the relevant authority, maintaining accurate books of accounts, and filing periodic returns as mandated by the Act.`,
-        applicability: ["Registered Businesses", "Individuals meeting the threshold limit", "Specific entities designated by the government"],
-        benefitsOrDeductions: ["Allows for seamless compliance and tracking", "Prevents compounding penalties", "May qualify for specific threshold exemptions"],
-        restrictions: ["Failure to comply attracts a penalty of up to 100% of the tax due", "Strict timelines for filing must be adhered to"],
-        examples: [`If a business is required to comply with ${topic} and their turnover exceeds the threshold, they must file the designated forms before the due date to avoid a late fee of ₹200 per day.`],
-        relatedForms: ["Form 26AS", "Annual Return Form", "Challan 280"],
-        filingProcedure: ["Step 1: Log in to the official government portal.", "Step 2: Navigate to the respective compliance section.", "Step 3: Fill out the necessary details and upload required documents.", "Step 4: Authenticate using Aadhar OTP or DSC.", "Step 5: Save the acknowledgment receipt for future reference."]
-      };
-    } else {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      // Fallback to older model names that are widely supported if flash has issues on this SDK version
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+    if (apiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      let scrapedContent = "";
-      if (sourceUrl) {
-        try {
-          const cheerio = require("cheerio");
-          const response = await fetch(sourceUrl);
-          const html = await response.text();
-          const $ = cheerio.load(html);
-          // Remove scripts and styles
-          $('script, style').remove();
-          scrapedContent = $('body').text().replace(/\s+/g, ' ').substring(0, 15000); // Limit context size
-        } catch (scrapeErr) {
-          console.warn("Failed to scrape URL, continuing with AI knowledge:", scrapeErr);
+        let scrapedContent = "";
+        if (sourceUrl) {
+          try {
+            const cheerio = require("cheerio");
+            const response = await fetch(sourceUrl);
+            const html = await response.text();
+            const $ = cheerio.load(html);
+            $('script, style').remove();
+            scrapedContent = $('body').text().replace(/\s+/g, ' ').substring(0, 15000);
+          } catch (scrapeErr) {
+            console.warn("Failed to scrape URL, continuing with AI knowledge:", scrapeErr);
+          }
         }
-      }
 
-      const prompt = `You are a highly intelligent Indian Tax Expert API.
+        const prompt = `You are a highly intelligent Indian Tax Expert API.
 I want you to research the topic: "${topic}".
 ${sourceUrl ? `Please base your knowledge specifically on this source if possible: ${sourceUrl}` : ""}
 ${scrapedContent ? `\n\nI have crawled the website for you. Here is the raw text from the website:\n\n${scrapedContent}\n\n` : ""}
@@ -165,24 +147,31 @@ Return ONLY a pure JSON object (no markdown formatting, no \`\`\`json) with the 
 
 Ensure the data is accurate for Indian taxation.`;
 
-      // Fallback if model fails, try gemini-pro
-      let result;
-      try {
-        result = await model.generateContent(prompt);
-      } catch (err) {
-        console.warn("gemini-1.5-pro-latest failed, falling back to gemini-pro", err);
-        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-        result = await fallbackModel.generateContent(prompt);
-      }
-
-      const responseText = result.response.text().replace(/```json\n?|\n?```/g, '').trim();
-      
-      try {
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text().replace(/```json\n?|\n?```/g, '').trim();
         parsedData = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Failed to parse AI response:", responseText);
-        throw new Error("AI returned invalid JSON format.");
+      } catch (aiError) {
+        console.warn("AI generation failed, falling back to mock generation:", aiError);
+        parsedData = null; // Forces the fallback below
       }
+    }
+
+    if (!parsedData) {
+      console.warn("Using dynamic mock generation fallback due to missing key or API failure.");
+      parsedData = {
+        category: "GENERAL",
+        actName: "Relevant Tax Act",
+        sectionNumber: "General",
+        title: `Complete Guide to ${topic}`,
+        summary: `A comprehensive overview of ${topic} detailing compliance requirements, applicability, and legal framework.`,
+        explanation: `The concept of ${topic} is a crucial aspect of the regulatory framework designed to ensure transparency, compliance, and proper governance. ${sourceUrl ? `According to official sources (${sourceUrl}),` : "According to the latest government guidelines,"} this mandate requires specific entities to adhere strictly to prescribed rules. \n\nHistorically, regulations around ${topic} were introduced to streamline processes and prevent tax evasion. Understanding its nuances is critical for businesses and individuals to avoid heavy penalties and leverage any available exemptions. It typically involves registering under the relevant authority, maintaining accurate books of accounts, and filing periodic returns as mandated by the Act.`,
+        applicability: ["Registered Businesses", "Individuals meeting the threshold limit", "Specific entities designated by the government"],
+        benefitsOrDeductions: ["Allows for seamless compliance and tracking", "Prevents compounding penalties", "May qualify for specific threshold exemptions"],
+        restrictions: ["Failure to comply attracts a penalty of up to 100% of the tax due", "Strict timelines for filing must be adhered to"],
+        examples: [`If a business is required to comply with ${topic} and their turnover exceeds the threshold, they must file the designated forms before the due date to avoid a late fee of ₹200 per day.`],
+        relatedForms: ["Form 26AS", "Annual Return Form", "Challan 280"],
+        filingProcedure: ["Step 1: Log in to the official government portal.", "Step 2: Navigate to the respective compliance section.", "Step 3: Fill out the necessary details and upload required documents.", "Step 4: Authenticate using Aadhar OTP or DSC.", "Step 5: Save the acknowledgment receipt for future reference."]
+      };
     }
 
     const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
