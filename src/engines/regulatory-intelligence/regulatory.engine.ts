@@ -5,8 +5,9 @@ import { schedulerService } from './scheduler.service';
 import { fetchEngine, FetchMethod, NormalizedResponse } from './fetch';
 import { ParserEngine } from './parser';
 import { CanonicalNormalizerService, ICanonicalDocument } from './canonical';
-import { DiffEngine, ChangeSet } from './diff';
+import { DiffEngine } from './diff';
 import { prisma } from '@/lib/db';
+import { ChangeSet as PrismaChangeSet } from '@prisma/client';
 import crypto from 'crypto';
 
 const parserEngine = new ParserEngine();
@@ -261,19 +262,30 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
     const newDoc = await this.processLatest(sourceId);
     
     if (!previousDoc) {
-      console.log(`[RegulatoryEngine] No previous doc for ${sourceId}, skipping diff.`);
-      return null;
+      console.log(`[RegulatoryEngine] No previous doc for ${sourceId}, creating a NEW_DOCUMENT changeset.`);
+      
+      const changeSet = await prisma.changeSet.create({
+        data: {
+          sourceId,
+          oldDocumentId: null,
+          newDocumentId: newDoc.id,
+          severity: 'HIGH',
+          changes: { summary: "New Document Indexed", type: "NEW_DOCUMENT" },
+          isProcessedByAI: false,
+        }
+      });
+      return changeSet;
     }
 
-    const changeSet = this.compareDocuments(previousDoc, newDoc);
+    const diffResult = this.compareDocuments(previousDoc, newDoc);
     
-    await prisma.changeSet.create({
+    const changeSet = await prisma.changeSet.create({
       data: {
         sourceId,
         oldDocumentId: previousDoc.id,
         newDocumentId: newDoc.id,
-        severity: changeSet.changeSeverity as never,
-        changes: { summary: changeSet.summary, type: changeSet.changeType } as never,
+        severity: diffResult.changeSeverity as never,
+        changes: { summary: diffResult.summary, type: diffResult.changeType } as never,
         isProcessedByAI: false,
       }
     });
@@ -281,9 +293,9 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
     return changeSet;
   }
 
-  public async detectChanges(): Promise<ChangeSet[]> {
+  public async detectChanges(): Promise<PrismaChangeSet[]> {
     console.log('[RegulatoryEngine] Detecting changes system-wide...');
-    const changeSets: ChangeSet[] = [];
+    const changeSets: PrismaChangeSet[] = [];
     
     for (const [id, source] of this.sources.entries()) {
       if (!source.enabled) continue;

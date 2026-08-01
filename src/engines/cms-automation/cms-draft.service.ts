@@ -1,5 +1,6 @@
-import { ChangeSetAnalysis, TaxCategory, ReviewStatus, SourceType } from "@prisma/client";
 import { prisma } from "../../../lib/db";
+import { ReviewStatus, TaxCategory, SourceType } from "@prisma/client";
+import { ICanonicalDocument } from "../regulatory-intelligence/canonical";
 
 export class CmsDraftService {
   /**
@@ -76,9 +77,10 @@ export class CmsDraftService {
     }
 
     // 3. Map Fields
-    const title = canonicalDoc.title || "Untitled Regulation Update";
+    const structuredOutput = (analysis.structuredOutput as Record<string, unknown>) || {};
+    const title = structuredOutput.title || canonicalDoc.title || "Untitled Regulation Update";
     const summary = analysis.summary;
-    const explanation = `**Impact:**\n${analysis.impact}\n\n**Recommendations:**\n${analysis.recommendations}`;
+    const explanation = structuredOutput.explanation || `**Impact:**\n${analysis.impact}\n\n**Recommendations:**\n${analysis.recommendations}`;
     const category = this.mapCategory(canonicalDoc.authority || "", analysis.changeSet.source.name);
     const slug = this.generateSlug(title);
 
@@ -93,15 +95,15 @@ export class CmsDraftService {
           reviewStatus: ReviewStatus.DRAFT,
           slug,
           actName: canonicalDoc.authority || "Unknown Act", // Providing a fallback act name
-          applicability: [],
-          benefitsOrDeductions: [],
-          restrictions: [],
-          examples: [],
-          relatedForms: [],
-          filingProcedure: [],
+          applicability: structuredOutput.applicability || [],
+          benefitsOrDeductions: structuredOutput.benefitsOrDeductions || [],
+          restrictions: structuredOutput.restrictions || [],
+          examples: structuredOutput.examples || [],
+          relatedForms: structuredOutput.relatedForms || [],
+          filingProcedure: structuredOutput.filingProcedure || [],
           relatedItems: [],
           relatedCalculators: [],
-          tags: ["AI_GENERATED", category],
+          tags: structuredOutput.tags || ["AI_GENERATED", category],
           sourceReferences: {
             create: {
               title: canonicalDoc.title || analysis.changeSet.source.name,
@@ -112,6 +114,21 @@ export class CmsDraftService {
           }
         }
       });
+
+      // Insert FAQs if any exist
+      if (structuredOutput.faqs && Array.isArray(structuredOutput.faqs)) {
+        for (const faq of structuredOutput.faqs) {
+          if (faq.question && faq.answer) {
+            await tx.fAQ.create({
+              data: {
+                question: faq.question,
+                answer: faq.answer,
+                knowledgeItemId: draft.id
+              }
+            });
+          }
+        }
+      }
 
       return draft.id;
     });

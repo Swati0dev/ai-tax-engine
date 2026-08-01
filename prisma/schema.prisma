@@ -372,6 +372,7 @@ model ChangeSetAnalysis {
   summary         String
   impact          String
   recommendations String
+  structuredOutput Json?
   provider        String
   model           String
   status          AnalysisStatus @default(PENDING)

@@ -95,6 +95,7 @@ export class AiAnalysisService {
           summary: parsed.summary || "No summary provided",
           impact: parsed.impact || "No impact provided",
           recommendations: parsed.recommendations || "No recommendations provided",
+          structuredOutput: parsed.structuredOutput || null,
           status: "COMPLETED"
         }
       });
