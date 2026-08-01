@@ -111,6 +111,18 @@ export function SiteHeader({ className }: SiteHeaderProps) {
     else router.push(`/knowledge-hub/${query.replace(/\s+/g, '-')}`);
   };
 
+  const handleNavigation = (e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+    setActiveDropdown(null);
+    setMobileMenuOpen(false);
+    
+    if (pathname === href) {
+      window.location.href = href; // Force reload if already on the page
+    } else {
+      router.push(href);
+    }
+  };
+
   return (
     <header ref={headerRef} className={cn("sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all duration-300", className)}>
       <div className="mx-auto flex h-[4.5rem] w-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8 gap-4">
@@ -156,7 +168,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 grid gap-1 animate-in fade-in slide-in-from-top-2">
                     <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider border-b mb-1">Learn</div>
                     {learnItems.map(item => (
-                        <Link key={item.href} href={item.href} onClick={() => setActiveDropdown(null)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                        <Link key={item.href} href={item.href} onClick={(e) => handleNavigation(e, item.href)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
                             {item.label}
                         </Link>
                     ))}
@@ -178,7 +190,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 grid gap-1 animate-in fade-in slide-in-from-top-2">
                     <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider border-b mb-1">Solutions</div>
                     {solutionItems.map(item => (
-                        <Link key={item.href} href={item.href} onClick={() => setActiveDropdown(null)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                        <Link key={item.href} href={item.href} onClick={(e) => handleNavigation(e, item.href)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
                             {item.label}
                         </Link>
                     ))}
@@ -200,7 +212,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-2 grid gap-1 animate-in fade-in slide-in-from-top-2">
                     <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider border-b mb-1">Tools</div>
                     {toolItems.map(item => (
-                        <Link key={item.href} href={item.href} onClick={() => setActiveDropdown(null)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
+                        <Link key={item.href} href={item.href} onClick={(e) => handleNavigation(e, item.href)} className="px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-primary/5 hover:text-primary transition-colors">
                             {item.label}
                         </Link>
                     ))}
@@ -277,7 +289,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">📚 LEARN</h3>
                     <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
                         {learnItems.map(item => (
-                            <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
+                            <Link key={item.href} href={item.href} onClick={(e) => handleNavigation(e, item.href)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
                         ))}
                     </div>
                 </div>
@@ -286,7 +298,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">💼 SOLUTIONS</h3>
                     <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
                         {solutionItems.map(item => (
-                            <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
+                            <Link key={item.href} href={item.href} onClick={(e) => handleNavigation(e, item.href)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
                         ))}
                     </div>
                 </div>
@@ -295,7 +307,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">🧮 TOOLS</h3>
                     <div className="flex flex-col gap-2 pl-2 border-l-2 border-slate-100">
                         {toolItems.map(item => (
-                            <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
+                            <Link key={item.href} href={item.href} onClick={(e) => handleNavigation(e, item.href)} className="text-base text-slate-700 font-medium py-1">{item.label}</Link>
                         ))}
                     </div>
                 </div>
