@@ -231,13 +231,17 @@ Ensure the data is accurate for Indian taxation.`;
           ]
         };
       } else {
+        const rawExplanation = scrapedContent 
+          ? `*** RAW SCRAPED CONTENT (AI PARSING FAILED DUE TO API KEY) ***\n\n${scrapedContent.substring(0, 3000)}...` 
+          : `The concept of ${topic} is a crucial aspect of the regulatory framework designed to ensure transparency, compliance, and proper governance. ${sourceUrl ? `According to official sources (${sourceUrl}),` : "According to the latest government guidelines,"} this mandate requires specific entities to adhere strictly to prescribed rules. \n\nHistorically, regulations around ${topic} were introduced to streamline processes and prevent tax evasion. Understanding its nuances is critical for businesses and individuals to avoid heavy penalties and leverage any available exemptions. It typically involves registering under the relevant authority, maintaining accurate books of accounts, and filing periodic returns as mandated by the Act.`;
+
         parsedData = {
           category: "GENERAL",
           actName: "Relevant Tax Act",
           sectionNumber: "General",
           title: `Complete Guide to ${topic}`,
-          summary: `A comprehensive AI overview of ${topic} detailing compliance requirements, applicability, and legal framework.`,
-          explanation: `The concept of ${topic} is a crucial aspect of the regulatory framework designed to ensure transparency, compliance, and proper governance. ${sourceUrl ? `According to official sources (${sourceUrl}),` : "According to the latest government guidelines,"} this mandate requires specific entities to adhere strictly to prescribed rules. \n\nHistorically, regulations around ${topic} were introduced to streamline processes and prevent tax evasion. Understanding its nuances is critical for businesses and individuals to avoid heavy penalties and leverage any available exemptions. It typically involves registering under the relevant authority, maintaining accurate books of accounts, and filing periodic returns as mandated by the Act.`,
+          summary: `A comprehensive overview of ${topic} detailing compliance requirements, applicability, and legal framework.`,
+          explanation: rawExplanation,
           applicability: ["Registered Businesses", "Individuals meeting the threshold limit", "Specific entities designated by the government"],
           benefitsOrDeductions: ["Allows for seamless compliance and tracking", "Prevents compounding penalties", "May qualify for specific threshold exemptions"],
           restrictions: ["Failure to comply attracts a penalty of up to 100% of the tax due", "Strict timelines for filing must be adhered to"],
