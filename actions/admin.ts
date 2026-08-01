@@ -111,16 +111,41 @@ export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         let scrapedContent = "";
+        const apifyToken = process.env.APIFY_API_TOKEN;
+        
         if (sourceUrl) {
-          try {
-            const cheerio = require("cheerio");
-            const response = await fetch(sourceUrl);
-            const html = await response.text();
-            const $ = cheerio.load(html);
-            $('script, style').remove();
-            scrapedContent = $('body').text().replace(/\s+/g, ' ').substring(0, 15000);
-          } catch (scrapeErr) {
-            console.warn("Failed to scrape URL, continuing with AI knowledge:", scrapeErr);
+          if (apifyToken) {
+            try {
+              const { ApifyClient } = require('apify-client');
+              const client = new ApifyClient({ token: apifyToken });
+              
+              const run = await client.actor("apify/cheerio-scraper").call({
+                startUrls: [{ url: sourceUrl }],
+                maxPagesPerCrawl: 1,
+              });
+
+              const { items } = await client.dataset(run.defaultDatasetId).listItems();
+              
+              if (items.length > 0 && items[0].text) {
+                scrapedContent = String(items[0].text).substring(0, 15000);
+              }
+            } catch (apifyErr) {
+              console.warn("Apify scrape failed, falling back to basic scraper:", apifyErr);
+            }
+          }
+
+          // Fallback to basic cheerio if Apify fails or is not configured
+          if (!scrapedContent) {
+            try {
+              const cheerio = require("cheerio");
+              const response = await fetch(sourceUrl);
+              const html = await response.text();
+              const $ = cheerio.load(html);
+              $('script, style').remove();
+              scrapedContent = $('body').text().replace(/\s+/g, ' ').substring(0, 15000);
+            } catch (scrapeErr) {
+              console.warn("Failed to scrape URL, continuing with AI knowledge:", scrapeErr);
+            }
           }
         }
 
