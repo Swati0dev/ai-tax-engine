@@ -94,14 +94,52 @@ export async function getAdminKnowledgeItems() {
   } catch (error: unknown) {
     console.error("[Admin Action] getAdminKnowledgeItems error:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed to fetch items" };
-  }
-}
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
   try {
     await requireAdmin();
-    // Simulate web crawling and AI parsing delay
-    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not configured on the server.");
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `You are a highly intelligent Indian Tax Expert API.
+I want you to research the topic: "${topic}".
+${sourceUrl ? `Please base your knowledge specifically on this source if possible: ${sourceUrl}` : ""}
+
+Return ONLY a pure JSON object (no markdown formatting, no \`\`\`json) with the following structure:
+{
+  "category": "GENERAL" or "BUSINESS_TAX" or "INCOME_TAX" or "GST",
+  "actName": "Name of the Act (e.g., Income Tax Act 1961, CGST Act 2017)",
+  "sectionNumber": "Section number if applicable, else 'General'",
+  "title": "A clear, professional title for this topic",
+  "summary": "A 2-3 sentence overview of what this is.",
+  "explanation": "A detailed, lawful explanation of this tax rule, what it is, why it exists, and how it works. (At least 2 paragraphs).",
+  "applicability": ["Who this applies to 1", "Who this applies to 2"],
+  "benefitsOrDeductions": ["Benefit 1", "Deduction 2"],
+  "restrictions": ["Restriction 1", "Limitation 2"],
+  "examples": ["A detailed example scenario with calculations if applicable."],
+  "relatedForms": ["Form 16", "ITR-4", etc],
+  "filingProcedure": ["Step 1...", "Step 2..."]
+}
+
+Ensure the data is accurate for Indian taxation.`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text().replace(/```json\n?|\n?```/g, '').trim();
+    
+    let parsedData;
+    try {
+      parsedData = JSON.parse(responseText);
+    } catch (e) {
+      console.error("Failed to parse AI response:", responseText);
+      throw new Error("AI returned invalid JSON format.");
+    }
 
     const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -109,19 +147,19 @@ export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
       where: { slug },
       update: {},
       create: {
-        category: 'GENERAL',
-        actName: 'Income Tax Act / GST Act',
-        sectionNumber: 'Auto-Crawled',
-        title: `Complete Guide to ${topic}`,
-        summary: `This is an AI-crawled draft regarding ${topic}. Please review the details carefully before publishing.`,
-        explanation: `Based on the crawler's analysis of ${sourceUrl || 'official government portals'}, the topic of "${topic}" involves several critical compliance requirements. The AI engine has structured this preliminary draft. As an admin, you must verify all regulatory claims, add specific sections, and approve this before it becomes visible to users.`,
-        applicability: ['General Taxpayers', 'Entities related to ' + topic],
-        benefitsOrDeductions: ['Relevant benefits will be dynamically extracted in full AI mode'],
-        restrictions: ['Subject to standard regulatory limitations'],
-        examples: [`Example scenario involving ${topic}.`],
-        relatedForms: ['Relevant forms extracted by AI'],
-        filingProcedure: ['Step 1: Refer to official documentation', 'Step 2: Submit required declarations'],
-        tags: ['crawled', 'auto-generated'],
+        category: parsedData.category || 'GENERAL',
+        actName: parsedData.actName || 'General Tax Law',
+        sectionNumber: parsedData.sectionNumber || 'N/A',
+        title: parsedData.title || `Complete Guide to ${topic}`,
+        summary: parsedData.summary || `An AI-generated summary for ${topic}.`,
+        explanation: parsedData.explanation || `Detailed explanation for ${topic} could not be fully parsed.`,
+        applicability: Array.isArray(parsedData.applicability) ? parsedData.applicability : [],
+        benefitsOrDeductions: Array.isArray(parsedData.benefitsOrDeductions) ? parsedData.benefitsOrDeductions : [],
+        restrictions: Array.isArray(parsedData.restrictions) ? parsedData.restrictions : [],
+        examples: Array.isArray(parsedData.examples) ? parsedData.examples : [],
+        relatedForms: Array.isArray(parsedData.relatedForms) ? parsedData.relatedForms : [],
+        filingProcedure: Array.isArray(parsedData.filingProcedure) ? parsedData.filingProcedure : [],
+        tags: ['crawled', 'ai-generated', slug],
         financialYear: '2024-25',
         assessmentYear: '2025-26',
         reviewStatus: ReviewStatus.DRAFT,
@@ -133,6 +171,7 @@ export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
     return { success: true, data: newItem };
   } catch (error: unknown) {
     console.error("[Admin Action] crawlCustomTopic error:", error);
-    return { success: false, error: error instanceof Error ? error.message : "Failed to crawl topic" };
+    return { success: false, error: error instanceof Error ? error.message : "Failed to crawl topic using AI" };
   }
 }
+
