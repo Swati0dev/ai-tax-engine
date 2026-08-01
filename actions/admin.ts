@@ -104,13 +104,13 @@ export async function crawlCustomTopic(topic: string, sourceUrl?: string) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     let parsedData = null;
+    let scrapedContent = "";
 
     if (apiKey) {
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        let scrapedContent = "";
         const apifyToken = process.env.APIFY_API_TOKEN;
         
         if (sourceUrl) {
