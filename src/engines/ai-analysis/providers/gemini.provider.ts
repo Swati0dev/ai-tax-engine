@@ -3,7 +3,7 @@ import { AIProvider } from "./ai-provider.interface";
 
 export class GeminiProvider implements AIProvider {
   public readonly name = "GEMINI";
-  public readonly modelName = "gemini-1.5-pro";
+  public readonly modelName = "gemini-3.6-flash";
   private genAI: GoogleGenerativeAI;
 
   constructor() {
