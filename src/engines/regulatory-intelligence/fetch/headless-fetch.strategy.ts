@@ -19,24 +19,50 @@ export class HeadlessFetchStrategy implements IFetchStrategy {
       const run = await client.actor("apify/cheerio-scraper").call({
         startUrls: [{ url: context.url }],
         maxPagesPerCrawl: 1,
-        pageFunction: "async function pageFunction(context) { const { $ } = context; return { text: $('body').text() }; }"
+        pageFunction: "async function pageFunction(context) { const { $ } = context; return { text: $('body').text(), html: $('html').html(), markdown: null, content: null, body: $('body').html() }; }"
       });
 
       const { items } = await client.dataset(run.defaultDatasetId).listItems();
       
-      if (!items || items.length === 0 || !items[0].text) {
-        throw new FetchError(FetchFailureType.EMPTY_RESPONSE, "Apify returned an empty dataset or no text content");
+      if (!items || items.length === 0) {
+        throw new FetchError(FetchFailureType.EMPTY_RESPONSE, "Apify returned an empty dataset");
       }
 
-      const scrapedText = String(items[0].text);
+      const datasetItem = items[0] as any;
+      
+      let scrapedText = "";
+      let contentType = "text/plain";
+      let selectedField = "";
+
+      if (datasetItem.markdown && String(datasetItem.markdown).trim().length > 0) {
+        scrapedText = String(datasetItem.markdown);
+        selectedField = "markdown";
+      } else if (datasetItem.text && String(datasetItem.text).trim().length > 0) {
+        scrapedText = String(datasetItem.text);
+        selectedField = "text";
+      } else if (datasetItem.content && String(datasetItem.content).trim().length > 0) {
+        scrapedText = String(datasetItem.content);
+        selectedField = "content";
+      } else if (datasetItem.body && String(datasetItem.body).trim().length > 0) {
+        scrapedText = String(datasetItem.body);
+        selectedField = "body";
+        contentType = "text/html";
+      } else if (datasetItem.html && String(datasetItem.html).trim().length > 0) {
+        scrapedText = String(datasetItem.html);
+        selectedField = "html";
+        contentType = "text/html";
+      } else {
+        throw new FetchError(FetchFailureType.EMPTY_RESPONSE, "Dataset exists but text field missing");
+      }
+
       const rawBody = Buffer.from(scrapedText, 'utf-8');
 
-      console.log(`[HeadlessFetchStrategy] Success fetching ${context.url} via Apify (${rawBody.length} bytes)`);
+      console.log(`[HeadlessFetchStrategy] Success fetching ${context.url} via Apify (${rawBody.length} bytes from field: ${selectedField})`);
 
       return {
         status: 200,
-        headers: { 'content-type': 'text/plain' },
-        contentType: 'text/plain',
+        headers: { 'content-type': contentType },
+        contentType: contentType,
         contentLength: rawBody.length,
         responseTime: Date.now() - context.startTime,
         encoding: 'utf-8',
