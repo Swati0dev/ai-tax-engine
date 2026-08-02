@@ -83,9 +83,18 @@ export class AiAnalysisService {
       // 4. Call Provider
       const responseText = await this.provider.analyze(prompt);
       
+      const cleanJsonStr = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+
+      if (cleanJsonStr === "INVALID_LEGAL_CONTENT" || cleanJsonStr.includes("INVALID_LEGAL_CONTENT")) {
+        throw new Error("INVALID_LEGAL_CONTENT: Website UI detected.");
+      }
+
+      if (cleanJsonStr === "INSUFFICIENT_LEGAL_CONTENT" || cleanJsonStr.includes("INSUFFICIENT_LEGAL_CONTENT")) {
+        throw new Error("INSUFFICIENT_LEGAL_CONTENT: Insufficient legal words or entities detected.");
+      }
+
       // Parse JSON from provider
       // Ensure we extract JSON even if there are markdown blocks
-      const cleanJsonStr = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
       const parsed = JSON.parse(cleanJsonStr);
 
       // 5. Update Record

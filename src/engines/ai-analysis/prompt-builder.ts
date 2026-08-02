@@ -17,7 +17,15 @@ ${newDocumentContent}
 ${changes}
 
 # Instructions
-You must output a strictly valid JSON response. DO NOT wrap the output in markdown \`\`\`json blocks. DO NOT add any explanatory text before or after the JSON.
+If the extracted content is primarily website navigation, menus, headers, footers, or accessibility information, STOP.
+Return EXACTLY the following text:
+INVALID_LEGAL_CONTENT
+
+If the extracted legal text contains fewer than 300 meaningful legal words OR contains fewer than 2 legal entities, STOP.
+Return EXACTLY the following text:
+INSUFFICIENT_LEGAL_CONTENT
+
+Otherwise, you must output a strictly valid JSON response. DO NOT wrap the output in markdown \`\`\`json blocks. DO NOT add any explanatory text before or after the JSON.
 
 The JSON MUST contain the following fields exactly:
 {

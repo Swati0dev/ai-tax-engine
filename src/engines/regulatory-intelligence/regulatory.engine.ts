@@ -316,6 +316,12 @@ export class RegulatoryIntelligenceEngine implements IRegulatoryEngine {
 
     const diffResult = this.compareDocuments(previousDoc, newDoc);
     
+    // Duplicate detection based on existing canonical hash
+    if (diffResult.changeSeverity === 'NONE' || diffResult.changeType === 'NONE' || diffResult.summary === 'Documents are identical') {
+      console.log(`[RegulatoryEngine] No changes detected for source: ${sourceId}. Canonical Hash matches. Existing Available. Skipping Draft.`);
+      return null;
+    }
+    
     const changeSet = await prisma.changeSet.create({
       data: {
         sourceId,
